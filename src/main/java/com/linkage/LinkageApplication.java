@@ -1,5 +1,7 @@
 package com.linkage;
 
+import com.linkage.controller.BefiscController;
+
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Environment;
 import jakarta.validation.Validation;
@@ -22,6 +24,8 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
 
-    }
+        BefiscController befiscController = new BefiscController(configuration, validator);
+        environment.jersey().register(befiscController);
 
+    }
 }

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Pattern;
 
 public class GetVpaByMobileSchema {
 
-    @NotBlank(message = "Please enter your mobile number")
+    @NotBlank(message = "Please enter a valid mobile number")
     @Pattern(regexp = "^[6-9]\\d{9}$", message = "Mobile number must be a valid 10-digit number and should not contain any alphabets.")
     private String mobile;
 

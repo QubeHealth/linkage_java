@@ -1,7 +1,7 @@
 package com.linkage.client;
 
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiRequest;
@@ -14,12 +14,13 @@ import jakarta.ws.rs.core.MultivaluedMap;
 public abstract class BaseServiceClient {
 
     protected LinkageConfiguration configuration;
+    protected static final Logger logger = LoggerFactory.getLogger(BaseServiceClient.class);
 
     protected BaseServiceClient(LinkageConfiguration configuration) {
         this.configuration = configuration;
     }
 
-    protected ApiResponse<Object> callThirdPartyApi(String url, String method, Object requestBody,
+    protected ApiResponse<Object> networkCallInternalService(String url, String method, Object requestBody,
             MultivaluedMap<String, Object> additionalHeaders) {
 
         MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
@@ -34,5 +35,11 @@ public abstract class BaseServiceClient {
         ApiRequest apiRequest = new ApiRequest(url, method, requestBody, headers);
         return ThirdPartyAPICall.thirdPartyAPICall(apiRequest);
     }
-}
 
+    protected ApiResponse<Object> networkCallExternalService(String url, String method, Object requestBody,
+            MultivaluedMap<String, Object> headers) {
+
+        ApiRequest apiRequest = new ApiRequest(url, method, requestBody, headers);
+        return ThirdPartyAPICall.thirdPartyAPICall(apiRequest);
+    }
+}

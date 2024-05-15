@@ -2,8 +2,12 @@ package com.linkage.utility;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.linkage.api.ApiRequest;
 import com.linkage.api.ApiResponse;
+import com.linkage.client.BaseServiceClient;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -18,6 +22,8 @@ public final class ThirdPartyAPICall {
 
     private ThirdPartyAPICall() {
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(ThirdPartyAPICall.class);
 
     public static ApiResponse<Object> thirdPartyAPICall(ApiRequest request) {
         Client client = ClientBuilder.newClient();
@@ -38,29 +44,21 @@ public final class ThirdPartyAPICall {
             response = builder.post(Entity.json(request.getBody()));
         }
 
-        System.out.println("\nThird party api request => " + Helper.toJsonString(request) + "\n");
+        logger.info("\nThird party api request => {}", Helper.toJsonString(request));
         // Use GenericType to specify the type parameter for readEntity method
         Map<String, Object> responseBody = response.readEntity(new GenericType<Map<String, Object>>() {
         });
+        logger.info("\nThird party api response => {}", responseBody);
 
-        System.out.println("\nThird party api response => " + Helper.toJsonString(responseBody) + "\n");
-
-        boolean status = (boolean) responseBody.getOrDefault("status", false);
-        String message = status ? "success" : "failed";
-
-        if (responseBody.containsKey("errorMessage")) {
-            message = responseBody.get("errorMessage").toString();
-        } else if (responseBody.containsKey("errors")) {
-            message = responseBody.get("errors").toString();
-        } else if (responseBody.containsKey("message")) {
-            message = responseBody.get("message") != null ? responseBody.get("message").toString() : message;
+        boolean status = false;
+        if (Response.Status.OK.getStatusCode() >= response.getStatus() && response.getStatus() < 300) {
+            status = true;
         }
-
-        Object data = responseBody.containsKey("data") ? responseBody.get("data") : null;
+        String message = status ? "success" : "failed";
 
         client.close();
 
-        return new ApiResponse<>(status, message, data);
+        return new ApiResponse<>(status, message, responseBody);
     }
 
     private static WebTarget appendQueryParams(WebTarget target, Map<String, Object> params) {
