@@ -1,6 +1,8 @@
 package com.linkage;
 
 import com.linkage.controller.BefiscController;
+import com.linkage.controller.WebhookController;
+import com.linkage.utility.AuthFilter;
 
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Environment;
@@ -24,8 +26,16 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
 
+        AuthFilter authFilter = new AuthFilter(configuration.getxApiKey(), configuration.getAuthorizationKey());
+
+        environment.servlets().addFilter("auth-filter", authFilter)
+                .addMappingForUrlPatterns(null, true, "/api/*");
+
         BefiscController befiscController = new BefiscController(configuration, validator);
+        WebhookController webhookController = new WebhookController(configuration, validator);
+
         environment.jersey().register(befiscController);
+        environment.jersey().register(webhookController);
 
     }
 }
