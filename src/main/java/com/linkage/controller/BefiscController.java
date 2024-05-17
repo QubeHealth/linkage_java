@@ -22,7 +22,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
-@Path("/api/v2")
+@Path("/api/befisc")
 @Produces(MediaType.APPLICATION_JSON)
 public class BefiscController extends BaseController {
 
