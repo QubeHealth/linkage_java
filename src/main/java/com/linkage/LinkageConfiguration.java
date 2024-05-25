@@ -11,6 +11,8 @@ public class LinkageConfiguration extends Configuration {
     private String authorizationKey;
     @NotEmpty
     private String xApiKey;
+    @NotEmpty
+    private String firebaseWebApiKey;
 
 
     public String getxApiKey() {
@@ -36,4 +38,11 @@ public class LinkageConfiguration extends Configuration {
     public void setAuthorizationKey(String authorizationKey) {
         this.authorizationKey = authorizationKey;
     }
+    public String  getFirebaseWebApiKey() {
+        return firebaseWebApiKey;
+    }
+    public void setFirebaseWebApiKey(String firebaseWebApiKey) {
+        this. firebaseWebApiKey= firebaseWebApiKey;
+    }
+   
 }
