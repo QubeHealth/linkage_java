@@ -38,11 +38,11 @@ public class LinkageConfiguration extends Configuration {
     public void setAuthorizationKey(String authorizationKey) {
         this.authorizationKey = authorizationKey;
     }
-    public String  getFirebaseWebApiKey() {
+    public String  getFireBaseWebApiKey() {
         return firebaseWebApiKey;
     }
-    public void setFirebaseWebApiKey(String firebaseWebApiKey) {
-        this. firebaseWebApiKey= firebaseWebApiKey;
+    public void setFireBaseWebApiKey(String fireBaseWebApiKey) {
+        this. firebaseWebApiKey= fireBaseWebApiKey;
     }
    
 }

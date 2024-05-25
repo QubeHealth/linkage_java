@@ -12,7 +12,7 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String xApiKey;
     @NotEmpty
-    private String firebaseWebApiKey;
+    private String firebaseWebAPIKey;
 
 
     public String getxApiKey() {
@@ -38,11 +38,11 @@ public class LinkageConfiguration extends Configuration {
     public void setAuthorizationKey(String authorizationKey) {
         this.authorizationKey = authorizationKey;
     }
-    public String  getFirebaseWebApiKey() {
-        return firebaseWebApiKey;
+    public String  getFireBaseWebApIKey() {
+        return firebaseWebAPIKey;
     }
-    public void setFirebaseWebApiKey(String firebaseWebApiKey) {
-        this. firebaseWebApiKey= firebaseWebApiKey;
+    public void setFireBaseWebApIKey(String fireBaseWebApiKey) {
+        this. firebaseWebAPIKey= fireBaseWebApiKey;
     }
    
 }

@@ -41,8 +41,8 @@ public class LinkageConfiguration extends Configuration {
     public String  getFirebaseWebApiKey() {
         return firebaseWebApiKey;
     }
-    public void setFirebaseWebApiKey(String firebaseWebApiKey) {
-        this. firebaseWebApiKey= firebaseWebApiKey;
+    public void setFirebaseWebApiKey(String fireBaseWebApiKey) {
+        this. firebaseWebApiKey= fireBaseWebApiKey;
     }
    
 }

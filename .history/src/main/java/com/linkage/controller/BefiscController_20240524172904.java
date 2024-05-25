@@ -9,6 +9,7 @@ import java.util.Set;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.BefiscService;
+import com.linkage.core.validations.GetReferalUrl;
 import com.linkage.core.validations.GetVpaByMobileSchema;
 import com.linkage.utility.Helper;
 
@@ -64,6 +65,25 @@ public class BefiscController extends BaseController {
 
         return result;
     }
-   
+    @POST
+    @Path("/generateReferalUrl")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Map<String, Object>> getVpaByMobile(@Context HttpServletRequest request,
+            GetReferalUrl body) {
+        Set<ConstraintViolation<GetReferalUrl>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+
+      
+
+
+        return null;
+    }
 
 }

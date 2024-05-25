@@ -64,6 +64,35 @@ public class BefiscController extends BaseController {
 
         return result;
     }
-   
+    @POST
+    @Path("/generateUrl")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Map<String, Object>> getVpaByMobile(@Context HttpServletRequest request,
+            GetVpaByMobileSchema body) {
+        Set<ConstraintViolation<GetVpaByMobileSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+
+        ApiResponse<Map<String, Object>> result = this.befiscService.mobileUpiSupreme(body);
+        logger.info("BEFISC RESPONSE : {}", result.getData());
+
+        List<Object> vpa = Helper.getDataFromMap(result.getData(), Arrays.asList("vpa"));
+        List<Object> name = Helper.getDataFromMap(result.getData(), Arrays.asList("name"));
+        List<Object> accountName = Helper.getDataFromMap(result.getData(), Arrays.asList("account_holder_name"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("vpa", vpa.isEmpty() ? null : vpa.get(0));
+        data.put("name", name.isEmpty() ? null : name.get(0));
+        data.put("accountName", accountName.isEmpty() ? null : accountName.get(0));
+        result.setData(data);
+
+        return result;
+    }
 
 }

@@ -1,0 +1,22 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 5013
+  adminConnectors:
+    - type: http
+      port: 5011
+
+logging:
+  level: INFO
+  appenders:
+    - type: file
+      currentLogFilename: ./logs/custom.log
+      archivedLogFilenamePattern: ./logs/custom-%d.log.gz
+      archivedFileCount: 90
+
+
+jwtTokenSignature: y3j9fGeMuVQFlzDTJN32RE6Z7S6ItyXGLqFrCkTHxBGS2TnfVSdCVtLxNENt8YDG
+
+xApiKey: f6d646a6c2f2df883ea0cccaa4097358ede98284
+
+authorizationKey: Basic cXViZV9oZWFsdGhfYWRtaW46Q0Y4VGQjTFFxSzdwTXpmblFC

@@ -37,7 +37,6 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         FirebaseController firebaseController = new FirebaseController(configuration, validator);
         environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
-        environment.jersey().register(firebaseController);
 
     }
 }
