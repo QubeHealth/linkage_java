@@ -13,7 +13,10 @@ public class LinkageConfiguration extends Configuration {
     private String xApiKey;
     @NotEmpty
     private String firebaseWebApiKey;
-
+    @NotEmpty
+    private String watiUrl;
+    @NotEmpty
+    private String watiToken;
 
     public String getxApiKey() {
         return xApiKey;
@@ -43,6 +46,18 @@ public class LinkageConfiguration extends Configuration {
     }
     public void setFirebaseWebApiKey(String firebaseWebApiKey) {
         this. firebaseWebApiKey= firebaseWebApiKey;
+    }
+    public String getWatiUrl() {
+        return watiUrl;
+    }
+    public void setWatiUrl(String watiUrl) {
+        this.watiUrl = watiUrl;
+    }
+    public String getWatiToken() {
+        return watiToken;
+    }
+    public void setWatiToken(String watiToken) {
+        this.watiToken = watiToken;
     }
    
 }

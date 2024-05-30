@@ -8,12 +8,16 @@ import com.google.api.services.storage.Storage.AnywhereCaches.List;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.GetVpaByMobileSchema;
+import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
 import com.linkage.utility.Helper;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
 public class WatiService extends BaseServiceClient {
+    private String refereeInviteTemplate = "qp_cashback_referal_invite24may2024";
+    private String referrerCashbackTemplate = "qp_cashback_referrer_24may2024";
+    private String refereeCashbackTemplate = "qp_cashback_referree_24may2024";
 
     public WatiService(LinkageConfiguration configuration) {
         super(configuration);
@@ -23,24 +27,71 @@ public class WatiService extends BaseServiceClient {
 
         MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
 
-        header.putSingle("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYTU3MGE2My00NTMxLTQ3NTItOTUyYi01Y2U0YzY2ZWFiZjkiLCJ1bmlxdWVfbmFtZSI6Imt1bmFsLmthbWJsZUBxdWJlaGVhbHRoLmNvbSIsIm5hbWVpZCI6Imt1bmFsLmthbWJsZUBxdWJlaGVhbHRoLmNvbSIsImVtYWlsIjoia3VuYWwua2FtYmxlQHF1YmVoZWFsdGguY29tIiwiYXV0aF90aW1lIjoiMDMvMjAvMjAyNCAwNzoyMToxMCIsImRiX25hbWUiOiJtdC1wcm9kLVRlbmFudHMiLCJ0ZW5hbnRfaWQiOiIxMTM3OTgiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiREVWRUxPUEVSIiwiQVVUT01BVElPTl9NQU5BR0VSIl0sImV4cCI6MjUzNDAyMzAwODAwLCJpc3MiOiJDbGFyZV9BSSIsImF1ZCI6IkNsYXJlX0FJIn0.YJa1N5fV3-nHLofACDrHOlIpHtKBZ1TBHkge0Rj5Df0");
-        String url = "https://live-mt-server.wati.io/113798/api/v1/sendTemplateMessage?whatsappNumber=91" + body.getMobile();
+        header.putSingle("Authorization", configuration.getWatiToken());
+        String url = configuration.getWatiUrl() + body.getMobile();
         
         //logger.info("mobile upi supreme response {}", Helper.toJsonString(response));
 
         //Arraylist of key value pairs then added to hashmap
         Map<String, String> parameter = new HashMap<>();
         parameter.put("name", "cashback_amount");
-        parameter.put("value", "100");
+        parameter.put("value", body.getCashbackAmt().toString());
         ArrayList<Map<String, String>> parameters = new ArrayList<>();
         parameters.add(parameter);
         Map<String, Object> mainMap = new HashMap<>();
-        mainMap.put("template_name", "qp_cashback_referal_invite24may2024");
+        mainMap.put("template_name", refereeInviteTemplate);
         mainMap.put("broadcast_name", "test referal");
         mainMap.put("parameters", parameters);
 
        return this.networkCallExternalService(url, "POST", mainMap, header);
 
+
+    }
+
+    public ApiResponse<Object> referrerCashbackMessage(RefereeInviteMsgSchema body)
+    {
+        MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
+
+        header.putSingle("Authorization", configuration.getWatiToken());
+        String url = configuration.getWatiUrl() + body.getMobile();
+        
+        //Arraylist of key value pairs then added to hashmap
+        Map<String, String> parameter = new HashMap<>();
+        parameter.put("name", "cashback_amount");
+        parameter.put("value", body.getCashbackAmt().toString());
+        ArrayList<Map<String, String>> parameters = new ArrayList<>();
+        parameters.add(parameter);
+        Map<String, Object> mainMap = new HashMap<>();
+        mainMap.put("template_name", referrerCashbackTemplate);
+        mainMap.put("broadcast_name", "test referal");
+        mainMap.put("parameters", parameters);
+
+       return this.networkCallExternalService(url, "POST", mainMap, header);
+
+    }
+    public ApiResponse<Object> refereeCashbackMessage(RefereeCashbackMsgSchema body)
+    {
+        MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
+
+        header.putSingle("Authorization", configuration.getWatiToken());
+        String url = configuration.getWatiUrl() + body.getMobile();
+        
+        //Arraylist of key value pairs then added to hashmap
+        Map<String, String> parameter = new HashMap<>();
+        parameter.put("name", "cashback_amount");
+        parameter.put("value", body.getCashbackAmt().toString());
+        Map<String, String> parameter2 = new HashMap<>();
+        parameter.put("name", "company_name");
+        parameter.put("value", body.getCompany().toString());
+        ArrayList<Map<String, String>> parameters = new ArrayList<>();
+        parameters.add(parameter);
+        parameters.add(parameter2);
+        Map<String, Object> mainMap = new HashMap<>();
+        mainMap.put("template_name", refereeCashbackTemplate);
+        mainMap.put("broadcast_name", "test referal");
+        mainMap.put("parameters", parameters);
+
+       return this.networkCallExternalService(url, "POST", mainMap, header);
 
     }
 
