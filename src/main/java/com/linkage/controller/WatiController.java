@@ -8,9 +8,9 @@ import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.client.BefiscService;
 import com.linkage.client.WatiService;
-import com.linkage.core.validations.GetVpaByMobileSchema;
+import com.linkage.core.validations.BillRejectedSchema;
+import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
 import com.linkage.utility.Helper;
@@ -111,5 +111,59 @@ public class WatiController extends BaseController {
         watiResponse.setData(null);
         return watiResponse; 
     }
+
+    @POST
+    @Path("/billVerifiedMessage")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> billVerifiedMessage(@Context HttpServletRequest request,
+            BillVerifiedMsgSchema body) {
+        Set<ConstraintViolation<BillVerifiedMsgSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> watiResponse = this.watiService.billVerifiedMessage(body);
+        if(!watiResponse.getStatus())
+        {
+            watiResponse.setMessage("Message failed to deliver");
+            return watiResponse;
+        }
+        watiResponse.setMessage("Message delivered successfully");
+        watiResponse.setData(null);
+        return watiResponse; 
+    }
+
+    @POST
+    @Path("/billRejectedMessage")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> billRejected(@Context HttpServletRequest request,
+            BillRejectedSchema body) {
+        Set<ConstraintViolation<BillRejectedSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> watiResponse = this.watiService.billRejected(body);
+        if(!watiResponse.getStatus())
+        {
+            watiResponse.setMessage("Message failed to deliver");
+            return watiResponse;
+        }
+        watiResponse.setMessage("Message delivered successfully");
+        watiResponse.setData(null);
+        return watiResponse; 
+    }
+
+
     
+
+
 }
