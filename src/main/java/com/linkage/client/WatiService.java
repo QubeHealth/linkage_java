@@ -91,7 +91,7 @@ public class WatiService extends BaseServiceClient {
         parameter.put("value", body.getCashbackAmt().toString());
         Map<String, String> parameter2 = new HashMap<>();
         parameter.put("name", "company_name");
-        parameter.put("value", body.getCompany().toString());
+        parameter.put("value", body.getCompany());
         ArrayList<Map<String, String>> parameters = new ArrayList<>();
         parameters.add(parameter);
         parameters.add(parameter2);
@@ -116,7 +116,7 @@ public class WatiService extends BaseServiceClient {
         parameter.put("value", body.getCashbackAmt().toString());
         Map<String, String> parameter2 = new HashMap<>();
         parameter2.put("name", "first_name");
-        parameter2.put("value", body.getFirstname().toString());
+        parameter2.put("value", body.getFirstname());
         ArrayList<Map<String, String>> parameters = new ArrayList<>();
         parameters.add(parameter);
         parameters.add(parameter2);

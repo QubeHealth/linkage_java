@@ -13,6 +13,7 @@ import com.linkage.core.validations.BillRejectedSchema;
 import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
+import com.linkage.core.validations.SendCashbackMsgSchema;
 import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -162,8 +163,45 @@ public class WatiController extends BaseController {
         return watiResponse; 
     }
 
+    @POST
+    @Path("/sendCashbackMessage")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> sendCashbackMessage(SendCashbackMsgSchema body)
+    { 
+        Set<ConstraintViolation<SendCashbackMsgSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        RefereeCashbackMsgSchema refereeBody = new RefereeCashbackMsgSchema();
+        refereeBody.setCashbackAmt(body.getCashbackAmtReferee());
+        refereeBody.setCompany(body.getCompany());
+        refereeBody.setMobile(body.getMobileReferee());
+        RefereeInviteMsgSchema refererBody = new RefereeInviteMsgSchema();
+        refererBody.setCashbackAmt(body.getCashbackAmtReferer());
+        refererBody.setMobile(body.getMobileReferer());
+        
+        ApiResponse<Object> watiResponse = this.watiService.refereeCashbackMessage(refereeBody);
+        if(!watiResponse.getStatus())
+        {
+            watiResponse.setMessage("Message failed to deliver to referee");
+            return watiResponse;
+        }
+        watiResponse.setData(null);
 
-    
+        ApiResponse<Object> watiResponse2 = this.watiService.referrerCashbackMessage(refererBody);
+        if(!watiResponse2.getStatus())
+        {
+            watiResponse2.setMessage("Message failed to deliver to rerferer");
+            return watiResponse2;
+        }
 
-
+        watiResponse2.setMessage("Message delivered successfully to referer and referee");
+        watiResponse2.setData(null);
+        return watiResponse2;
+    }
 }

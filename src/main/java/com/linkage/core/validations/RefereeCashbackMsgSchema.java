@@ -11,7 +11,7 @@ public class RefereeCashbackMsgSchema {
     @NotNull(message = "Please enter a valid cashback amount")
     @Min(value = 1, message = "Cashback amount must be greater than 0")
     @JsonProperty("cashback_amount")
-    private Long cashbackAmt;
+    private Integer cashbackAmt;
 
     @NotBlank(message = "Please enter a valid mobile number")
     @Pattern(regexp = "^[6-9]\\d{9}$", message = "Mobile number must be a valid 10-digit number and should not contain any alphabets.")
@@ -36,11 +36,11 @@ public class RefereeCashbackMsgSchema {
         this.mobile = mobile;
     }
 
-    public void setCashbackAmt(Long cashbackAmt) {
+    public void setCashbackAmt(Integer cashbackAmt) {
         this.cashbackAmt = cashbackAmt;
     }
 
-    public Long getCashbackAmt() {
+    public Integer getCashbackAmt() {
         return cashbackAmt;
     }
 }
