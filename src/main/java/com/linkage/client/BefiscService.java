@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
+import com.linkage.core.validations.GetNameByVpaSchema;
 import com.linkage.core.validations.GetVpaByMobileSchema;
 import com.linkage.utility.Helper;
 
@@ -47,5 +48,20 @@ public class BefiscService extends BaseServiceClient {
         Map<String, Object> data = (Map<String, Object>) responseData.get("result");
 
         return new ApiResponse<>(status, message, data);
+    }
+
+    public ApiResponse<Map<String,Object>> vpaAnalysis(GetNameByVpaSchema body){
+
+        MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
+        header.putSingle("authkey", "ODWPKDP73RC9937");
+        ApiResponse<Object> response = this.networkCallExternalService("https://vpa-analysis.befisc.com",
+        "post", body, header);
+        Map<String, Object> responseData = (Map<String, Object>) response.getData();
+        Boolean status = Integer.parseInt(responseData.get("status").toString()) == 1;
+        String message = responseData.get("message").toString();
+        Map<String, Object> data = (Map<String, Object>) responseData.get("result");
+
+        return new ApiResponse<>(status, message, data);
+
     }
 }
