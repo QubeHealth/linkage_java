@@ -36,4 +36,16 @@ public class BefiscService extends BaseServiceClient {
 
     }
 
+    public ApiResponse<Map<String, Object>> multipleUpi(GetVpaByMobileSchema body) {
+        MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
+        header.putSingle("authkey", "ODWPKDP73RC9937");
+        ApiResponse<Object> response = this.networkCallExternalService("https://mobile-lookup-for-multiple-upi.befisc.com",
+        "post", body, header);
+        Map<String, Object> responseData = (Map<String, Object>) response.getData();
+        Boolean status = Integer.parseInt(responseData.get("status").toString()) == 1;
+        String message = responseData.get("message").toString();
+        Map<String, Object> data = (Map<String, Object>) responseData.get("result");
+
+        return new ApiResponse<>(status, message, data);
+    }
 }

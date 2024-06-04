@@ -64,6 +64,36 @@ public class BefiscController extends BaseController {
 
         return result;
     }
+
+    @POST
+    @Path("/getMultipleUpi")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Map<String,Object>> getMultipleUpi(@Context HttpServletRequest request,
+            GetVpaByMobileSchema body){
+                Set<ConstraintViolation<GetVpaByMobileSchema>> violations = validator.validate(body);
+                if (!violations.isEmpty()) {
+                    // Construct error message from violations
+                    String errorMessage = violations.stream()
+                            .map(ConstraintViolation::getMessage)
+                            .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+                    return new ApiResponse<>(false, errorMessage, null);
+                }
+                ApiResponse<Map<String, Object>> result = this.befiscService.multipleUpi(body);
+            logger.info("BEFISC RESPONSE : {}", result.getData());
+
+        List<Object> upiIds = Helper.getDataFromMap(result.getData(), Arrays.asList("upi"));
+        List<Object> name = Helper.getDataFromMap(result.getData(), Arrays.asList("name"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("upi", upiIds.isEmpty() ? null : upiIds.get(0));
+        data.put("name", name.isEmpty() ? null : name.get(0));
+        result.setData(data);
+        return result; 
+
+    }
+
+
    
 
 }
