@@ -9,6 +9,7 @@ import java.util.Set;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.BefiscService;
+import com.linkage.core.validations.GetBankDetailsByAccSchema;
 import com.linkage.core.validations.GetNameByVpaSchema;
 import com.linkage.core.validations.GetVpaByMobileSchema;
 import com.linkage.utility.Helper;
@@ -121,7 +122,23 @@ public class BefiscController extends BaseController {
 
     }
 
+    @POST
+    @Path("/getBankDetailsByAcc")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Map<String,Object>> getBankDetailsByAcc(@Context HttpServletRequest request,
+            GetBankDetailsByAccSchema body){
+                Set<ConstraintViolation<GetBankDetailsByAccSchema>> violations = validator.validate(body);
+                if (!violations.isEmpty()) {
+                    // Construct error message from violations
+                    String errorMessage = violations.stream()
+                            .map(ConstraintViolation::getMessage)
+                            .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+                    return new ApiResponse<>(false, errorMessage, null);
+                }
+            
+                ApiResponse<Map<String, Object>> result = this.befiscService.bankDetails(body);
 
-   
-
+        return result;
+    }
 }
