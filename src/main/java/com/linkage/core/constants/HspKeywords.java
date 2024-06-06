@@ -1,12 +1,15 @@
 package com.linkage.core.constants;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class hspKeywords {
-    public static ArrayList<String> hspKeys()
-    {
+public abstract class HspKeywords {
+    private HspKeywords() {
+    }
+
+    public static List<String> hspKeys() {
         ArrayList<String> hspKeywords = new ArrayList<>();
-        
+
         hspKeywords.add("vascular surgery");
         hspKeywords.add("vascular medicine");
         hspKeywords.add("urology");
@@ -19,7 +22,7 @@ public class hspKeywords {
         hspKeywords.add("plastic, reconstructive and aesthetic surgery");
         hspKeywords.add("physical medicine and rehabilitation");
         hspKeywords.add("pathology");
-        hspKeywords.add("paediatrics");
+        hspKeywords.add("paediatric");
         hspKeywords.add("paediatric surgery");
         hspKeywords.add("paediatric rheumatology");
         hspKeywords.add("paediatric respiratory medicine");
@@ -251,15 +254,11 @@ public class hspKeywords {
         hspKeywords.add("Eye wear");
         hspKeywords.add("Eye Plus");
         hspKeywords.add("Imaging centre");
-        hspKeywords.add("ahcl chembur");
-        hspKeywords.add("beams research company private limited");
         hspKeywords.add("eye ");
-        hspKeywords.add("indur jaisinghani");
-        hspKeywords.add("qrg opd");
         hspKeywords.add("dr ");
-        hspKeywords.add("kallappa shekharappa mavintop");
         hspKeywords.add("dental");
+        hspKeywords.add("ortho ");
 
         return hspKeywords;
-    } 
+    }
 }

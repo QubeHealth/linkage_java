@@ -3,7 +3,6 @@ package com.linkage;
 import io.dropwizard.core.Configuration;
 import jakarta.validation.constraints.NotEmpty;
 
-
 public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String jwtTokenSignature;
@@ -14,6 +13,8 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String firebaseWebApiKey;
 
+    @NotEmpty
+    private String befiscAuthKey;
 
     public String getxApiKey() {
         return xApiKey;
@@ -38,11 +39,21 @@ public class LinkageConfiguration extends Configuration {
     public void setAuthorizationKey(String authorizationKey) {
         this.authorizationKey = authorizationKey;
     }
-    public String  getFirebaseWebApiKey() {
+
+    public String getFirebaseWebApiKey() {
         return firebaseWebApiKey;
     }
+
     public void setFirebaseWebApiKey(String firebaseWebApiKey) {
-        this. firebaseWebApiKey= firebaseWebApiKey;
+        this.firebaseWebApiKey = firebaseWebApiKey;
     }
-   
+
+    public String getBefiscAuthKey() {
+        return befiscAuthKey;
+    }
+
+    public void setBefiscAuthKey(String befiscAuthKey) {
+        this.befiscAuthKey = befiscAuthKey;
+    }
+
 }
