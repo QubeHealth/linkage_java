@@ -19,11 +19,12 @@ public class RefereeCashbackMsgSchema {
 
     @NotBlank(message = "Please enter a valid compay name")
     @JsonProperty("company_name")
-    private String company; 
+    private String company;
 
     public String getCompany() {
         return company;
     }
+
     public void setCompany(String company) {
         this.company = company;
     }

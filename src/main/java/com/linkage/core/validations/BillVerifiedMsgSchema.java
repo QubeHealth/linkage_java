@@ -21,11 +21,11 @@ public class BillVerifiedMsgSchema {
 
     @NotBlank(message = "Please enter a valid first name")
     @JsonProperty("first_name")
-    private String firstname; 
+    private String firstname;
 
     @NotBlank(message = "Please enter status of bill approval(APPROVED or PARTIALLY_APPROVED)")
     @JsonProperty("approval_status")
-    private String status; 
+    private String status;
 
     public String getBillStatus() {
         return status;
@@ -38,6 +38,7 @@ public class BillVerifiedMsgSchema {
     public String getFirstname() {
         return firstname;
     }
+
     public void setFirstname(String company) {
         this.firstname = company;
     }
@@ -57,10 +58,11 @@ public class BillVerifiedMsgSchema {
     public Long getCashbackAmt() {
         return cashbackAmt;
     }
-    
-    // Custom validation to ensure status is either "APPROVED" or "PARTIALLY_APPROVED"
-    @AssertTrue(message = "Status must be either 'APPROVED' or 'PARTIALLY_APPROVED'")   
+
+    // Custom validation to ensure status is either "APPROVED" or
+    // "PARTIALLY_APPROVED"
+    @AssertTrue(message = "Status must be either 'APPROVED' or 'PARTIALLY_APPROVED'")
     private boolean isValidStatus() {
-    return "APPROVED".equals(status) || "PARTIALLY_APPROVED".equals(status);
+        return "APPROVED".equals(status) || "PARTIALLY_APPROVED".equals(status);
     }
 }

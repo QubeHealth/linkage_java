@@ -35,33 +35,41 @@ public class SendCashbackMsgSchema {
     public String getCompany() {
         return company;
     }
+
     public void setCompany(String company) {
         this.company = company;
     }
+
     public Integer getCashbackAmtReferee() {
         return cashbackAmtReferee;
     }
+
     public void setCashbackAmtReferee(Integer cashbackAmtReferee) {
         this.cashbackAmtReferee = cashbackAmtReferee;
     }
+
     public Integer getCashbackAmtReferer() {
         return cashbackAmtReferer;
     }
+
     public void setCashbackAmtReferer(Integer cashbackAmtReferer) {
         this.cashbackAmtReferer = cashbackAmtReferer;
     }
+
     public void setMobileReferee(String mobileReferee) {
         this.mobileReferee = mobileReferee;
     }
+
     public String getMobileReferee() {
         return mobileReferee;
     }
+
     public void setMobileReferer(String mobileReferer) {
         this.mobileReferer = mobileReferer;
     }
+
     public String getMobileReferer() {
         return mobileReferer;
     }
-
 
 }
