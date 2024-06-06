@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.linkage.api.ApiRequest;
 import com.linkage.api.ApiResponse;
-import com.linkage.client.BaseServiceClient;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;

@@ -12,7 +12,10 @@ public class LinkageConfiguration extends Configuration {
     private String xApiKey;
     @NotEmpty
     private String firebaseWebApiKey;
-
+    @NotEmpty
+    private String watiUrl;
+    @NotEmpty
+    private String watiToken;
     @NotEmpty
     private String befiscAuthKey;
 
@@ -55,5 +58,17 @@ public class LinkageConfiguration extends Configuration {
     public void setBefiscAuthKey(String befiscAuthKey) {
         this.befiscAuthKey = befiscAuthKey;
     }
-
+    public String getWatiUrl() {
+        return watiUrl;
+    }
+    public void setWatiUrl(String watiUrl) {
+        this.watiUrl = watiUrl;
+    }
+    public String getWatiToken() {
+        return watiToken;
+    }
+    public void setWatiToken(String watiToken) {
+        this.watiToken = watiToken;
+    }
+   
 }
