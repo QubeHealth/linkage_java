@@ -88,7 +88,7 @@ public final class Helper {
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
             SecretKeySpec secretKey = new SecretKeySpec(encryptionKey, "AES");
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
             byte[] encryptedBytes = cipher.doFinal(data.getBytes());
 
