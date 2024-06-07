@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
 
-import com.google.protobuf.Api;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.BefiscService;
@@ -64,13 +62,7 @@ public class BefiscController extends BaseController {
         List<Object> name = Helper.getDataFromMap(result.getData(), Arrays.asList("name"));
         List<Object> accountName = Helper.getDataFromMap(result.getData(), Arrays.asList("account_holder_name"));
 
-        Map<String, Object> validation = hspValidationCheck(name.get(0).toString());
-        if (Boolean.FALSE.equals(validation.get("valid_hsp"))) {
-            validation = hspValidationCheck(accountName.get(0).toString());
-        }
-
-        Map<String, Object> data = new HashMap<>(validation);
-
+        Map<String, Object> data = new HashMap<>();
         data.put("vpa", vpa.isEmpty() ? null : vpa.get(0));
         data.put("merchant_name", name.isEmpty() ? null : name.get(0));
         data.put("bank_account_name", accountName.isEmpty() ? null : accountName.get(0));
@@ -103,6 +95,7 @@ public class BefiscController extends BaseController {
         data.put("upi", upiIds.isEmpty() ? null : upiIds.get(0));
         data.put("name", name.isEmpty() ? null : name.get(0));
         result.setData(data);
+
         return result;
 
     }
@@ -131,13 +124,7 @@ public class BefiscController extends BaseController {
         List<Object> name = Helper.getDataFromMap(result.getData(), Arrays.asList("name"));
         List<Object> accountName = Helper.getDataFromMap(result.getData(), Arrays.asList("account_holder_name"));
 
-        Map<String, Object> validation = hspValidationCheck(name.get(0).toString());
-        if (Boolean.FALSE.equals(validation.get("valid_hsp"))) {
-            validation = hspValidationCheck(accountName.get(0).toString());
-        }
-
-        Map<String, Object> data = new HashMap<>(validation);
-
+        Map<String, Object> data = new HashMap<>();
         data.put("vpa", vpa.isEmpty() ? null : vpa.get(0));
         data.put("merchant_name", name.isEmpty() ? null : name.get(0));
         data.put("bank_account_name", accountName.isEmpty() ? null : accountName.get(0));
@@ -178,14 +165,8 @@ public class BefiscController extends BaseController {
 
         List<Object> accountHolderName = Helper.getDataFromMap(result.getData(), Arrays.asList("registered_name"));
 
-        Map<String, Object> validation = hspValidationCheck(accountHolderName.get(0).toString());
-
-        Map<String, Object> data = new HashMap<>(validation);
-        data.put("account_status", accountStatus.get(0).toString());
-        data.put("bank_account_name", accountHolderName.isEmpty() ? null : accountHolderName.get(0).toString());
-        data.put("account_number", body.getAccountNumber());
-        data.put("ifsc_code", body.getIfscCode());
-        result.setData(data);
+        result.setData(
+                Map.of("bank_account_name", accountHolderName.isEmpty() ? null : accountHolderName.get(0).toString()));
 
         return result;
 
