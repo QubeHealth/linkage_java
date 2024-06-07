@@ -183,6 +183,8 @@ public class BefiscController extends BaseController {
         Map<String, Object> data = new HashMap<>(validation);
         data.put("account_status", accountStatus.get(0).toString());
         data.put("bank_account_name", accountHolderName.isEmpty() ? null : accountHolderName.get(0).toString());
+        data.put("account_number", body.getAccountNumber());
+        data.put("ifsc_code", body.getIfscCode());
         result.setData(data);
 
         return result;
