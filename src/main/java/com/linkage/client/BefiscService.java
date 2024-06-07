@@ -6,8 +6,8 @@ import java.util.Map;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.GetBankDetailsByAccSchema;
-import com.linkage.core.validations.GetNameByVpaSchema;
 import com.linkage.core.validations.GetVpaByMobileSchema;
+import com.linkage.core.validations.GetVpaDetailsSchema;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
@@ -27,7 +27,7 @@ public class BefiscService extends BaseServiceClient {
         return callExternalService("https://mobile-lookup-for-multiple-upi.befisc.com", body);
     }
 
-    public ApiResponse<Map<String, Object>> vpaAnalysis(GetNameByVpaSchema body) {
+    public ApiResponse<Map<String, Object>> vpaAnalysis(GetVpaDetailsSchema body) {
         return callExternalService("https://vpa-analysis.befisc.com", body);
     }
 
@@ -37,7 +37,7 @@ public class BefiscService extends BaseServiceClient {
 
         Map<String, Object> reqBody = new HashMap<>();
         reqBody.put("account_no", body.getAccountNumber());
-        reqBody.put("ifsc_code", body.getIfsc_code());
+        reqBody.put("ifsc_code", body.getIfscCode());
         reqBody.put("name", ""); // optional field
         reqBody.put("consent", "Y");
         reqBody.put("consent_text", CONSENT);
@@ -58,8 +58,8 @@ public class BefiscService extends BaseServiceClient {
             return new ApiResponse<>(status, message, data);
         } catch (Exception e) {
             // Handle exception or log error
-            e.printStackTrace();
-            return new ApiResponse<>(false, "Error occurred", null);
+            System.out.println(e.getMessage());
+            return new ApiResponse<>(false, "Something went wrong", null);
         }
     }
 }

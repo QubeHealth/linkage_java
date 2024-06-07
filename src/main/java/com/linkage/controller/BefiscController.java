@@ -7,13 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 
+import com.google.protobuf.Api;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.BefiscService;
 import com.linkage.core.constants.HspKeywords;
 import com.linkage.core.validations.GetBankDetailsByAccSchema;
-import com.linkage.core.validations.GetNameByVpaSchema;
 import com.linkage.core.validations.GetVpaByMobileSchema;
+import com.linkage.core.validations.GetVpaDetailsSchema;
 import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,18 +53,27 @@ public class BefiscController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
-
         ApiResponse<Map<String, Object>> result = this.befiscService.mobileUpiSupreme(body);
         logger.info("BEFISC RESPONSE : {}", result.getData());
+
+        if (!result.getStatus()) {
+            return result;
+        }
 
         List<Object> vpa = Helper.getDataFromMap(result.getData(), Arrays.asList("vpa"));
         List<Object> name = Helper.getDataFromMap(result.getData(), Arrays.asList("name"));
         List<Object> accountName = Helper.getDataFromMap(result.getData(), Arrays.asList("account_holder_name"));
 
-        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> validation = hspValidationCheck(name.get(0).toString());
+        if (Boolean.FALSE.equals(validation.get("valid_hsp"))) {
+            validation = hspValidationCheck(accountName.get(0).toString());
+        }
+
+        Map<String, Object> data = new HashMap<>(validation);
+
         data.put("vpa", vpa.isEmpty() ? null : vpa.get(0));
-        data.put("name", name.isEmpty() ? null : name.get(0));
-        data.put("accountName", accountName.isEmpty() ? null : accountName.get(0));
+        data.put("merchant_name", name.isEmpty() ? null : name.get(0));
+        data.put("bank_account_name", accountName.isEmpty() ? null : accountName.get(0));
         result.setData(data);
 
         return result;
@@ -98,12 +108,12 @@ public class BefiscController extends BaseController {
     }
 
     @POST
-    @Path("/getNameByVpa")
+    @Path("/getVpaDetails")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public ApiResponse<Map<String, Object>> getNameByVpa(
-            GetNameByVpaSchema body) {
-        Set<ConstraintViolation<GetNameByVpaSchema>> violations = validator.validate(body);
+            GetVpaDetailsSchema body) {
+        Set<ConstraintViolation<GetVpaDetailsSchema>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
             // Construct error message from violations
             String errorMessage = violations.stream()
@@ -112,12 +122,25 @@ public class BefiscController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Map<String, Object>> result = this.befiscService.vpaAnalysis(body);
+
+        if (!result.getStatus()) {
+            return result;
+        }
+
+        List<Object> vpa = Helper.getDataFromMap(result.getData(), Arrays.asList("vpa"));
         List<Object> name = Helper.getDataFromMap(result.getData(), Arrays.asList("name"));
         List<Object> accountName = Helper.getDataFromMap(result.getData(), Arrays.asList("account_holder_name"));
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("name", name.isEmpty() ? null : name.get(0));
-        data.put("accountName", accountName.isEmpty() ? null : accountName.get(0));
+        Map<String, Object> validation = hspValidationCheck(name.get(0).toString());
+        if (Boolean.FALSE.equals(validation.get("valid_hsp"))) {
+            validation = hspValidationCheck(accountName.get(0).toString());
+        }
+
+        Map<String, Object> data = new HashMap<>(validation);
+
+        data.put("vpa", vpa.isEmpty() ? null : vpa.get(0));
+        data.put("merchant_name", name.isEmpty() ? null : name.get(0));
+        data.put("bank_account_name", accountName.isEmpty() ? null : accountName.get(0));
         result.setData(data);
 
         return result;
@@ -125,7 +148,7 @@ public class BefiscController extends BaseController {
     }
 
     @POST
-    @Path("/getBankDetailsByAcc")
+    @Path("/getBankDetails")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public ApiResponse<Map<String, Object>> getBankDetailsByAcc(@Context HttpServletRequest request,
@@ -138,84 +161,48 @@ public class BefiscController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
+
         ApiResponse<Map<String, Object>> result = this.befiscService.bankDetails(body);
 
+        if (!result.getStatus()) {
+            return result;
+        }
+
+        List<Object> accountStatus = Helper.getDataFromMap(result.getData(), Arrays.asList("account_status"));
+        if (!accountStatus.get(0).toString().equals("SUCCESS")) {
+            result.setStatus(false);
+            result.setMessage("Invalid Bank details");
+            result.setData(null);
+            return result;
+        }
+
+        List<Object> accountHolderName = Helper.getDataFromMap(result.getData(), Arrays.asList("registered_name"));
+
+        Map<String, Object> validation = hspValidationCheck(accountHolderName.get(0).toString());
+
+        Map<String, Object> data = new HashMap<>(validation);
+        data.put("account_status", accountStatus.get(0).toString());
+        data.put("bank_account_name", accountHolderName.isEmpty() ? null : accountHolderName.get(0).toString());
+        result.setData(data);
+
         return result;
+
     }
 
-    @POST
-    @Path("/validateName")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public ApiResponse<Map<String, Object>> validateName(
-            GetVpaByMobileSchema body) {
+    public Map<String, Object> hspValidationCheck(String hspName) {
 
-        // Creating a HashMap for storing the UPI ids linked to the mobile number passed
-        // in the schema
-        Map<String, Object> data = new HashMap();
-        data = getMultipleUpi(body).getData();
+        List<String> hspKeywords = HspKeywords.hspKeys();
+        String key = "";
+        Boolean valid = false;
 
-        // Moving those UPI ids into an arrayList so that they can be iterated through
-        ArrayList<String> x = (ArrayList<String>) data.get("upi");
-
-        // Calling the arrayList with hspKeywords
-        List<String> iterator = HspKeywords.hspKeys();
-
-        // iterating through each UPI id
-        for (int i = 0; i < x.size(); i++) {
-
-            x.get(i);
-
-            // Getting the names that are associated with the UPI id
-            GetNameByVpaSchema temp = new GetNameByVpaSchema();
-            temp.setVpa(x.get(i));
-
-            // moving the names into a hashmap
-            Map<String, Object> names = new HashMap();
-            names = getNameByVpa(temp).getData();
-
-            // From a hashmap to two individual Strings
-            String account_name = names.get("accountName").toString();
-            String name = names.get("name").toString();
-
-            // Iterating through the arrayList for each hspKeyword
-            for (int j = 0; j < iterator.size(); j++) {
-                if (account_name.indexOf(iterator.get(j)) != -1) {
-
-                    // Creating a hashMap with the requested data since the keyword exists in the
-                    // bank_account_name
-                    Map<String, Object> requestedData = new HashMap<>();
-                    requestedData.put("vpa", temp.getVpa());
-                    requestedData.put("bank_account_name", account_name);
-                    requestedData.put("keyword_hit", iterator.get(j));
-                    requestedData.put("name", name);
-                    ApiResponse success = new ApiResponse<Map<String, Object>>(true,
-                            "The given name has been validated with keyword " + iterator.get(j), requestedData);
-
-                    return success;
-                }
-                if (name.indexOf(iterator.get(j)) != -1) {
-
-                    // Creating a hashMap with the requested data since the keyword exists in the
-                    // name
-                    Map<String, Object> requestedData = new HashMap<>();
-                    requestedData.put("vpa", temp.getVpa());
-                    requestedData.put("bank_account_name", account_name);
-                    requestedData.put("keyword_hit", iterator.get(j));
-                    requestedData.put("name", name);
-                    ApiResponse success = new ApiResponse<Map<String, Object>>(true,
-                            "The given name has been validated with keyword " + iterator.get(j), requestedData);
-
-                    return success;
-                }
+        for (String keyword : hspKeywords) {
+            if (hspName.contains(keyword)) {
+                key = keyword;
+                valid = true;
+                break;
             }
-
         }
-        // If the name is not found to be a part of either name of account name, then we
-        // reutrn the failure message
-        ApiResponse failure = new ApiResponse<Map<String, Object>>(false, "The given name has not been validated",
-                null);
-        return failure;
+        return Map.of("valid_hsp", valid, "keyword", key);
     }
 
 }
