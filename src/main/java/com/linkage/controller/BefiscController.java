@@ -66,6 +66,15 @@ public class BefiscController extends BaseController {
         data.put("vpa", vpa.isEmpty() ? null : vpa.get(0));
         data.put("merchant_name", name.isEmpty() ? null : name.get(0));
         data.put("bank_account_name", accountName.isEmpty() ? null : accountName.get(0));
+
+        Map<String, Object> validation = hspValidationCheck(data.get("merchant_name").toString());
+        if (Boolean.FALSE.equals(validation.get("valid_hsp"))) {
+            validation = hspValidationCheck(data.get("bank_account_name").toString());
+        }
+
+        data.put("status", (boolean) validation.get("valid_hsp") ? "VALID_HSP" : "INVALID_HSP");
+        data.put("keyword", validation.get("keyword"));
+
         result.setData(data);
 
         return result;
@@ -128,6 +137,14 @@ public class BefiscController extends BaseController {
         data.put("vpa", vpa.isEmpty() ? null : vpa.get(0));
         data.put("merchant_name", name.isEmpty() ? null : name.get(0));
         data.put("bank_account_name", accountName.isEmpty() ? null : accountName.get(0));
+
+        Map<String, Object> validation = hspValidationCheck(data.get("merchant_name").toString());
+        if (Boolean.FALSE.equals(validation.get("valid_hsp"))) {
+            validation = hspValidationCheck(data.get("bank_account_name").toString());
+        }
+
+        data.put("status", (boolean) validation.get("valid_hsp") ? "VALID_HSP" : "INVALID_HSP");
+        data.put("keyword", validation.get("keyword"));
         result.setData(data);
 
         return result;
@@ -164,9 +181,18 @@ public class BefiscController extends BaseController {
         }
 
         List<Object> accountHolderName = Helper.getDataFromMap(result.getData(), Arrays.asList("registered_name"));
+        String name = accountHolderName.get(0) != null ? accountHolderName.get(0).toString() : "";
 
-        result.setData(
-                Map.of("bank_account_name", accountHolderName.isEmpty() ? null : accountHolderName.get(0).toString()));
+        Map<String, Object> validation = hspValidationCheck(name);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("status", (boolean) validation.get("valid_hsp") ? "VALID_HSP" : "INVALID_HSP");
+        data.put("keyword", validation.get("keyword"));
+        data.put("bank_account_name", name);
+        data.put("account_number", body.getAccountNumber());
+        data.put("ifsc_code", body.getIfscCode());
+
+        result.setData(data);
 
         return result;
 
