@@ -51,7 +51,7 @@ public final class ThirdPartyAPICall {
         logger.info("\nThird party api response => {}", responseBody);
 
         boolean status = false;
-        if (Response.Status.OK.getStatusCode() >= response.getStatus() && response.getStatus() < 300) {
+        if (Response.Status.OK.getStatusCode() <= response.getStatus() && response.getStatus() < 300) {
             status = true;
         }
         String message = status ? "success" : "failed";

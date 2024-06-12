@@ -13,6 +13,12 @@ public class LinkageConfiguration extends Configuration {
     private String xApiKey;
     @NotEmpty
     private String firebaseWebApiKey;
+    @NotEmpty
+    private String kaleyraApiKey;
+    @NotEmpty
+    private String kaleyraSID;
+    @NotEmpty
+    private String kaleyraUrl;
 
 
     public String getxApiKey() {
@@ -44,5 +50,22 @@ public class LinkageConfiguration extends Configuration {
     public void setFirebaseWebApiKey(String firebaseWebApiKey) {
         this. firebaseWebApiKey= firebaseWebApiKey;
     }
-   
+    public void setKaleyraApiKey(String kaleyraApiKey) {
+        this.kaleyraApiKey = kaleyraApiKey;
+    }
+    public String  getKaleyraApiKey() {
+        return kaleyraApiKey;
+    }
+    public void setKaleyraSID(String kaleyraSID) {
+        this.kaleyraSID = kaleyraSID;
+    }
+    public String  getKaleyraSID() {
+        return kaleyraSID;
+    }
+    public void setKaleyraUrl(String kaleyraUrl) {
+        this.kaleyraUrl = kaleyraUrl;
+    }
+    public String  getKaleyraUrl() {
+        return kaleyraUrl;
+    }
 }
