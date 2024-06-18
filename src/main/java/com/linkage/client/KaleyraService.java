@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.core.validations.KaleyraInviteMessageSchema;
+import com.linkage.core.validations.ReferralInviteMessageSchema;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
@@ -19,7 +19,7 @@ public class KaleyraService extends BaseServiceClient {
         super(configuration);
     }
     
-    public ApiResponse<Object> kaleyraInviteMessage(KaleyraInviteMessageSchema body){
+    public ApiResponse<Object> ReferralInviteMessage(ReferralInviteMessageSchema body){
         String mobile = body.getMobile();
         String firstName = body.getFirstName();
         String DiscountAmt = String.valueOf(body.getDiscountAmount());

@@ -1,15 +1,11 @@
 package com.linkage.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.linkage.client.KaleyraService;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.core.validations.KaleyraInviteMessageSchema;
+import com.linkage.core.validations.ReferralInviteMessageSchema;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -20,7 +16,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-
 
 @Path("/api/kaleyra")
 @Produces(MediaType.APPLICATION_JSON)
@@ -34,13 +29,13 @@ public class KaleyraController extends BaseController {
     }
 
     @POST
-    @Path("/kaleyraInviteMessage")
+    @Path("/referralInviteMessage")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ApiResponse<Object> KaleyraInviteMessage(@Context HttpServletRequest request,
-            KaleyraInviteMessageSchema body) {
-        
-        Set<ConstraintViolation<KaleyraInviteMessageSchema>> violations = validator.validate(body);
+    public ApiResponse<Object> ReferralInviteMessage(@Context HttpServletRequest request,
+            ReferralInviteMessageSchema body) {
+
+        Set<ConstraintViolation<ReferralInviteMessageSchema>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
             // Construct error message from violations
             String errorMessage = violations.stream()
@@ -49,7 +44,7 @@ public class KaleyraController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
 
-        ApiResponse<Object> kaleyraResponse = this.kaleyraService.kaleyraInviteMessage(body);
+        ApiResponse<Object> kaleyraResponse = this.kaleyraService.ReferralInviteMessage(body);
         if (!kaleyraResponse.getStatus()) {
             kaleyraResponse.setMessage("Message failed to deliver");
             return kaleyraResponse;
@@ -59,5 +54,5 @@ public class KaleyraController extends BaseController {
         return kaleyraResponse;
 
     }
-    
+
 }
