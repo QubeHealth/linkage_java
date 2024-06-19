@@ -6,6 +6,7 @@ import java.util.Set;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.FirebaseService;
+import com.linkage.core.validations.GetReferalUrl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -17,6 +18,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 @Path("/api/firebase")
 public class FirebaseController extends BaseController {
     private FirebaseService firebaseService;
@@ -31,23 +33,22 @@ public class FirebaseController extends BaseController {
     @Path("/getReferralUrl")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getReferalUrl(@Context HttpServletRequest request
-        ) {
-        // Set<ConstraintViolation<GetReferalUrl>> violations = validator.validate(body);
-        // if (!violations.isEmpty()) {
-        //     // Construct error message from violations
-        //     String errorMessage = violations.stream()
-        //             .map(ConstraintViolation::getMessage)
-        //             .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
-        //     return Response.status(Response.Status.OK)
-        //     .entity(new ApiResponse<>(false, errorMessage, null))
-        //     .build();
-        // }
+    public Response getReferalUrl(@Context HttpServletRequest request, GetReferalUrl body) {
+        Set<ConstraintViolation<GetReferalUrl>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return Response.status(Response.Status.OK)
+                    .entity(new ApiResponse<>(false, errorMessage, null))
+                    .build();
+        }
 
         Map<String, Object> requestBody = Map.of(
                 "dynamicLinkInfo", Map.of(
                         "domainUriPrefix", "https://qubehealth.page.link",
-                        "link", "https://www.qubehealth.com?referralCode=" ,
+                        "link", "https://www.qubehealth.com?referralCode=",
                         "androidInfo", Map.of(
                                 "androidPackageName", "com.qubehealth"),
                         "iosInfo", Map.of(
@@ -56,9 +57,8 @@ public class FirebaseController extends BaseController {
         ApiResponse<Object> dApiResponse = firebaseService.getFirebaseShortUrl(requestBody);
 
         return Response.status(Response.Status.OK)
-        .entity(new ApiResponse<>(true, "Data fetched successfully", dApiResponse.getData()))
-        .build();
+                .entity(new ApiResponse<>(true, "Data fetched successfully", dApiResponse.getData()))
+                .build();
 
-    }}
-
-
+    }
+}
