@@ -1,10 +1,5 @@
 package com.linkage.utility;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -93,7 +88,7 @@ public final class Helper {
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
             SecretKeySpec secretKey = new SecretKeySpec(encryptionKey, "AES");
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
             byte[] encryptedBytes = cipher.doFinal(data.getBytes());
 

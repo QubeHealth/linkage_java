@@ -18,6 +18,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 @Path("/api/firebase")
 public class FirebaseController extends BaseController {
     private FirebaseService firebaseService;
@@ -32,8 +33,7 @@ public class FirebaseController extends BaseController {
     @Path("/getReferralUrl")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getReferalUrl(@Context HttpServletRequest request,
-            GetReferalUrl body) {
+    public Response getReferalUrl(@Context HttpServletRequest request, GetReferalUrl body) {
         Set<ConstraintViolation<GetReferalUrl>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
             // Construct error message from violations
@@ -41,14 +41,14 @@ public class FirebaseController extends BaseController {
                     .map(ConstraintViolation::getMessage)
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return Response.status(Response.Status.OK)
-            .entity(new ApiResponse<>(false, errorMessage, null))
-            .build();
+                    .entity(new ApiResponse<>(false, errorMessage, null))
+                    .build();
         }
 
         Map<String, Object> requestBody = Map.of(
                 "dynamicLinkInfo", Map.of(
                         "domainUriPrefix", "https://qubehealth.page.link",
-                        "link", "https://www.qubehealth.com?referralCode=" + body.getReferCode(),
+                        "link", "https://www.qubehealth.com?referralCode=",
                         "androidInfo", Map.of(
                                 "androidPackageName", "com.qubehealth"),
                         "iosInfo", Map.of(
@@ -57,9 +57,8 @@ public class FirebaseController extends BaseController {
         ApiResponse<Object> dApiResponse = firebaseService.getFirebaseShortUrl(requestBody);
 
         return Response.status(Response.Status.OK)
-        .entity(new ApiResponse<>(true, "Data fetched successfully", dApiResponse.getData()))
-        .build();
+                .entity(new ApiResponse<>(true, "Data fetched successfully", dApiResponse.getData()))
+                .build();
 
     }
-
 }
