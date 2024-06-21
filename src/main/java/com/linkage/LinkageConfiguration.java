@@ -13,7 +13,9 @@ public class LinkageConfiguration extends Configuration {
     private String xApiKey;
     @NotEmpty
     private String firebaseWebApiKey;
-
+    @NotEmpty
+    private String xGoogApiKey;
+    @NotEmpty
 
     public String getxApiKey() {
         return xApiKey;
@@ -44,5 +46,10 @@ public class LinkageConfiguration extends Configuration {
     public void setFirebaseWebApiKey(String firebaseWebApiKey) {
         this. firebaseWebApiKey= firebaseWebApiKey;
     }
-   
+    public String getxGoogApiKey() {
+        return xGoogApiKey;
+    }
+   public void setxGoogApiKey(String xGoogApiKey) {
+       this.xGoogApiKey = xGoogApiKey;
+   }
 }
