@@ -32,7 +32,9 @@ public class ErupeeService extends BaseServiceClient {
 
         try {
 
-            String body = encryptRequest(Helper.toJsonString(request));
+            String body = Helper.toJsonString(request);
+            System.out.println(body);
+            body = encryptRequest(body);
 
             System.out.println(body);
 
@@ -70,7 +72,7 @@ public class ErupeeService extends BaseServiceClient {
         // 5. Build the complete request object
         JSONObject request = new JSONObject();
         request.put("requestId", UUID.randomUUID());
-        request.put("service", "AccountCreation");
+        request.put("service", "CreateVouchers");
         request.put("encryptedKey", encodedEncryptedKey);
         request.put("oaepHashingAlgorithm", "NONE");
         request.put("iv", encodedIv);

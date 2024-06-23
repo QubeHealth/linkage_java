@@ -47,8 +47,9 @@ public final class ThirdPartyAPICall {
         // Use GenericType to specify the type parameter for readEntity method
         Map<String, Object> responseBody = response.readEntity(new GenericType<Map<String, Object>>() {
         });
-        logger.info("\nThird party api response => {}", responseBody);
 
+        System.out.println("Response status => " + response.toString());
+        logger.info("\nThird party api response => {}", responseBody);
         boolean status = false;
         if (Response.Status.OK.getStatusCode() <= response.getStatus() && response.getStatus() < 300) {
             status = true;

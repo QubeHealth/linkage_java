@@ -1,5 +1,7 @@
 package com.linkage.core.validations;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 
 public class ErupeeSchema {
@@ -19,8 +21,10 @@ public class ErupeeSchema {
         private String expiry;
         private String purposeCode;
         private Integer mcc;
-        private String voucherRedemptionType;
-        private String payerVA;
+        @JsonProperty("VoucherRedemptionType")
+        private String VoucherRedemptionType;
+        @JsonProperty("PayerVA")
+        private String PayerVA;
         private String type;
     }
 
