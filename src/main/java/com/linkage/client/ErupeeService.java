@@ -1,6 +1,8 @@
 package com.linkage.client;
 
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -15,6 +17,7 @@ import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.ErupeeSchema.VoucherRequest;
 import com.linkage.utility.Helper;
 
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
@@ -103,5 +106,42 @@ public class ErupeeService extends BaseServiceClient {
         Cipher cipher = Cipher.getInstance(AES_CBC_PKCS5);
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
         return cipher.doFinal(data);
+    }
+
+
+    public static String decrypt(String encryptedData, String encryptedKey, String clientPrivateKeyPath) throws Exception {
+
+        // 1. Get the IV
+        byte[] decodedData = Base64.getDecoder().decode(encryptedData);
+        byte[] iv = Arrays.copyOfRange(decodedData, 0, 16);
+        byte[] encryptedResponse = Arrays.copyOfRange(decodedData, 16, decodedData.length);
+
+        // 2. Decrypt the session key
+        byte[] privateKeyBytes = readFile(clientPrivateKeyPath);
+        PrivateKey clientPrivateKey = getPrivateKeyFromPKCS12(privateKeyBytes);
+        Cipher keyCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        keyCipher.init(Cipher.DECRYPT_MODE, clientPrivateKey);
+        byte[] decodedKey = keyCipher.doFinal(Base64.getDecoder().decode(encryptedKey));
+
+        // 3. Decrypt the response
+        SecretKeySpec sessionKeySpec = new SecretKeySpec(decodedKey, "AES");
+        Cipher responseCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        responseCipher.init(Cipher.DECRYPT_MODE, sessionKeySpec, new IvParameterSpec(iv));
+        byte[] decryptedResponse = responseCipher.doFinal(encryptedResponse);
+
+        // 4. Skip the IV and return the decrypted response
+        return new String(decryptedResponse, StandardCharsets.UTF_8);
+    }
+
+    private static byte[] readFile(String path) throws Exception {
+        // Replace with your logic to read the file from the specified path
+        // This example assumes the file is a byte array
+        return new byte[0]; // Placeholder, replace with actual file reading logic
+    }
+
+    private static PrivateKey getPrivateKeyFromPKCS12(byte[] keystoreBytes) throws Exception {
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keystoreBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePrivate(keySpec);
     }
 }
