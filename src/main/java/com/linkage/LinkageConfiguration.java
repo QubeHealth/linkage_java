@@ -17,6 +17,13 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String watiToken;
     @NotEmpty
+    private String kaleyraApiKey;
+    @NotEmpty
+    private String kaleyraSID;
+    @NotEmpty
+    private String kaleyraUrl;
+
+    @NotEmpty
     private String befiscAuthKey;
 
     public String getxApiKey() {
@@ -58,17 +65,44 @@ public class LinkageConfiguration extends Configuration {
     public void setBefiscAuthKey(String befiscAuthKey) {
         this.befiscAuthKey = befiscAuthKey;
     }
+
     public String getWatiUrl() {
         return watiUrl;
     }
+
     public void setWatiUrl(String watiUrl) {
         this.watiUrl = watiUrl;
     }
+
     public String getWatiToken() {
         return watiToken;
     }
+
     public void setWatiToken(String watiToken) {
         this.watiToken = watiToken;
     }
-   
+
+    public void setKaleyraApiKey(String kaleyraApiKey) {
+        this.kaleyraApiKey = kaleyraApiKey;
+    }
+
+    public String getKaleyraApiKey() {
+        return kaleyraApiKey;
+    }
+
+    public void setKaleyraSID(String kaleyraSID) {
+        this.kaleyraSID = kaleyraSID;
+    }
+
+    public String getKaleyraSID() {
+        return kaleyraSID;
+    }
+
+    public void setKaleyraUrl(String kaleyraUrl) {
+        this.kaleyraUrl = kaleyraUrl;
+    }
+
+    public String getKaleyraUrl() {
+        return kaleyraUrl;
+    }
 }
