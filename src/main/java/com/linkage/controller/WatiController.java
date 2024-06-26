@@ -7,6 +7,7 @@ import com.linkage.api.ApiResponse;
 import com.linkage.client.WatiService;
 import com.linkage.core.validations.BillRejectedSchema;
 import com.linkage.core.validations.BillVerifiedMsgSchema;
+import com.linkage.core.validations.CashbackTypeMessageSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
 import com.linkage.core.validations.SendCashbackMsgSchema;
@@ -144,6 +145,30 @@ public class WatiController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> watiResponse = this.watiService.billRejected(body);
+        if (!watiResponse.getStatus()) {
+            watiResponse.setMessage("Message failed to deliver");
+            return watiResponse;
+        }
+        watiResponse.setMessage("Message delivered successfully");
+        watiResponse.setData(null);
+        return watiResponse;
+    }
+
+    @POST
+    @Path("/cashbackTypeMessage")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object>cashbackTypeMessage(@Context HttpServletRequest request,
+            CashbackTypeMessageSchema body) {
+        Set<ConstraintViolation<CashbackTypeMessageSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> watiResponse = this.watiService.cashbackTypeMessage(body);
         if (!watiResponse.getStatus()) {
             watiResponse.setMessage("Message failed to deliver");
             return watiResponse;
