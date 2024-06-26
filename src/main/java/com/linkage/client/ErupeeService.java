@@ -4,6 +4,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.crypto.Cipher;
@@ -41,7 +42,15 @@ public class ErupeeService extends BaseServiceClient {
 
             System.out.println(body);
 
-            return this.networkCallExternalService(url, "POST", body, header);
+            ApiResponse<Object> res = this.networkCallExternalService(url, "POST", body, header);
+
+            Map<String, Object> data = (Map<String, Object>) res.getData();
+
+            String encryptedKey = data.get("encryptedKey").toString();
+
+            decrypt(data.get("encryptedData").toString(), encryptedKey, "");
+
+            return res;
 
         } catch (Exception e) {
             return new ApiResponse<>(false, e.getMessage(), null);
@@ -108,8 +117,7 @@ public class ErupeeService extends BaseServiceClient {
         return cipher.doFinal(data);
     }
 
-
-    public static String decrypt(String encryptedData, String encryptedKey, String clientPrivateKeyPath) throws Exception {
+    public static String decrypt(String encryptedData, String encryptedKey, String privateKey) throws Exception {
 
         // 1. Get the IV
         byte[] decodedData = Base64.getDecoder().decode(encryptedData);
@@ -117,7 +125,7 @@ public class ErupeeService extends BaseServiceClient {
         byte[] encryptedResponse = Arrays.copyOfRange(decodedData, 16, decodedData.length);
 
         // 2. Decrypt the session key
-        byte[] privateKeyBytes = readFile(clientPrivateKeyPath);
+        byte[] privateKeyBytes = privateKey.getBytes();
         PrivateKey clientPrivateKey = getPrivateKeyFromPKCS12(privateKeyBytes);
         Cipher keyCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         keyCipher.init(Cipher.DECRYPT_MODE, clientPrivateKey);
@@ -131,12 +139,6 @@ public class ErupeeService extends BaseServiceClient {
 
         // 4. Skip the IV and return the decrypted response
         return new String(decryptedResponse, StandardCharsets.UTF_8);
-    }
-
-    private static byte[] readFile(String path) throws Exception {
-        // Replace with your logic to read the file from the specified path
-        // This example assumes the file is a byte array
-        return new byte[0]; // Placeholder, replace with actual file reading logic
     }
 
     private static PrivateKey getPrivateKeyFromPKCS12(byte[] keystoreBytes) throws Exception {

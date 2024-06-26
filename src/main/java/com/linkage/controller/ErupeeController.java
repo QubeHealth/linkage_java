@@ -1,5 +1,6 @@
 package com.linkage.controller;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
@@ -48,6 +49,10 @@ public class ErupeeController extends BaseController {
 
         ApiResponse<Object> res = this.erupeeService.creatVoucher(body);
         System.out.println("RES ==>\n" + Helper.toJsonString(res));
+
+        Map<String,Object> resData = (Map<String,Object>) res.getData();
+
+        
 
         return null;
 
