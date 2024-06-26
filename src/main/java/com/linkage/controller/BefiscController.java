@@ -72,7 +72,7 @@ public class BefiscController extends BaseController {
             validation = hspValidationCheck(data.get("bank_account_name").toString());
         }
 
-        data.put("status", (boolean) validation.get("valid_hsp") ? "VALID_HSP" : "INVALID_HSP");
+        data.put("status", ((boolean) validation.get("valid_hsp")) ? "VALID_HSP" : "INVALID_HSP");
         data.put("keyword", validation.get("keyword"));
 
         result.setData(data);
@@ -143,7 +143,7 @@ public class BefiscController extends BaseController {
             validation = hspValidationCheck(data.get("bank_account_name").toString());
         }
 
-        data.put("status", (boolean) validation.get("valid_hsp") ? "VALID_HSP" : "INVALID_HSP");
+        data.put("status", ((boolean) validation.get("valid_hsp")) ? "VALID_HSP" : "INVALID_HSP");
         data.put("keyword", validation.get("keyword"));
         result.setData(data);
 
@@ -186,7 +186,7 @@ public class BefiscController extends BaseController {
         Map<String, Object> validation = hspValidationCheck(name);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("status", (boolean) validation.get("valid_hsp") ? "VALID_HSP" : "INVALID_HSP");
+        data.put("status", ((boolean) validation.get("valid_hsp")) ? "VALID_HSP" : "INVALID_HSP");
         data.put("keyword", validation.get("keyword"));
         data.put("bank_account_name", name);
         data.put("account_number", body.getAccountNumber());
@@ -205,7 +205,7 @@ public class BefiscController extends BaseController {
         Boolean valid = false;
 
         for (String keyword : hspKeywords) {
-            if (hspName.contains(keyword)) {
+            if (hspName.toLowerCase().contains(keyword.toLowerCase())) {
                 key = keyword;
                 valid = true;
                 break;
