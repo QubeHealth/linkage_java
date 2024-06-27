@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NearbySearchSchema {
+public class TextSearchSchema {
     
     @NotBlank(message = "Latitude is required")
     @JsonProperty("latitude")
