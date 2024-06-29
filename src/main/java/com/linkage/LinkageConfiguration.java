@@ -4,19 +4,19 @@ import io.dropwizard.core.Configuration;
 import jakarta.validation.constraints.NotEmpty;
 
 public class LinkageConfiguration extends Configuration {
-    @NotEmpty
+    
     private String jwtTokenSignature;
-    @NotEmpty
+    
     private String authorizationKey;
-    @NotEmpty
+    
     private String xApiKey;
-    @NotEmpty
+    
     private String firebaseWebApiKey;
-    @NotEmpty
+    
     private String watiUrl;
-    @NotEmpty
+    
     private String watiToken;
-    @NotEmpty
+    
     private String befiscAuthKey;
 
     public String getxApiKey() {

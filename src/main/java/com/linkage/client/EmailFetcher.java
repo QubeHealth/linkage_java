@@ -1,15 +1,12 @@
 package com.linkage.client;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-import com.linkage.core.validations.EmailSchema;
-
 import javax.mail.*;
-
+import javax.mail.internet.MimeMultipart;
 import com.linkage.LinkageConfiguration;
 
-public abstract class EmailFetcher extends BaseServiceClient{
+public abstract class EmailFetcher extends BaseServiceClient {
     protected String host;
     protected String port;
     protected String user;
@@ -39,37 +36,55 @@ public abstract class EmailFetcher extends BaseServiceClient{
         inbox.open(Folder.READ_ONLY);
     }
 
-    public Message fetchLatestEmail() throws MessagingException {
-        EmailSchema latestEmail = null;
-
-        // Set up properties for the email session
-        Properties properties = new Properties();
-        properties.put("mail.store.protocol", "imaps");
-
-        // Create the email session
-        Session emailSession = Session.getDefaultInstance(properties);
-        Store store = emailSession.getStore();
-        store.connect(host, user, password);
-
-        // Open the inbox folder
-        Folder emailFolder = store.getFolder("INBOX");
-        emailFolder.open(Folder.READ_ONLY);
-
+    public Message fetchLatestEmail() throws MessagingException, IOException {
         Message message = null;
-        // Fetch the latest message from the inbox
-        int messageCount = emailFolder.getMessageCount();
+
+        Message[] messages = inbox.getMessages();
+        for (int i = 0; i < 5; i++) {
+            Object content = messages[i].getContent().toString();
+
+            String subject = messages[i].getSubject();
+            String description = messages[i].getDescription();
+            int size = messages[i].getSize();
+
+            String textContent = getTextFromMimeMultipart((Multipart) content);
+
+            System.out.println("Message " + (i + 1));
+            System.out.println("Subject: " + subject);
+            System.out.println("Description: " + description);
+            System.out.println("Size: " + size);
+            System.out.println("Content:\n" + textContent);
+            System.out.println("--------------------------");
+        }
+
+        int messageCount = inbox.getMessageCount();
         if (messageCount > 0) {
-            message = emailFolder.getMessage(messageCount);
-            latestEmail = new EmailSchema();
         }
         return message;
     }
 
+    private String getTextFromMimeMultipart(Multipart content) throws MessagingException, IOException {
+        StringBuilder result = new StringBuilder();
+        int count = content.getCount();
+        for (int i = 0; i < count; i++) {
+            BodyPart bodyPart = content.getBodyPart(i);
+            if (bodyPart.isMimeType("text/plain")) {
+                result.append(bodyPart.getContent());
+            } else if (bodyPart.isMimeType("text/html")) {
+                String html = (String) bodyPart.getContent();
+                result.append(org.jsoup.Jsoup.parse(html).text()); // Using Jsoup to convert HTML to plain text
+            } else if (bodyPart.getContent() instanceof MimeMultipart) {
+                result.append(getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
+            }
+        }
+        return result.toString();
+    }
+
     public abstract String fetchSubject(Message message) throws MessagingException;
 
-    public abstract String fetchBody(Message message) throws Exception;
+    public abstract String fetchBody(Message message) throws IOException, MessagingException;
 
-    public abstract void fetchAttachments(Message message, String saveDirectory) throws Exception;
+    public abstract void fetchAttachments(Message message, String saveDirectory);
 
     public void close() throws MessagingException {
         if (inbox != null && inbox.isOpen()) {
