@@ -3,9 +3,7 @@ package com.linkage.client;
 import java.io.IOException;
 import java.util.Properties;
 import javax.mail.*;
-import javax.mail.internet.MimeMultipart;
 import com.linkage.LinkageConfiguration;
-import org.jsoup.Jsoup;
 
 public abstract class EmailFetcher extends BaseServiceClient {
     protected String host;
@@ -43,45 +41,10 @@ public abstract class EmailFetcher extends BaseServiceClient {
 
         if (messageCount > 0) {
             message = inbox.getMessage(messageCount);
-            Object content = message.getContent();
-
-            String subject = message.getSubject();
-            String description = message.getDescription();
-            int size = message.getSize();
-
-            String textContent = "";
-            if (content instanceof String) {
-                textContent = (String) content;
-            } else if (content instanceof Multipart) {
-                textContent = getTextFromMimeMultipart((Multipart) content);
-            }
-
-            System.out.println("Latest Message");
-            System.out.println("Subject: " + subject);
-            System.out.println("Description: " + description);
-            System.out.println("Size: " + size);
-            System.out.println("Content:\n" + textContent);
-            System.out.println("--------------------------");
         }
         return message;
     }
 
-    private String getTextFromMimeMultipart(Multipart mimeMultipart) throws MessagingException, IOException {
-        StringBuilder result = new StringBuilder();
-        int count = mimeMultipart.getCount();
-        for (int i = 0; i < count; i++) {
-            BodyPart bodyPart = mimeMultipart.getBodyPart(i);
-            if (bodyPart.isMimeType("text/plain")) {
-                result.append(bodyPart.getContent());
-            } else if (bodyPart.isMimeType("text/html")) {
-                String html = (String) bodyPart.getContent();
-                result.append(Jsoup.parse(html).text()); // Using Jsoup to convert HTML to plain text
-            } else if (bodyPart.getContent() instanceof MimeMultipart) {
-                result.append(getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
-            }
-        }
-        return result.toString();
-    }
 
     public abstract String fetchSubject(Message message) throws MessagingException;
 

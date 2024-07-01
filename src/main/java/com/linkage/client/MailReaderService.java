@@ -4,10 +4,12 @@ import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.internet.MimeMultipart;
 
 import java.io.IOException;
 import com.linkage.LinkageConfiguration;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
 
 public class MailReaderService extends EmailFetcher {
    
@@ -28,32 +30,30 @@ public class MailReaderService extends EmailFetcher {
     @Override
     public String fetchBody(Message message) throws IOException, MessagingException {
         Object content = message.getContent();
-        if (content instanceof String) {
-            System.out.println("Email content is plain text.");
-            return (String) content; // Handle plain text emails directly
-        } else if (content instanceof Multipart) {
-            System.out.println("Email content is multipart.");
-            Multipart multipart = (Multipart) content;
-            StringBuilder text = new StringBuilder();
-            handleMultipart(multipart, text);
-            return text.toString(); // Trim to remove any leading or trailing whitespace
-        }
-        System.out.println("Email content is of an unknown type.");
-        return null;
+        String textContent = "";
+            if (content instanceof String) {
+                textContent = (String) content;
+            } else if (content instanceof Multipart) {
+                textContent = getTextFromMimeMultipart((Multipart) content);
+            }
+        return textContent;
     }
 
-    private void handleMultipart(Multipart multipart, StringBuilder text) throws MessagingException, IOException {
-        for (int i = 0; i < multipart.getCount(); i++) {
-            BodyPart bodyPart = multipart.getBodyPart(i);
-            String contentType = bodyPart.getContentType();
-            
-            System.out.println("Processing part with content type: " + contentType);
-            
-            // Handle plain text parts
-            if (contentType.startsWith("text/plain")) {
-                text.append(bodyPart.getContent().toString().trim()).append("\n"); // Append and trim to remove extra whitespace
+    private String getTextFromMimeMultipart(Multipart mimeMultipart) throws MessagingException, IOException {
+        StringBuilder result = new StringBuilder();
+        int count = mimeMultipart.getCount();
+        for (int i = 0; i < count; i++) {
+            BodyPart bodyPart = mimeMultipart.getBodyPart(i);
+            if (bodyPart.isMimeType("text/plain")) {
+                result.append(bodyPart.getContent());
+            } else if (bodyPart.isMimeType("text/html")) {
+                String html = (String) bodyPart.getContent();
+                result.append(Jsoup.parse(html).text()); // Using Jsoup to convert HTML to plain text
+            } else if (bodyPart.getContent() instanceof MimeMultipart) {
+                result.append(getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
             }
         }
+        return result.toString();
     }
 
     public String fetchAndProcessEmail() throws MessagingException, IOException {
@@ -72,15 +72,17 @@ public class MailReaderService extends EmailFetcher {
             return handleFinalBillAndDischargeSummary(subject, body); // Comment: Handles 'final bill and discharge summary' emails
         } else if ("pre auth".equalsIgnoreCase(keyword)) {
             return handlePreAuth(subject); // Comment: Handles 'pre auth' emails
+        } else if ("cashless credit request".equalsIgnoreCase(keyword)) {
+            return handleCashlessCreditRequest(subject,body);
+        } else if ("addtional information".equalsIgnoreCase(keyword)) {
+            return handleAddtionalInformation(subject, body);
         } else {
-            JSONObject errorJson = new JSONObject();
-            errorJson.put("error", "No matching function found for keyword: " + keyword);
-            return errorJson.toString();
+            return "No matching function found for keyword: " + keyword;
         }
     }
 
     private String parseSubjectForKeyword(String subject) {
-        String[] keywords = { "supporting document", "query reply", "final bill and discharge summary", "pre auth" };
+        String[] keywords = { "supporting document", "query reply", "final bill and discharge summary", "pre auth","cashless credit request", "addtional information" };
         String lowerCaseSubject = subject.toLowerCase();
 
         for (String keyword : keywords) {
@@ -125,6 +127,100 @@ public class MailReaderService extends EmailFetcher {
         } else {
             JSONObject errorJson = new JSONObject();
             errorJson.put("error", "Unable to extract name, khiladi_id, and cl_no from subject: " + subject);
+            return errorJson.toString();
+        }
+    }
+
+    private String handleCashlessCreditRequest(String subject, String body) {
+        String employeeName = null;
+        String employeeCode = null;
+        String claimNo = null;
+        String finalApprovedAmount = null;
+        String cashlessRequestAmount = null;
+    
+        // Extract approved ID from subject
+        String[] subjectParts = subject.split("\\s+");
+        for (int i = 0; i < subjectParts.length; i++) {
+            if (subjectParts[i].equalsIgnoreCase("approved")) {
+                employeeCode = subjectParts[i + 1].replace(",", "").trim();
+            }
+        }
+    
+        // Extract details from body
+        String[] bodyLines = body.split("\n");
+        for (String line : bodyLines) {
+            line = line.trim();
+            if (line.startsWith("Emloyee Name:-")) {
+                employeeName = line.substring("Emloyee Name:-".length()).trim();
+            } else if (line.startsWith("Employee Code:-")) {
+                employeeCode = line.substring("Employee Code:-".length()).trim();
+            } else if (line.startsWith("Claim No:-")) {
+                claimNo = line.substring("Claim No:-".length()).trim();
+            } else if (line.startsWith("Final Cashless Approved Amount:-")) {
+                finalApprovedAmount = line.substring("Final Cashless Approved Amount:-".length()).trim();
+            } else if (line.startsWith("Cashless Request Amount:-")) {
+                cashlessRequestAmount = line.substring("Cashless Request Amount:-".length()).trim();
+            }
+        }
+    
+        if (employeeName != null && employeeCode != null && claimNo != null && finalApprovedAmount != null && cashlessRequestAmount != null) {
+            JSONObject json = new JSONObject();
+            json.put("Type", "cashless credit request");
+            json.put("employee_name", employeeName);
+            json.put("employee_code", employeeCode);
+            json.put("claim_no", claimNo);
+            json.put("final_cashless_approved_amount", finalApprovedAmount);
+            json.put("cashless_request_amount", cashlessRequestAmount);
+            return json.toString();
+        } else {
+            JSONObject errorJson = new JSONObject();
+            errorJson.put("error", "Unable to extract all required details from subject and body.");
+            return errorJson.toString();
+        }
+    }
+
+    private String handleAddtionalInformation(String subject, String body) {
+        String employeeCode = null;
+        String claimNo = null;
+        String documentRequired = null;
+        String patientName = null;
+
+        // Extract approved_id from subject
+        String[] subjectParts = subject.split("\\s+");
+        for (int i = 0; i < subjectParts.length; i++) {
+            if (subjectParts[i].matches("\\d+")) {
+                employeeCode = subjectParts[i].trim();
+                break;
+            }
+        }
+
+        // Extract information from body
+        String[] bodyLines = body.split("\n");
+        for (String line : bodyLines) {
+            if (line.contains("Your Employee code No:-")) {
+                employeeCode = line.split("Your Employee code No:-")[1].trim();
+                employeeCode = employeeCode.split("\\s+")[0].trim();
+            } else if (line.contains("Your claim intimation No:-")) {
+                claimNo = line.split("Your claim intimation No:-")[1].trim();
+            } else if (line.contains("Kindly provide :-")) {
+                documentRequired = line.split("Kindly provide :-")[1].trim();
+            } else if (line.contains("Patient Name:-")) {
+                patientName = line.split("Patient Name:-")[1].trim();
+                //patientName = patientName.split("\\s+")[0].trim();
+            }
+        }
+
+        if (employeeCode != null && claimNo != null) {
+            JSONObject json = new JSONObject();
+            json.put("Type", "Addtional Information");
+            json.put("employee_code", employeeCode);
+            json.put("claim_no", claimNo);
+            json.put("document_required", documentRequired);
+            json.put("patient_name", patientName);
+            return json.toString();
+        } else {
+            JSONObject errorJson = new JSONObject();
+            errorJson.put("error", "Unable to extract all required details from subject and body.");
             return errorJson.toString();
         }
     }
