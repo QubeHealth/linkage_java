@@ -1,15 +1,19 @@
 package com.linkage.client;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.Part;
 
-import java.io.IOException;
-import com.linkage.LinkageConfiguration;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+
+import com.linkage.LinkageConfiguration;
 
 public class MailReaderService extends EmailFetcher {
    
@@ -37,6 +41,33 @@ public class MailReaderService extends EmailFetcher {
                 textContent = getTextFromMimeMultipart((Multipart) content);
             }
         return textContent;
+    }
+
+    @Override
+    public void fetchAttachments(Message message) throws IOException, MessagingException {
+        Object content = message.getContent();
+
+        if (content instanceof MimeMultipart) {
+            MimeMultipart multipart = (MimeMultipart) content;
+            for (int i = 0; i < multipart.getCount(); i++) {
+                BodyPart bodyPart = multipart.getBodyPart(i);
+                if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+                    String fileName = bodyPart.getFileName();
+                    if (fileName != null && !fileName.isEmpty()) {
+                        String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
+
+                        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+                            bodyPart.getInputStream().transferTo(outputStream);
+                        } catch (IOException | MessagingException e) {
+                            e.printStackTrace();
+                            throw new IOException("Error downloading attachment: " + fileName, e);
+                        }
+
+                        System.out.println("Attachment downloaded");
+                    }
+                }
+            }
+        }
     }
 
     private String getTextFromMimeMultipart(Multipart mimeMultipart) throws MessagingException, IOException {
@@ -73,9 +104,9 @@ public class MailReaderService extends EmailFetcher {
         } else if ("pre auth".equalsIgnoreCase(keyword)) {
             return handlePreAuth(subject); // Comment: Handles 'pre auth' emails
         } else if ("cashless credit request".equalsIgnoreCase(keyword)) {
-            return handleCashlessCreditRequest(subject,body);
+            return handleCashlessCreditRequest(subject,body,message);
         } else if ("addtional information".equalsIgnoreCase(keyword)) {
-            return handleAddtionalInformation(subject, body);
+            return handleAddtionalInformation(subject, body, message);
         } else {
             return "No matching function found for keyword: " + keyword;
         }
@@ -131,13 +162,14 @@ public class MailReaderService extends EmailFetcher {
         }
     }
 
-    private String handleCashlessCreditRequest(String subject, String body) {
+    private String handleCashlessCreditRequest(String subject, String body, Message message) throws IOException, MessagingException {
         String employeeName = null;
         String employeeCode = null;
         String claimNo = null;
         String finalApprovedAmount = null;
         String cashlessRequestAmount = null;
     
+        fetchAttachments(message);
         // Extract approved ID from subject
         String[] subjectParts = subject.split("\\s+");
         for (int i = 0; i < subjectParts.length; i++) {
@@ -179,11 +211,13 @@ public class MailReaderService extends EmailFetcher {
         }
     }
 
-    private String handleAddtionalInformation(String subject, String body) {
+    private String handleAddtionalInformation(String subject, String body, Message message) throws IOException, MessagingException {
         String employeeCode = null;
         String claimNo = null;
         String documentRequired = null;
         String patientName = null;
+
+        fetchAttachments(message); 
 
         // Extract approved_id from subject
         String[] subjectParts = subject.split("\\s+");
@@ -292,7 +326,7 @@ public class MailReaderService extends EmailFetcher {
     }
 
     @Override
-    public void fetchAttachments(Message message, String saveDirectory) {
-        
+    public void close() throws MessagingException {
+        super.close();
     }
 }

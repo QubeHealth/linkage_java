@@ -2,7 +2,13 @@ package com.linkage.client;
 
 import java.io.IOException;
 import java.util.Properties;
-import javax.mail.*;
+
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+
 import com.linkage.LinkageConfiguration;
 
 public abstract class EmailFetcher extends BaseServiceClient {
@@ -42,15 +48,16 @@ public abstract class EmailFetcher extends BaseServiceClient {
         if (messageCount > 0) {
             message = inbox.getMessage(messageCount);
         }
+        
         return message;
     }
 
-
+    
     public abstract String fetchSubject(Message message) throws MessagingException;
 
     public abstract String fetchBody(Message message) throws IOException, MessagingException;
 
-    public abstract void fetchAttachments(Message message, String saveDirectory);
+    public abstract void fetchAttachments(Message message) throws IOException, MessagingException;
 
     public void close() throws MessagingException {
         if (inbox != null && inbox.isOpen()) {
