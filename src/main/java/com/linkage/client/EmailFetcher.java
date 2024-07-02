@@ -1,7 +1,5 @@
 package com.linkage.client;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -20,7 +18,6 @@ import javax.mail.internet.MimeMultipart;
 import org.jsoup.Jsoup;
 
 import com.linkage.LinkageConfiguration;
-import com.linkage.api.ApiRequest;
 import com.linkage.api.ApiResponse;
 import com.linkage.utility.GcpFileUpload;
 import com.linkage.utility.Helper;
@@ -81,8 +78,10 @@ public abstract class EmailFetcher extends BaseServiceClient {
         return textContent;
     }
 
-    public void fetchAttachments(Message message, String userId) throws IOException, MessagingException {
+    public String fetchAttachments(Message message, String userId) throws IOException, MessagingException {
         Object content = message.getContent();
+        String gcpPath = null;
+        String gcpUrl = null;
 
         if (content instanceof MimeMultipart) {
             MimeMultipart multipart = (MimeMultipart) content;
@@ -95,26 +94,25 @@ public abstract class EmailFetcher extends BaseServiceClient {
                     String contentType = bodyPart.getContentType();
                     InputStream fileContent = bodyPart.getInputStream();
 
-                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments(contentType, fileName, fileContent.readAllBytes(), contentType,
-                            true);
+                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments(contentType, fileName, fileContent.readAllBytes(), contentType, true);
+                        gcpUrl = gcpRes.getData();
+                       // gcpPath = GcpFileUpload.getSignedUrl(contentType,gcpUrl);
 
-                            String gcpUrl = gcpRes.getData();
 
-                    if (fileName != null && !fileName.isEmpty()) {
-                        String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
+                    // if (fileName != null && !fileName.isEmpty()) {
+                    //     String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
 
-                        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-                            bodyPart.getInputStream().transferTo(outputStream);
-                        } catch (IOException | MessagingException e) {
-                            e.printStackTrace();
-                            throw new IOException("Error downloading attachment: " + fileName, e);
-                        }
-
-                        System.out.println("Attachment downloaded");
-                    }
+                    //     try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+                    //         bodyPart.getInputStream().transferTo(outputStream);
+                    //     } catch (IOException | MessagingException e) {
+                    //         e.printStackTrace();
+                    //         throw new IOException("Error downloading attachment: " + fileName, e);
+                    //     }
+                    // }
                 }
             }
         }
+        return gcpUrl;
     }
 
     private String getTextFromMimeMultipart(Multipart mimeMultipart) throws MessagingException, IOException {

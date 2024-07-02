@@ -103,7 +103,7 @@ public class MailReaderService extends EmailFetcher {
         String finalApprovedAmount = null;
         String cashlessRequestAmount = null;
     
-        fetchAttachments(message);
+        fetchAttachments(message,employeeCode);
         // Extract approved ID from subject
         String[] subjectParts = subject.split("\\s+");
         for (int i = 0; i < subjectParts.length; i++) {
@@ -151,7 +151,7 @@ public class MailReaderService extends EmailFetcher {
         String documentRequired = null;
         String patientName = null;
 
-        fetchAttachments(message); 
+        fetchAttachments(message,employeeCode); 
 
         // Extract approved_id from subject
         String[] subjectParts = subject.split("\\s+");

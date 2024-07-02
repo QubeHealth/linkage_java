@@ -19,6 +19,9 @@ public class LinkageConfiguration extends Configuration {
     
     private String befiscAuthKey;
 
+    @NotEmpty
+    private String masterUrl;
+
     public String getxApiKey() {
         return xApiKey;
     }
@@ -70,5 +73,10 @@ public class LinkageConfiguration extends Configuration {
     public void setWatiToken(String watiToken) {
         this.watiToken = watiToken;
     }
-   
+    public String getMasterurl() {
+        return masterUrl;
+    }
+    public void setMasterUrl(String masterUrl) {
+        this.masterUrl = masterUrl;
+    }
 }
