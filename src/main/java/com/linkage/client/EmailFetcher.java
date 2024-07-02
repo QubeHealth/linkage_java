@@ -3,7 +3,9 @@ package com.linkage.client;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.mail.BodyPart;
 import javax.mail.Folder;
@@ -18,6 +20,10 @@ import javax.mail.internet.MimeMultipart;
 import org.jsoup.Jsoup;
 
 import com.linkage.LinkageConfiguration;
+import com.linkage.api.ApiRequest;
+import com.linkage.api.ApiResponse;
+import com.linkage.utility.GcpFileUpload;
+import com.linkage.utility.Helper;
 
 public abstract class EmailFetcher extends BaseServiceClient {
     protected String host;
@@ -56,10 +62,9 @@ public abstract class EmailFetcher extends BaseServiceClient {
         if (messageCount > 0) {
             message = inbox.getMessage(messageCount);
         }
-        
+
         return message;
     }
-
 
     public String fetchSubject(Message message) throws MessagingException {
         return message.getSubject();
@@ -68,15 +73,15 @@ public abstract class EmailFetcher extends BaseServiceClient {
     public String fetchBody(Message message) throws IOException, MessagingException {
         Object content = message.getContent();
         String textContent = "";
-            if (content instanceof String) {
-                textContent = (String) content;
-            } else if (content instanceof Multipart) {
-                textContent = getTextFromMimeMultipart((Multipart) content);
-            }
+        if (content instanceof String) {
+            textContent = (String) content;
+        } else if (content instanceof Multipart) {
+            textContent = getTextFromMimeMultipart((Multipart) content);
+        }
         return textContent;
     }
 
-    public void fetchAttachments(Message message) throws IOException, MessagingException {
+    public void fetchAttachments(Message message, String userId) throws IOException, MessagingException {
         Object content = message.getContent();
 
         if (content instanceof MimeMultipart) {
@@ -84,7 +89,17 @@ public abstract class EmailFetcher extends BaseServiceClient {
             for (int i = 0; i < multipart.getCount(); i++) {
                 BodyPart bodyPart = multipart.getBodyPart(i);
                 if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
-                    String fileName = bodyPart.getFileName();
+                    String documentId = UUID.randomUUID().toString();
+                    String fileName = Helper.md5Encryption(userId) + "/estimation/" + documentId + ".pdf";
+
+                    String contentType = bodyPart.getContentType();
+                    InputStream fileContent = bodyPart.getInputStream();
+
+                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments(contentType, fileName, fileContent.readAllBytes(), contentType,
+                            true);
+
+                            String gcpUrl = gcpRes.getData();
+
                     if (fileName != null && !fileName.isEmpty()) {
                         String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
 

@@ -82,4 +82,33 @@ public final class GcpFileUpload {
             return "";
         }
     }
+
+    public static ApiResponse<String> uploadEmailAttachments(String bucketName, String outputFileNamePath,
+            byte[] fileContent,
+            String contentType, boolean isSignUrl) {
+        try {
+            Storage storage = getStorage();
+            // Define the path for staging environment
+            if (!"PROD".equals(System.getenv("Environment"))) {
+                outputFileNamePath = "testing/" + outputFileNamePath;
+            }
+
+            BlobId blobId = BlobId.of(bucketName, outputFileNamePath);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                    .setContentType(contentType)
+                    .build();
+
+            Blob blob = storage.create(blobInfo, fileContent);
+
+            // Handle signed URL generation
+            String signedUrl = "";
+            if (isSignUrl) {
+                signedUrl = blob.signUrl(EXPIRATION_TIMEOUT, TimeUnit.DAYS).toString();
+            }
+
+            return new ApiResponse<>(true, "File Uploaded Successfully", signedUrl);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "File Upload Failed", e.getMessage());
+        }
+    }
 }
