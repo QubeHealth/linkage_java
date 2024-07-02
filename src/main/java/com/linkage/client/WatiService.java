@@ -39,10 +39,12 @@ public class WatiService extends BaseServiceClient {
     // Referrer gets cashback after referee registers with message invite
     public ApiResponse<Object> referrerCashbackMessage(RefereeInviteMsgSchema body) {
 
+        Integer cbReferer = Integer.parseInt(body.getCashbackAmt().toString());
+
         // Arraylist of key value pairs then added to hashmap
         Map<String, String> parameter = new HashMap<>();
         parameter.put("name", "cashback_amount");
-        parameter.put("value", body.getCashbackAmt().toString());
+        parameter.put("value", cbReferer.toString());
 
         return sendMessage(body.getMobile(), REFERER_CASHBACK_TEMPLATE, "REFERER_CASHBACK", List.of(parameter));
 
@@ -51,10 +53,12 @@ public class WatiService extends BaseServiceClient {
     // Referee gets cashback after registering with message invite
     public ApiResponse<Object> refereeCashbackMessage(RefereeCashbackMsgSchema body) {
 
+        Integer cbReferee = Integer.parseInt(body.getCashbackAmt().toString());
+
         // Arraylist of key value pairs then added to hashmap
         Map<String, String> parameter1 = new HashMap<>();
         parameter1.put("name", "cashback_amount");
-        parameter1.put("value", body.getCashbackAmt().toString());
+        parameter1.put("value", cbReferee.toString());
         Map<String, String> parameter2 = new HashMap<>();
         parameter2.put("name", "company_name");
         parameter2.put("value", body.getCompany());
