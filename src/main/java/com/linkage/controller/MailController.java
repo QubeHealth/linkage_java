@@ -1,6 +1,8 @@
 package com.linkage.controller;
 
 import java.io.IOException;
+import java.util.Map;
+
 import javax.mail.MessagingException;
 import com.linkage.LinkageConfiguration;
 import com.linkage.client.MailReaderService;
@@ -29,7 +31,7 @@ public class MailController extends BaseController {
     @Path("/preAuthRequest")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String preAuthRequest(@Context HttpServletRequest request) throws MessagingException, IOException {
+    public Map<String, String> preAuthRequest(@Context HttpServletRequest request) throws MessagingException, IOException {
         return this.mailReaderService.fetchAndProcessEmail();
     }
 }

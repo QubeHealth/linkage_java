@@ -3,6 +3,9 @@ package com.linkage.client;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -10,7 +13,6 @@ import javax.mail.Multipart;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.Part;
 
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
 import com.linkage.LinkageConfiguration;
@@ -87,7 +89,7 @@ public class MailReaderService extends EmailFetcher {
         return result.toString();
     }
 
-    public String fetchAndProcessEmail() throws MessagingException, IOException {
+    public Map<String, String> fetchAndProcessEmail() throws MessagingException, IOException {
         connect();
         Message message = fetchLatestEmail();
         String subject = fetchSubject(message);
@@ -108,7 +110,9 @@ public class MailReaderService extends EmailFetcher {
         } else if ("addtional information".equalsIgnoreCase(keyword)) {
             return handleAddtionalInformation(subject, body, message);
         } else {
-            return "No matching function found for keyword: " + keyword;
+            Map<String, String> responseMap = new HashMap<>();
+            responseMap.put("error", "No matching function found for keyword: " + keyword);
+            return responseMap;
         }
     }
 
@@ -124,13 +128,13 @@ public class MailReaderService extends EmailFetcher {
         return null;
     }
 
-    private String handleSupportingDocument() {
-        JSONObject json = new JSONObject();
-        json.put("message", "Handling for supporting document");
-        return json.toString();
+    private Map<String, String> handleSupportingDocument() {
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put("message", "Handling for supporting document");
+        return responseMap;
     }
 
-    private String handleQueryReply(String subject, String body) {
+    private Map<String, String> handleQueryReply(String subject, String body) {
         String khiladiId = null;
         String clNo = null;
         String name = null;
@@ -147,22 +151,22 @@ public class MailReaderService extends EmailFetcher {
             }
         }
 
+        Map<String, String> responseMap = new HashMap<>();
+
         if (khiladiId != null && clNo != null && name != null) {
-            JSONObject json = new JSONObject();
-            json.put("Type", "query reply");
-            json.put("name", name);
-            json.put("khiladi_id", khiladiId);
-            json.put("cl_no", clNo);
-            json.put("body", body);
-            return json.toString();
+            responseMap.put("Type", "query reply");
+            responseMap.put("name", name);
+            responseMap.put("khiladi_id", khiladiId);
+            responseMap.put("cl_no", clNo);
+            responseMap.put("body", body);
         } else {
-            JSONObject errorJson = new JSONObject();
-            errorJson.put("error", "Unable to extract name, khiladi_id, and cl_no from subject: " + subject);
-            return errorJson.toString();
+            responseMap.put("error", "Unable to extract name, khiladi_id, and cl_no from subject: " + subject);
         }
+
+        return responseMap;
     }
 
-    private String handleCashlessCreditRequest(String subject, String body, Message message) throws IOException, MessagingException {
+    private Map<String, String> handleCashlessCreditRequest(String subject, String body, Message message) throws IOException, MessagingException {
         String employeeName = null;
         String employeeCode = null;
         String claimNo = null;
@@ -195,23 +199,23 @@ public class MailReaderService extends EmailFetcher {
             }
         }
     
+        Map<String, String> responseMap = new HashMap<>();
+
         if (employeeName != null && employeeCode != null && claimNo != null && finalApprovedAmount != null && cashlessRequestAmount != null) {
-            JSONObject json = new JSONObject();
-            json.put("Type", "cashless credit request");
-            json.put("employee_name", employeeName);
-            json.put("employee_code", employeeCode);
-            json.put("claim_no", claimNo);
-            json.put("final_cashless_approved_amount", finalApprovedAmount);
-            json.put("cashless_request_amount", cashlessRequestAmount);
-            return json.toString();
+            responseMap.put("Type", "cashless credit request");
+            responseMap.put("employee_name", employeeName);
+            responseMap.put("employee_code", employeeCode);
+            responseMap.put("claim_no", claimNo);
+            responseMap.put("final_cashless_approved_amount", finalApprovedAmount);
+            responseMap.put("cashless_request_amount", cashlessRequestAmount);
         } else {
-            JSONObject errorJson = new JSONObject();
-            errorJson.put("error", "Unable to extract all required details from subject and body.");
-            return errorJson.toString();
+            responseMap.put("error", "Unable to extract all required details from subject and body.");
         }
+
+        return responseMap;
     }
 
-    private String handleAddtionalInformation(String subject, String body, Message message) throws IOException, MessagingException {
+    private Map<String, String> handleAddtionalInformation(String subject, String body, Message message) throws IOException, MessagingException {
         String employeeCode = null;
         String claimNo = null;
         String documentRequired = null;
@@ -244,22 +248,22 @@ public class MailReaderService extends EmailFetcher {
             }
         }
 
+        Map<String, String> responseMap = new HashMap<>();
+
         if (employeeCode != null && claimNo != null) {
-            JSONObject json = new JSONObject();
-            json.put("Type", "Addtional Information");
-            json.put("employee_code", employeeCode);
-            json.put("claim_no", claimNo);
-            json.put("document_required", documentRequired);
-            json.put("patient_name", patientName);
-            return json.toString();
+            responseMap.put("Type", "Additional Information");
+            responseMap.put("employee_code", employeeCode);
+            responseMap.put("claim_no", claimNo);
+            responseMap.put("document_required", documentRequired);
+            responseMap.put("patient_name", patientName);
         } else {
-            JSONObject errorJson = new JSONObject();
-            errorJson.put("error", "Unable to extract all required details from subject and body.");
-            return errorJson.toString();
+            responseMap.put("error", "Unable to extract all required details from subject and body.");
         }
+
+        return responseMap;
     }
 
-    private String handleFinalBillAndDischargeSummary(String subject, String body) {
+    private Map<String, String> handleFinalBillAndDischargeSummary(String subject, String body) {
         String khiladiId = null;
         String claimNo = null;
         String name = null;
@@ -278,22 +282,22 @@ public class MailReaderService extends EmailFetcher {
             }
         }
 
+        Map<String, String> responseMap = new HashMap<>();
+
         if (khiladiId != null && claimNo != null && name != null) {
-            JSONObject json = new JSONObject();
-            json.put("Type", "Final Bill And Discharge Summary");
-            json.put("name", name);
-            json.put("khiladi_id", khiladiId);
-            json.put("claim_no", claimNo);
-            json.put("body", body); // Assuming 'body' needs to be included here
-            return json.toString();
+            responseMap.put("Type", "Final Bill And Discharge Summary");
+            responseMap.put("name", name);
+            responseMap.put("khiladi_id", khiladiId);
+            responseMap.put("claim_no", claimNo);
+            responseMap.put("body", body);
         } else {
-            JSONObject errorJson = new JSONObject();
-            errorJson.put("error", "Unable to extract name, khiladi_id, and claim_no from subject: " + subject);
-            return errorJson.toString();
+            responseMap.put("error", "Unable to extract name, khiladi_id, and claim_no from subject: " + subject);
         }
+
+        return responseMap;
     }
 
-    private String handlePreAuth(String subject) {
+    private Map<String, String> handlePreAuth(String subject) {
         String khiladiId = null;
         String policyNo = null;
         String name = null;
@@ -311,18 +315,17 @@ public class MailReaderService extends EmailFetcher {
                 name = parts[i + 1] + " " + parts[i + 2];
             }
         }
+        Map<String, String> responseMap = new HashMap<>();
 
         if (khiladiId != null && policyNo != null && name != null) {
-            JSONObject json = new JSONObject();
-            json.put("name", name);
-            json.put("khiladi_id", khiladiId);
-            json.put("policy_no", policyNo);
-            return json.toString();
+            responseMap.put("name", name);
+            responseMap.put("khiladi_id", khiladiId);
+            responseMap.put("policy_no", policyNo);
         } else {
-            JSONObject errorJson = new JSONObject();
-            errorJson.put("error", "Unable to extract name, khiladi_id, and policy_no from subject: " + subject);
-            return errorJson.toString();
+            responseMap.put("error", "Unable to extract name, khiladi_id, and policy_no from subject: " + subject);
         }
+
+        return responseMap;
     }
 
     @Override
