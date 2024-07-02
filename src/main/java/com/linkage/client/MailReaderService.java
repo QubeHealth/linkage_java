@@ -1,20 +1,11 @@
 package com.linkage.client;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.Part;
-
-import org.jsoup.Jsoup;
-
 import com.linkage.LinkageConfiguration;
 
 public class MailReaderService extends EmailFetcher {
@@ -26,67 +17,6 @@ public class MailReaderService extends EmailFetcher {
 
     public void connect() throws MessagingException {
         super.connect();
-    }
-
-    @Override
-    public String fetchSubject(Message message) throws MessagingException {
-        return message.getSubject();
-    }
-
-    @Override
-    public String fetchBody(Message message) throws IOException, MessagingException {
-        Object content = message.getContent();
-        String textContent = "";
-            if (content instanceof String) {
-                textContent = (String) content;
-            } else if (content instanceof Multipart) {
-                textContent = getTextFromMimeMultipart((Multipart) content);
-            }
-        return textContent;
-    }
-
-    @Override
-    public void fetchAttachments(Message message) throws IOException, MessagingException {
-        Object content = message.getContent();
-
-        if (content instanceof MimeMultipart) {
-            MimeMultipart multipart = (MimeMultipart) content;
-            for (int i = 0; i < multipart.getCount(); i++) {
-                BodyPart bodyPart = multipart.getBodyPart(i);
-                if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
-                    String fileName = bodyPart.getFileName();
-                    if (fileName != null && !fileName.isEmpty()) {
-                        String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
-
-                        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-                            bodyPart.getInputStream().transferTo(outputStream);
-                        } catch (IOException | MessagingException e) {
-                            e.printStackTrace();
-                            throw new IOException("Error downloading attachment: " + fileName, e);
-                        }
-
-                        System.out.println("Attachment downloaded");
-                    }
-                }
-            }
-        }
-    }
-
-    private String getTextFromMimeMultipart(Multipart mimeMultipart) throws MessagingException, IOException {
-        StringBuilder result = new StringBuilder();
-        int count = mimeMultipart.getCount();
-        for (int i = 0; i < count; i++) {
-            BodyPart bodyPart = mimeMultipart.getBodyPart(i);
-            if (bodyPart.isMimeType("text/plain")) {
-                result.append(bodyPart.getContent());
-            } else if (bodyPart.isMimeType("text/html")) {
-                String html = (String) bodyPart.getContent();
-                result.append(Jsoup.parse(html).text()); // Using Jsoup to convert HTML to plain text
-            } else if (bodyPart.getContent() instanceof MimeMultipart) {
-                result.append(getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
-            }
-        }
-        return result.toString();
     }
 
     public Map<String, String> fetchAndProcessEmail() throws MessagingException, IOException {
@@ -135,7 +65,7 @@ public class MailReaderService extends EmailFetcher {
     }
 
     private Map<String, String> handleQueryReply(String subject, String body) {
-        String khiladiId = null;
+        String khId = null;
         String clNo = null;
         String name = null;
 
@@ -143,7 +73,7 @@ public class MailReaderService extends EmailFetcher {
 
         for (int i = 0; i < parts.length; i++) {
             if (parts[i].startsWith("KH")) {
-                khiladiId = parts[i].trim();
+                khId = parts[i].trim();
             } else if (parts[i].startsWith("CL-")) {
                 clNo = parts[i].trim();
             } else if (name == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
@@ -153,14 +83,14 @@ public class MailReaderService extends EmailFetcher {
 
         Map<String, String> responseMap = new HashMap<>();
 
-        if (khiladiId != null && clNo != null && name != null) {
+        if (khId != null && clNo != null && name != null) {
             responseMap.put("Type", "query reply");
             responseMap.put("name", name);
-            responseMap.put("khiladi_id", khiladiId);
+            responseMap.put("kh_id", khId);
             responseMap.put("cl_no", clNo);
             responseMap.put("body", body);
         } else {
-            responseMap.put("error", "Unable to extract name, khiladi_id, and cl_no from subject: " + subject);
+            responseMap.put("error", "Unable to extract name, kh_id, and cl_no from subject: " + subject);
         }
 
         return responseMap;
@@ -264,7 +194,7 @@ public class MailReaderService extends EmailFetcher {
     }
 
     private Map<String, String> handleFinalBillAndDischargeSummary(String subject, String body) {
-        String khiladiId = null;
+        String khId = null;
         String claimNo = null;
         String name = null;
 
@@ -272,7 +202,7 @@ public class MailReaderService extends EmailFetcher {
 
         for (int i = 0; i < parts.length; i++) {
             if (parts[i].startsWith("KH")) {
-                khiladiId = parts[i].trim();
+                khId = parts[i].trim();
             } else if (parts[i].startsWith("CLAIM") && i < parts.length - 1 && parts[i + 1].startsWith("NO-")) {
                 if (i + 2 < parts.length) {
                     claimNo = parts[i + 2].trim();
@@ -284,21 +214,21 @@ public class MailReaderService extends EmailFetcher {
 
         Map<String, String> responseMap = new HashMap<>();
 
-        if (khiladiId != null && claimNo != null && name != null) {
+        if (khId != null && claimNo != null && name != null) {
             responseMap.put("Type", "Final Bill And Discharge Summary");
             responseMap.put("name", name);
-            responseMap.put("khiladi_id", khiladiId);
+            responseMap.put("kh_id", khId);
             responseMap.put("claim_no", claimNo);
             responseMap.put("body", body);
         } else {
-            responseMap.put("error", "Unable to extract name, khiladi_id, and claim_no from subject: " + subject);
+            responseMap.put("error", "Unable to extract name, kh_id, and claim_no from subject: " + subject);
         }
 
         return responseMap;
     }
 
     private Map<String, String> handlePreAuth(String subject) {
-        String khiladiId = null;
+        String khId = null;
         String policyNo = null;
         String name = null;
 
@@ -306,7 +236,7 @@ public class MailReaderService extends EmailFetcher {
 
         for (int i = 0; i < parts.length; i++) {
             if (parts[i].startsWith("KH")) {
-                khiladiId = parts[i].trim();
+                khId = parts[i].trim();
             } else if (parts[i].equalsIgnoreCase("Policy") && i < parts.length - 1 && parts[i + 1].equalsIgnoreCase("No:")) {
                 if (i + 2 < parts.length) {
                     policyNo = parts[i + 2].trim();
@@ -317,12 +247,12 @@ public class MailReaderService extends EmailFetcher {
         }
         Map<String, String> responseMap = new HashMap<>();
 
-        if (khiladiId != null && policyNo != null && name != null) {
+        if (khId != null && policyNo != null && name != null) {
             responseMap.put("name", name);
-            responseMap.put("khiladi_id", khiladiId);
+            responseMap.put("kh_id", khId);
             responseMap.put("policy_no", policyNo);
         } else {
-            responseMap.put("error", "Unable to extract name, khiladi_id, and policy_no from subject: " + subject);
+            responseMap.put("error", "Unable to extract name, kh_id, and policy_no from subject: " + subject);
         }
 
         return responseMap;

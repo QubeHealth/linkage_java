@@ -28,10 +28,10 @@ public class MailController extends BaseController {
     }
 
     @POST
-    @Path("/preAuthRequest")
+    @Path("/emailReader")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> preAuthRequest(@Context HttpServletRequest request) throws MessagingException, IOException {
+    public Map<String, String> emailReader(@Context HttpServletRequest request) throws MessagingException, IOException {
         return this.mailReaderService.fetchAndProcessEmail();
     }
 }
