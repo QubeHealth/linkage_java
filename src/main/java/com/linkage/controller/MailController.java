@@ -8,6 +8,7 @@ import javax.mail.MessagingException;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.MailReaderService;
+import com.linkage.client.MailWriterService;
 import com.linkage.client.MasterService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +28,13 @@ public class MailController extends BaseController {
 
     private MailReaderService mailReaderService;
     private MasterService masterService;
+    private MailWriterService mailWriterService;
 
     public MailController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
         this.mailReaderService = new MailReaderService(null, null, null, null, configuration);
         this.masterService = new MasterService(configuration);
+        this.mailWriterService = new MailWriterService(configuration);
     }
 
     @POST
@@ -57,5 +60,13 @@ public class MailController extends BaseController {
                     .entity(new ApiResponse<>(false, "Error storing data", null))
                     .build();
         }
+    }
+
+    @POST
+    @Path("/emailWriter")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String emailWriter(@Context HttpServletRequest request) throws MessagingException, IOException {
+        return this.mailWriterService.mailSender();
     }
 }

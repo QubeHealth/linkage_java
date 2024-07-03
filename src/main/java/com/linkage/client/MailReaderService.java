@@ -3,14 +3,11 @@ package com.linkage.client;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-
 import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import com.linkage.LinkageConfiguration;
-import com.linkage.core.constants.Constants;
 
 public class MailReaderService extends EmailFetcher {
 
@@ -136,7 +133,7 @@ public class MailReaderService extends EmailFetcher {
         String finalApprovedAmount = null;
         String cashlessRequestAmount = null;
 
-        fetchAttachments(message, employeeCode);
+        fetchAttachments(message);
         // Extract approved ID from subject
         String[] subjectParts = subject.split("\\s+");
         for (int i = 0; i < subjectParts.length; i++) {
@@ -179,14 +176,14 @@ public class MailReaderService extends EmailFetcher {
         return responseMap;
     }
 
-    private Map<String, String> handleAddtionalInformation(String subject, String body, Message message)
+    private Map<String, String> handleAdditionalInformation(String subject, String body, Message message)
             throws IOException, MessagingException {
         String employeeCode = null;
         String claimNo = null;
         String documentRequired = null;
         String patientName = null;
 
-        fetchAttachments(message, employeeCode);
+        fetchAttachments(message);
 
         // Extract approved_id from subject
         String[] subjectParts = subject.split("\\s+");
