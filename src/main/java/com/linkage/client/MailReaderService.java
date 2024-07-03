@@ -236,7 +236,7 @@ public class MailReaderService extends EmailFetcher {
         return responseMap;
     }
 
-    private String handlePreAuth(String subject) {
+    private Map<String,String> handlePreAuth(String subject) {
         String khId = null;
         String policyNo = null;
         String name = null;
@@ -265,10 +265,10 @@ public class MailReaderService extends EmailFetcher {
             responseMap.put("kh_id", khId);
             responseMap.put("policy_no", policyNo);
         } else {
-            return "Data values missing in subject of email";
+            return null;
         }
 
-        return "";
+        return responseMap;
     }
 
     @Override
