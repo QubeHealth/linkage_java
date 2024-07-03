@@ -45,12 +45,17 @@ public class MailController extends BaseController {
     @POST
     @Path("/emailDataStore")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response emailDataStore (@Context HttpServletRequest request, Map<String, String> requestBody){
-    
-    ApiResponse<Object> dApiResponse = masterService.mailDataStore(requestBody);
-
-        return Response.status(Response.Status.OK)
-                .entity(new ApiResponse<>(true, "Data stored successfully", null))
-                .build();
-}
+    public Response emailDataStore(@Context HttpServletRequest request, Map<String, String> requestBody) {
+        try {
+            //ApiResponse<Object> dApiResponse = masterService.mailDataStore(requestBody);
+            return Response.status(Response.Status.OK)
+                    .entity(new ApiResponse<>(true, "Data stored successfully", null))
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse<>(false, "Error storing data", null))
+                    .build();
+        }
+    }
 }
