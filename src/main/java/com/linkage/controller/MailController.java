@@ -49,8 +49,10 @@ public class MailController extends BaseController {
     
     ApiResponse<Object> dApiResponse = masterService.mailDataStore(requestBody);
 
-        return Response.status(Response.Status.OK)
-                .entity(new ApiResponse<>(true, "Data stored successfully", null))
+    return Response.status(Response.Status.OK)
+                .entity(new ApiResponse<>(true, "Data fetched successfully", dApiResponse.getData()))
                 .build();
+
 }
+
 }

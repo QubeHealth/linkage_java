@@ -52,7 +52,7 @@ public abstract class EmailFetcher extends BaseServiceClient {
         inbox.open(Folder.READ_ONLY);
     }
 
-    public Message fetchLatestEmail() throws MessagingException, IOException {
+    public Message fetchLatestEmail() throws MessagingException {
         Message message = null;
         int messageCount = inbox.getMessageCount();
 
