@@ -115,8 +115,31 @@ public class MailController extends BaseController {
         Long emailItems = (Long)this.masterService.emailInsert(emailerItems);
 
         Map<String, Object> adjudicationDataMap = new HashMap<>();
-        adjudicationDataMap.put("partnered_user_id",policyNo);
         adjudicationDataMap.put("tpa_desk_id",khId);
+        adjudicationDataMap.put("pf_req_id", prefundedEmail);
+        adjudicationDataMap.put("requested_amount", null);
+        adjudicationDataMap.put("estimated_amount", null);
+        adjudicationDataMap.put("file_path", );
+        adjudicationDataMap.put("file_name", );
+        adjudicationDataMap.put("user_id", policyNo);
+        adjudicationDataMap.put("offer_id", null);
+        adjudicationDataMap.put("hsp_id",123);
+        adjudicationDataMap.put("document_id", );
+        adjudicationDataMap.put("associated_user_id", null);
+        adjudicationDataMap.put("status", "PENDING");
+        adjudicationDataMap.put("created_by", "TPA DESK");
+        adjudicationDataMap.put("requested_by", null);
+
+        Long adjudicationDataId = (Long)this.loansService.adjudicationDataStore(adjudicationDataMap);
+
+        Map<String, Object> adjudicationItems = new HashMap<>();
+        adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
+        adjudicationItems.put("pf_document_id",prefundedEmail);
+        adjudicationItems.put("document_url", );
+        adjudicationItems.put("is_active", 1);
+
+        Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
+
     }
     
     //Query reply flow db calls
