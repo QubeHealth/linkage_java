@@ -81,7 +81,7 @@ public abstract class EmailFetcher extends BaseServiceClient {
         return textContent;
     }
 
-    public void fetchAttachments(Message message) throws IOException, MessagingException {
+    public void fetchAttachments(Message message, String string) throws IOException, MessagingException {
         Object content = message.getContent();
 
         if (content instanceof MimeMultipart) {

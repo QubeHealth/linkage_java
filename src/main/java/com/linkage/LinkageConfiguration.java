@@ -19,6 +19,8 @@ public class LinkageConfiguration extends Configuration {
     
     private String befiscAuthKey;
 
+    private String loansUrl;
+
     @NotEmpty
     private String masterUrl;
 
@@ -78,5 +80,12 @@ public class LinkageConfiguration extends Configuration {
     }
     public void setMasterUrl(String masterUrl) {
         this.masterUrl = masterUrl;
+    }
+
+    public String getLoansUrl() {
+        return loansUrl;
+    }
+    public void setLoansurl(String loansUrl) {
+        this.loansUrl = loansUrl;
     }
 }
