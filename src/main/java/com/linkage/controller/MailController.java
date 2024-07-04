@@ -14,6 +14,8 @@ import com.linkage.client.LoansService;
 import com.linkage.client.MailReaderService;
 import com.linkage.client.MailWriterService;
 import com.linkage.client.MasterService;
+import com.linkage.core.constants.Constants;
+import com.linkage.core.constants.Constants.EmailSubjectKeywords;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Validator;
@@ -53,15 +55,15 @@ public class MailController extends BaseController {
         String type = response.get("type");
 
         // Based on the type, call different db functions using if-else conditions
-        if ("PRE AUTH".equalsIgnoreCase(type)) {
+        if (EmailSubjectKeywords.PRE_AUTH.equalsIgnoreCase(type)) {
             handlePreAuth(response);
-        } else if ("QUERY REPLY".equalsIgnoreCase(type)) {
+        } else if (EmailSubjectKeywords.QUERY_REPLY.equalsIgnoreCase(type)) {
             handleQueryReply(response);
-        } else if ("FINAL BILL AND DISCHARGE SUMMARY".equalsIgnoreCase(type)) {
+        } else if (EmailSubjectKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY.equalsIgnoreCase(type)) {
             handleFinalBillAndDischargeSummary(response);
-        } else if ("CASHLESS CREDIT REQUEST".equalsIgnoreCase(type)) {
+        } else if (EmailSubjectKeywords.CASHLESS_CREDIT_REQUEST.equalsIgnoreCase(type)) {
             handleCashlessCreditRequest(response);
-        } else if ("ADDITIONAL INFORMATION".equalsIgnoreCase(type)) {
+        } else if (EmailSubjectKeywords.ADDITIONAL_INFORMATION.equalsIgnoreCase(type)) {
             handleAdditionalInformation(response);
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("Unknown type: " + type).build();

@@ -8,6 +8,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import com.linkage.LinkageConfiguration;
+import com.linkage.core.constants.Constants.EmailSubjectKeywords;
 
 public class MailReaderService extends EmailFetcher {
 
@@ -35,17 +36,17 @@ public class MailReaderService extends EmailFetcher {
                 markAsUnread(message);
                 responseMap = new HashMap<>();
                 responseMap.put("error", "No matching function found for keyword: " + keyword);
-            } else if ("query reply".equalsIgnoreCase(keyword)) {
+            } else if (EmailSubjectKeywords.QUERY_REPLY.equalsIgnoreCase(keyword)) {
                 responseMap = handleQueryReply(subject, body);
-            } else if ("supporting document".equalsIgnoreCase(keyword)) {
+            } else if (EmailSubjectKeywords.SUPPORTING_DOCUMENT.equalsIgnoreCase(keyword)) {
                 responseMap = handleSupportingDocument();
-            } else if ("final bill and discharge summary".equalsIgnoreCase(keyword)) {
+            } else if (EmailSubjectKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY.equalsIgnoreCase(keyword)) {
                 responseMap = handleFinalBillAndDischargeSummary(subject, body);
-            } else if ("pre auth".equalsIgnoreCase(keyword)) {
+            } else if (EmailSubjectKeywords.PRE_AUTH.equalsIgnoreCase(keyword)) {
                 responseMap = handlePreAuth(subject);
-            } else if ("cashless credit request".equalsIgnoreCase(keyword)) {
+            } else if (EmailSubjectKeywords.CASHLESS_CREDIT_REQUEST.equalsIgnoreCase(keyword)) {
                 responseMap = handleCashlessCreditRequest(subject, body, message);
-            } else if ("additional information".equalsIgnoreCase(keyword)) {
+            } else if (EmailSubjectKeywords.ADDITIONAL_INFORMATION.equalsIgnoreCase(keyword)) {
                 responseMap = handleAdditionalInformation(subject, body, message);
             } else {
                 responseMap = new HashMap<>();
