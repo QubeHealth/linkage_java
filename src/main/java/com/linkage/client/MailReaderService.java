@@ -46,7 +46,7 @@ public class MailReaderService extends EmailFetcher {
             } else if ("cashless credit request".equalsIgnoreCase(keyword)) {
                 responseMap = handleCashlessCreditRequest(subject, body, message);
             } else if ("additional information".equalsIgnoreCase(keyword)) {
-                responseMap = handleAddtionalInformation(subject, body, message);
+                responseMap = handleAdditionalInformation(subject, body, message);
             } else {
                 responseMap = new HashMap<>();
                 responseMap.put("error", "No matching function found for keyword: " + keyword);
@@ -150,7 +150,7 @@ public class MailReaderService extends EmailFetcher {
         String initialCashlessApprovedAmount = null;
         String initialCashlessRequestAmount = null;
 
-        fetchAttachments(message, employeeCode);
+        fetchAttachments(message);
         // Extract approved ID from subject
         String[] subjectParts = subject.split("\\s+");
         for (int i = 0; i < subjectParts.length; i++) {
@@ -249,15 +249,8 @@ public class MailReaderService extends EmailFetcher {
 
         return responseMap;
     }
-<<<<<<< HEAD
 
-    private Map<String, String> handleAdditionalInformation(String subject, String body, Message message)
-=======
- 
-    
-    private Map<String, String> handleAddtionalInformation(String subject, String body, Message message)
->>>>>>> 23e34031482fea45cd17298b34d8dd7163652f5d
-            throws IOException, MessagingException {
+    private Map<String, String> handleAdditionalInformation(String subject, String body, Message message) throws IOException, MessagingException {
         String employeeCode = null;
         String claimNo = null;
         String documentRequired = null;
@@ -381,6 +374,3 @@ public class MailReaderService extends EmailFetcher {
         super.close();
     }
 }
-
-
-
