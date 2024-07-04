@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -51,7 +53,7 @@ public abstract class EmailFetcher extends BaseServiceClient {
         store = emailSession.getStore("imaps");
         store.connect(host, user, password);
         inbox = store.getFolder("INBOX");
-        inbox.open(Folder.READ_ONLY);
+        inbox.open(Folder.READ_WRITE);
     }
 
     public Message fetchLatestEmail() throws MessagingException {
@@ -81,67 +83,63 @@ public abstract class EmailFetcher extends BaseServiceClient {
         return textContent;
     }
 
-    public void fetchAttachments(Message message) throws IOException, MessagingException {
-        Object content = message.getContent();
-
-        if (content instanceof MimeMultipart) {
-            MimeMultipart multipart = (MimeMultipart) content;
-            for (int i = 0; i < multipart.getCount(); i++) {
-                BodyPart bodyPart = multipart.getBodyPart(i);
-                if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
-                    String fileName = bodyPart.getFileName();
-                    if (fileName != null && !fileName.isEmpty()) {
-                        String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
-
-                        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-                            bodyPart.getInputStream().transferTo(outputStream);
-                        } catch (IOException | MessagingException e) {
-                            e.printStackTrace();
-                            throw new IOException("Error downloading attachment: " + fileName, e);
-                        }
-
-                        System.out.println("Attachment downloaded");
-                    }
-                }
-            }
-        }
-    }
-
-    // public String fetchAttachments(Message message, String userId) throws IOException, MessagingException {
+    // public Map<String,String>  fetchAttachments(Message message, String userId) throws IOException, MessagingException {
     //     Object content = message.getContent();
-    //     String gcpUrl = null;
+    //     Map<String,String> gcpResponse = new HashMap<>();
+    //     gcpResponse.put("gcp_path", "gcpUrl");
+    //     gcpResponse.put("gcp_file_name", "gcpFileName");
 
     //     if (content instanceof MimeMultipart) {
     //         MimeMultipart multipart = (MimeMultipart) content;
     //         for (int i = 0; i < multipart.getCount(); i++) {
     //             BodyPart bodyPart = multipart.getBodyPart(i);
     //             if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
-    //                 String documentId = UUID.randomUUID().toString();
-    //                 String fileName = Helper.md5Encryption(userId) + "/estimation/" + documentId + ".pdf";
+    //                 String fileName = bodyPart.getFileName();
+    //                 if (fileName != null && !fileName.isEmpty()) {
+    //                     String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
 
-    //                 String contentType = bodyPart.getContentType();
-    //                 InputStream fileContent = bodyPart.getInputStream();
+    //                     try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+    //                         bodyPart.getInputStream().transferTo(outputStream);
+    //                     } catch (IOException | MessagingException e) {
+    //                         e.printStackTrace();
+    //                         throw new IOException("Error downloading attachment: " + fileName, e);
+    //                     }
 
-    //               ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments(contentType, fileName, fileContent.readAllBytes(), contentType, true);
-    //                     gcpUrl = gcpRes.getData();
-    //                    // gcpPath = GcpFileUpload.getSignedUrl(contentType,gcpUrl);
-
-
-    //                 // if (fileName != null && !fileName.isEmpty()) {
-    //                 //     String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
-
-    //                 //     try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-    //                 //         bodyPart.getInputStream().transferTo(outputStream);
-    //                 //     } catch (IOException | MessagingException e) {
-    //                 //         e.printStackTrace();
-    //                 //         throw new IOException("Error downloading attachment: " + fileName, e);
-    //                 //     }
-    //                 // }
+    //                     System.out.println("Attachment downloaded");
+    //                 }
     //             }
     //         }
     //     }
-    //     return gcpUrl;
+    //     return gcpResponse;
     // }
+
+    public Map<String,String> fetchAttachments(Message message, String userId) throws IOException, MessagingException {
+        Object content = message.getContent();
+        String gcpUrl = null;
+        String gcpFileName = null;
+        Map<String,String> gcpResponse = new HashMap<>();
+
+        if (content instanceof MimeMultipart) {
+            MimeMultipart multipart = (MimeMultipart) content;
+            for (int i = 0; i < multipart.getCount(); i++) {
+                BodyPart bodyPart = multipart.getBodyPart(i);
+                if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+                    String documentId = UUID.randomUUID().toString();
+                    gcpFileName = Helper.md5Encryption(userId) + "/estimation/" + documentId + ".pdf";
+
+                    String contentType = bodyPart.getContentType();
+                    InputStream fileContent = bodyPart.getInputStream();
+
+                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments(contentType, gcpFileName, fileContent.readAllBytes(), contentType, true);
+                        gcpUrl = gcpRes.getData();
+                }
+            }
+        }
+        gcpResponse.put("gcp_path", gcpUrl);
+        gcpResponse.put("gcp_file_name", gcpFileName);
+
+        return gcpResponse;
+    }
 
     private String getTextFromMimeMultipart(Multipart mimeMultipart) throws MessagingException, IOException {
         StringBuilder result = new StringBuilder();
