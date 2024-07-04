@@ -26,13 +26,13 @@ public class MailReaderService extends EmailFetcher {
     public Map<String, String> fetchAndProcessEmail() throws MessagingException, IOException {
         connect();
         Message message = fetchLatestEmail();
+        Map<String, String> responseMap = new HashMap<>();
         try {
             String subject = fetchSubject(message);
             String body = fetchBody(message);
 
             String keyword = parseSubjectForKeyword(subject);
 
-            Map<String, String> responseMap;
             if (keyword == null) {
                 // Mark email as unread
                 markAsUnread(message);
@@ -49,7 +49,7 @@ public class MailReaderService extends EmailFetcher {
             } else if ("cashless credit request".equalsIgnoreCase(keyword)) {
                 responseMap = handleCashlessCreditRequest(subject, body, message);
             } else if ("additional information".equalsIgnoreCase(keyword)) {
-                responseMap = handleAdditionalInformation(subject, body, message);
+                responseMap = handleAddtionalInformation(subject, body, message);
             } else {
                 responseMap = new HashMap<>();
                 responseMap.put("error", "No matching function found for keyword: " + keyword);
@@ -57,7 +57,6 @@ public class MailReaderService extends EmailFetcher {
 
             markAsRead(message);
 
-            return responseMap;
         } catch (Exception e) {
             // Mark email as unread
             markAsUnread(message);
@@ -65,6 +64,7 @@ public class MailReaderService extends EmailFetcher {
         } finally {
             close();
         }
+        return responseMap;
     }
 
     private String parseSubjectForKeyword(String subject) {
@@ -96,8 +96,8 @@ public class MailReaderService extends EmailFetcher {
 
     private Map<String, String> handleQueryReply(String subject, String body) {
         String khId = null;
-        String clNo = null;
-        String name = null;
+        String claimNo = null;
+        String patientName = null;
 
         String[] parts = subject.split("\\s+");
 
@@ -105,22 +105,23 @@ public class MailReaderService extends EmailFetcher {
             if (parts[i].startsWith("KH")) {
                 khId = parts[i].trim();
             } else if (parts[i].startsWith("CL-")) {
-                clNo = parts[i].trim();
-            } else if (name == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
-                name = parts[i + 1] + " " + parts[i + 2];
-            } else if (name == null && parts.length > i  && parts[i].equalsIgnoreCase("For")) {
-                name = parts[i + 1];
+                claimNo = parts[i].trim();
+            } else if (patientName == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
+                patientName = parts[i + 1] + " " + parts[i + 2];
+            } else if (patientName == null && parts.length > i  && parts[i].equalsIgnoreCase("For")) {
+                patientName = parts[i + 1];
             }
         }
 
         Map<String, String> responseMap = new HashMap<>();
 
-        if (khId != null && clNo != null && name != null) {
-            responseMap.put("Type", "query reply");
-            responseMap.put("name", name);
+        if (khId != null && claimNo != null && patientName != null) {
+            responseMap.put("type", "QUERY REPLY");
+            responseMap.put("patient_name", patientName);
             responseMap.put("tpa_desk_id", khId);
-            responseMap.put("cl_no", clNo);
+            responseMap.put("claim_no", claimNo);
             responseMap.put("body", body);
+            responseMap.put("subject", subject);
         } else {
             responseMap.put("error", "Unable to extract name, kh_id, and cl_no from subject: " + subject);
         }
@@ -130,11 +131,81 @@ public class MailReaderService extends EmailFetcher {
 
     private Map<String, String> handleCashlessCreditRequest(String subject, String body, Message message)
             throws IOException, MessagingException {
+        String[] bodyLines = body.split("\n");
+        for (String line : bodyLines) {
+            if (line.startsWith("Initial Cashless Approved Amount:-")) {
+                return handleInitialCashlessCreditRequest(subject, body, message);
+            } else if (line.startsWith("Final Cashless Approved Amount:-")) {
+                return handleFinalCashlessCreditRequest(subject, body, message);
+            }
+        }
+        // If neither condition matches, return an error response
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put("error", "Neither Initial nor Final Cashless Approved Amount found in body.");
+        return responseMap;
+    }
+
+    private Map<String, String> handleInitialCashlessCreditRequest(String subject, String body, Message message)
+            throws IOException, MessagingException {
+        String employeeName = null;
+        String employeeCode = null;
+        String claimNo = null;
+        String initialCashlessApprovedAmount = null;
+        String initialCashlessRequestAmount = null;
+
+        fetchAttachments(message, employeeCode);
+        // Extract approved ID from subject
+        String[] subjectParts = subject.split("\\s+");
+        for (int i = 0; i < subjectParts.length; i++) {
+            if (subjectParts[i].equalsIgnoreCase("approved")) {
+                employeeCode = subjectParts[i + 1].replace(",", "").trim();
+            }
+        }
+
+        // Extract details from body
+        String[] bodyLines = body.split("\n");
+        for (String line : bodyLines) {
+            line = line.trim();
+            if (line.startsWith("Emloyee Name:-")) {
+                employeeName = line.substring("Emloyee Name:-".length()).trim();
+            } else if (line.startsWith("Employee Code:-")) {
+                employeeCode = line.substring("Employee Code:-".length()).trim();
+            } else if (line.startsWith("Claim No:-")) {
+                claimNo = line.substring("Claim No:-".length()).trim();
+            } else if (line.startsWith("Initial Cashless Approved Amount:-")) {
+                initialCashlessApprovedAmount = line.substring("Initial Cashless Approved Amount:-".length()).trim();
+            } else if (line.startsWith("Cashless Request Amount:-")) {
+                initialCashlessRequestAmount = line.substring("Cashless Request Amount:-".length()).trim();
+            }
+        }
+
+        Map<String, String> responseMap = new HashMap<>();
+
+        if (employeeName != null && employeeCode != null && claimNo != null && initialCashlessApprovedAmount != null
+                && initialCashlessRequestAmount != null) {
+            responseMap.put("type", "cashless credit request");
+            responseMap.put("employee_name", employeeName);
+            responseMap.put("employee_code", employeeCode);
+            responseMap.put("claim_no", claimNo);
+            responseMap.put("initial_cashless_approved_amount", initialCashlessApprovedAmount);
+            responseMap.put("initial_cashless_request_amount", initialCashlessRequestAmount);
+            responseMap.put("subject", subject);
+            responseMap.put("body", body);
+
+        } else {
+            responseMap.put("error", "Unable to extract all required details from subject and body.");
+        }
+
+        return responseMap;
+    }
+
+    private Map<String, String> handleFinalCashlessCreditRequest(String subject, String body, Message message)
+            throws IOException, MessagingException {
         String employeeName = null;
         String employeeCode = null;
         String claimNo = null;
         String finalApprovedAmount = null;
-        String cashlessRequestAmount = null;
+        String finalCashlessRequestAmount = null;
 
         fetchAttachments(message, employeeCode);
         // Extract approved ID from subject
@@ -158,27 +229,31 @@ public class MailReaderService extends EmailFetcher {
             } else if (line.startsWith("Final Cashless Approved Amount:-")) {
                 finalApprovedAmount = line.substring("Final Cashless Approved Amount:-".length()).trim();
             } else if (line.startsWith("Cashless Request Amount:-")) {
-                cashlessRequestAmount = line.substring("Cashless Request Amount:-".length()).trim();
+                finalCashlessRequestAmount = line.substring("Cashless Request Amount:-".length()).trim();
             }
         }
 
         Map<String, String> responseMap = new HashMap<>();
 
         if (employeeName != null && employeeCode != null && claimNo != null && finalApprovedAmount != null
-                && cashlessRequestAmount != null) {
-            responseMap.put("Type", "cashless credit request");
+                && finalCashlessRequestAmount != null) {
+            responseMap.put("type", "CASHLESS CREDIT REQUEST");
             responseMap.put("employee_name", employeeName);
             responseMap.put("employee_code", employeeCode);
             responseMap.put("claim_no", claimNo);
             responseMap.put("final_cashless_approved_amount", finalApprovedAmount);
-            responseMap.put("cashless_request_amount", cashlessRequestAmount);
+            responseMap.put("final_cashless_request_amount", finalCashlessRequestAmount);
+            responseMap.put("subject", subject);
+            responseMap.put("body", body);
+
         } else {
             responseMap.put("error", "Unable to extract all required details from subject and body.");
         }
 
         return responseMap;
     }
-
+ 
+    
     private Map<String, String> handleAddtionalInformation(String subject, String body, Message message)
             throws IOException, MessagingException {
         String employeeCode = null;
@@ -216,7 +291,7 @@ public class MailReaderService extends EmailFetcher {
         Map<String, String> responseMap = new HashMap<>();
 
         if (employeeCode != null && claimNo != null) {
-            responseMap.put("Type", "Additional Information");
+            responseMap.put("type", "Additional Information");
             responseMap.put("employee_code", employeeCode);
             responseMap.put("claim_no", claimNo);
             responseMap.put("document_required", documentRequired);
@@ -231,7 +306,7 @@ public class MailReaderService extends EmailFetcher {
     private Map<String, String> handleFinalBillAndDischargeSummary(String subject, String body) {
         String khId = null;
         String claimNo = null;
-        String name = null;
+        String patientName = null;
 
         String[] parts = subject.split("\\s+");
 
@@ -242,18 +317,19 @@ public class MailReaderService extends EmailFetcher {
                 if (i + 2 < parts.length) {
                     claimNo = parts[i + 2].trim();
                 }
-            } else if (name == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
-                name = parts[i + 1] + " " + parts[i + 2];
+            } else if (patientName == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
+                patientName = parts[i + 1] + " " + parts[i + 2];
             }
         }
 
         Map<String, String> responseMap = new HashMap<>();
 
-        if (khId != null && claimNo != null && name != null) {
-            responseMap.put("Type", "Final Bill And Discharge Summary");
-            responseMap.put("name", name);
+        if (khId != null && claimNo != null && patientName != null) {
+            responseMap.put("type", "Final Bill And Discharge Summary");
+            responseMap.put("patient_name", patientName);
             responseMap.put("kh_id", khId);
             responseMap.put("claim_no", claimNo);
+            responseMap.put("subject", subject);
             responseMap.put("body", body);
         } else {
             responseMap.put("error", "Unable to extract name, kh_id, and claim_no from subject: " + subject);
@@ -265,7 +341,7 @@ public class MailReaderService extends EmailFetcher {
     private Map<String,String> handlePreAuth(String subject) {
         String khId = null;
         String policyNo = null;
-        String name = null;
+        String patientName = null;
 
         String[] parts = subject.split("\\s+");
 
@@ -278,18 +354,19 @@ public class MailReaderService extends EmailFetcher {
                 if (i + 2 < parts.length) {
                     policyNo = parts[i + 2].trim();
                 }
-            } else if (name == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
-                name = parts[i + 1] + " " + parts[i + 2];
+            } else if (patientName == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
+                patientName = parts[i + 1] + " " + parts[i + 2];
             }
         }
 
         // Storing the data in a hashmap
         Map<String, String> responseMap = new HashMap<>();
 
-        if (khId != null && policyNo != null && name != null) {
-            responseMap.put("name", name);
+        if (khId != null && policyNo != null && patientName != null) {
+            responseMap.put("patient_name", patientName);
             responseMap.put("kh_id", khId);
             responseMap.put("policy_no", policyNo);
+            responseMap.put("subject",subject);
         } else {
             return null;
         }
@@ -302,3 +379,6 @@ public class MailReaderService extends EmailFetcher {
         super.close();
     }
 }
+
+
+

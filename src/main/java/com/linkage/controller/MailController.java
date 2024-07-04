@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.mail.MessagingException;
 
+import org.apache.commons.lang3.ObjectUtils.Null;
+
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.LoansService;
@@ -42,15 +44,44 @@ public class MailController extends BaseController {
     @Path("/emailReader")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> emailReader(@Context HttpServletRequest request) throws MessagingException, IOException {
-        return this.mailReaderService.fetchAndProcessEmail();
+    public Response emailReader(@Context HttpServletRequest request) throws MessagingException, IOException {
+        // Fetch and process the email
+        Map<String, String> response = this.mailReaderService.fetchAndProcessEmail();
 
-        //Pre-Auth flow db calls
+        // Extract common details from the response
+        String type = response.get("type");
+
+        // Based on the type, call different db functions using if-else conditions
+        if ("PRE AUTH".equalsIgnoreCase(type)) {
+            handlePreAuth(response);
+        } else if ("QUERY REPLY".equalsIgnoreCase(type)) {
+            handleQueryReply(response);
+        } else if ("FINAL BILL AND DISCHARGE SUMMARY".equalsIgnoreCase(type)) {
+            handleFinalBillAndDischargeSummary(response);
+        } else if ("CASHLESS CREDIT REQUEST".equalsIgnoreCase(type)) {
+            handleCashlessCreditRequest(response);
+        } else if ("ADDITIONAL INFORMATION".equalsIgnoreCase(type)) {
+            handleAdditionalInformation(response);
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Unknown type: " + type).build();
+        }
+
+        return Response.ok().entity("Processed successfully").build();
+    }
+
+    //Pre-Auth flow db calls
+    private void handlePreAuth(Map<String, String> response) {
+
+        String policyNo = response.get("policy_no");
+        String khId = response.get("kh_id");
+        String subject = response.get("subject");
+        String patientName = response.get("patient_name");
+
         Map<String, Object> preFundedReqMap = new HashMap<>();
         preFundedReqMap.put("user_id","123");
         preFundedReqMap.put("hsp_id","123");
-        preFundedReqMap.put("partnered_user_id",policy_no);
-        preFundedReqMap.put("tpa_desk_id",KH_id);
+        preFundedReqMap.put("partnered_user_id",policyNo);
+        preFundedReqMap.put("tpa_desk_id",khId);
         preFundedReqMap.put("status","PENDING");
         preFundedReqMap.put("type","TPA");
         preFundedReqMap.put("processed_at",null);
@@ -71,36 +102,308 @@ public class MailController extends BaseController {
         Long prefundedEmail = (Long)this.masterService.prefundedEmail(preFundedEmailerMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
-        emailerItems.put("tpa_desk_id",KH_id);
-        emaileritems.put("claim_no", null);
+        emailerItems.put("tpa_desk_id",khId);
+        emailerItems.put("claim_no", null);
         emailerItems.put("initial_amt_req",null);
         emailerItems.put("initial_amt_approved",null);
-        emaileritems.put("final_adj_amt_req", null);
+        emailerItems.put("final_adj_amt_req", null);
         emailerItems.put("final_adj_amt_approved",null);
-        emailerItems.put("metadata",metadata);
-        emailerItems.put("patient_name",patient_name);
+        emailerItems.put("metadata",subject);
+        emailerItems.put("patient_name",patientName);
 
         Long emailItems = (Long)this.masterService.emailInsert(emailerItems);
 
         Map<String, Object> adjudicationDataMap = new HashMap<>();
-        adjudicationDataMap.put("")
+        adjudicationDataMap.put("partnered_user_id",policyNo);
+        adjudicationDataMap.put("tpa_desk_id",khId);
+    }
+    
+    //Query reply flow db calls
+    private void handleQueryReply(Map<String, String> response) {
+        
+        String claimNo = response.get("claim_no");
+        String khId = response.get("tpa_desk_id");
+        String subject = response.get("subject");
+        String patientName = response.get("patient_name");
+        String body = response.get("body");
+
+        Map<String, Object> preFundedReqMap = new HashMap<>();
+        preFundedReqMap.put("user_id","123");
+        preFundedReqMap.put("hsp_id","123");
+        preFundedReqMap.put("partnered_user_id",null);
+        preFundedReqMap.put("tpa_desk_id",khId);
+        preFundedReqMap.put("status","PENDING");
+        preFundedReqMap.put("type","TPA");
+        preFundedReqMap.put("processed_at",null);
+        preFundedReqMap.put("requested_amount",null);
+        preFundedReqMap.put("disbursement_amount",null);
+        preFundedReqMap.put("is_active",true);
+        preFundedReqMap.put("claim_no",claimNo);
+
+        Long preFundedRequest = (Long)this.loansService.preFundedrequestStore(preFundedReqMap);
+       
+        Map<String,Object> preFundedEmailerMap = new HashMap<>();
+        preFundedEmailerMap.put("type","QUERY REPLY");
+        preFundedEmailerMap.put("subject",subject);
+        preFundedEmailerMap.put("is_active",true);
+        preFundedEmailerMap.put("claim_no",claimNo);
+        preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
+
+        Long prefundedEmail = (Long)this.masterService.prefundedEmail(preFundedEmailerMap);
+
+        Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put("tpa_desk_id",khId);
+        emailerItems.put("claim_no", claimNo);
+        emailerItems.put("initial_amt_req",null);
+        emailerItems.put("initial_amt_approved",null);
+        emailerItems.put("final_adj_amt_req", null);
+        emailerItems.put("final_adj_amt_approved",null);
+        emailerItems.put("metadata",subject + body);
+        emailerItems.put("patient_name",patientName);
+
+        Long emailItems = (Long)this.masterService.emailInsert(emailerItems);
+
+        Map<String, Object> adjudicationDataMap = new HashMap<>();
+        adjudicationDataMap.put("partnered_user_id",null);
+        adjudicationDataMap.put("tpa_desk_id",khId);
+    }   
+
+    //Cashless to check Initial Or Final
+    private void handleCashlessCreditRequest(Map<String, String> response) throws IOException, MessagingException {
+        
+        String body = response.get(body);
+        String[] bodyLines = body.split("\n");
+        for (String line : bodyLines) {
+            if (line.startsWith("Initial Cashless Approved Amount:-")) {
+                handleInitialCashlessCreditRequest(response);
+                return;
+            } else if (line.startsWith("Final Cashless Approved Amount:-")) {
+                handleFinalCashlessCreditRequest(response);
+                return;
+            }
+        }
+    
+        // If neither condition matches, handle error case
+        Map<String, Object> errorResponseMap = new HashMap<>();
+        errorResponseMap.put("error", "Neither Initial nor Final Cashless Approved Amount found in body.");
 
     }
 
-    // @POST
-    // @Path("/emailDataStore")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public Response emailDataStore(@Context HttpServletRequest request, Map<String, String> requestBody) {
-    //     try {
-    //         //ApiResponse<Object> dApiResponse = masterService.mailDataStore(requestBody);
-    //         return Response.status(Response.Status.OK)
-    //                 .entity(new ApiResponse<>(true, "Data stored successfully", null))
-    //                 .build();
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-    //                 .entity(new ApiResponse<>(false, "Error storing data", null))
-    //                 .build();
-    //     }
-    // }
+    //Initial Cashless Credit Request flow db calls
+    private void handleInitialCashlessCreditRequest(Map<String, String> response) {
+        String employeeCode = response.get("employee_code");
+        String claimNo = response.get("claim_no");
+        String initialCashlessApprovedAmount = response.get("initial_cashless_approved_amount");
+        String initialCashlessRequestAmount = response.get("initial_cashless_request_amount");
+        String subject = response.get("subject");
+        String body = response.get("body");
+
+        Map<String, Object> preFundedReqMap = new HashMap<>();
+        preFundedReqMap.put("user_id", "123");
+        preFundedReqMap.put("hsp_id", "123");
+        preFundedReqMap.put("partnered_user_id", employeeCode);
+        preFundedReqMap.put("tpa_desk_id", null);
+        preFundedReqMap.put("status", "PENDING");
+        preFundedReqMap.put("type", "TPA");
+        preFundedReqMap.put("processed_at", null);
+        preFundedReqMap.put("requested_amount", null); //check wheather initial or final
+        preFundedReqMap.put("disbursement_amount", null);
+        preFundedReqMap.put("is_active", true);
+        preFundedReqMap.put("claim_no", claimNo);
+    
+        Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
+    
+        Map<String, Object> preFundedEmailerMap = new HashMap<>();
+        preFundedEmailerMap.put("type", "INITIAL CASHLESS CREDIT REQUEST");
+        preFundedEmailerMap.put("subject", subject);
+        preFundedEmailerMap.put("is_active", true);
+        preFundedEmailerMap.put("claim_no", claimNo);
+        preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
+    
+        Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
+    
+        Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put("tpa_desk_id", null);
+        emailerItems.put("claim_no", claimNo);
+        emailerItems.put("initial_amt_req", initialCashlessRequestAmount);
+        emailerItems.put("initial_amt_approved", initialCashlessApprovedAmount);
+        emailerItems.put("final_adj_amt_req", null);
+        emailerItems.put("final_adj_amt_approved", null);
+        emailerItems.put("metadata", subject + body);
+        emailerItems.put("patient_name", null);
+    
+        Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
+    
+        Map<String, Object> adjudicationDataMap = new HashMap<>();
+        adjudicationDataMap.put("partnered_user_id", employeeCode);
+        adjudicationDataMap.put("tpa_desk_id", null);
+    }
+
+    //Final Cashless Credit Request flow db calls
+    private void handleFinalCashlessCreditRequest(Map<String, String> response) {
+        String employeeCode = response.get("employee_code");
+        String claimNo = response.get("claim_no");
+        String finalCashlessApprovedAmount = response.get("final_cashless_approved_amount");
+        String finalCashlessRequestAmount = response.get("final_cashless_request_amount");
+        String subject = response.get("subject");
+        String body = response.get("body"); 
+    
+        Map<String, Object> preFundedReqMap = new HashMap<>();
+        preFundedReqMap.put("user_id", "123");
+        preFundedReqMap.put("hsp_id", "123");
+        preFundedReqMap.put("partnered_user_id", employeeCode);
+        preFundedReqMap.put("tpa_desk_id", null);
+        preFundedReqMap.put("status", "PENDING");
+        preFundedReqMap.put("type", "TPA");
+        preFundedReqMap.put("processed_at", null);
+        preFundedReqMap.put("requested_amount", null); //check wheather initial or final
+        preFundedReqMap.put("disbursement_amount", null);
+        preFundedReqMap.put("is_active", true);
+        preFundedReqMap.put("claim_no", claimNo);
+    
+        Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
+    
+        Map<String, Object> preFundedEmailerMap = new HashMap<>();
+        preFundedEmailerMap.put("type", "FINAL CASHLESS CREDIT REQUEST");
+        preFundedEmailerMap.put("subject", subject);
+        preFundedEmailerMap.put("is_active", true);
+        preFundedEmailerMap.put("claim_no", claimNo);
+        preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
+    
+        Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
+    
+        Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put("tpa_desk_id", null);
+        emailerItems.put("claim_no", claimNo);
+        emailerItems.put("initial_amt_req", null);
+        emailerItems.put("initial_amt_approved", null);
+        emailerItems.put("final_adj_amt_req", finalCashlessRequestAmount);
+        emailerItems.put("final_adj_amt_approved", finalCashlessApprovedAmount);
+        emailerItems.put("metadata", subject + body);
+        emailerItems.put("patient_name", null);
+    
+        Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
+    
+        Map<String, Object> adjudicationDataMap = new HashMap<>();
+        adjudicationDataMap.put("partnered_user_id", employeeCode);
+        adjudicationDataMap.put("tpa_desk_id", null);
+    }
+
+    //Final Bill And Discharge Summary flow db calls
+    private void handleFinalBillAndDischargeSummary(Map<String, String> response) {
+        String patientName = response.get("patient_name");
+        String claimNo = response.get("claim_no");
+        String khId = response.get("kh_id");
+        String subject = response.get("subject");
+        String body = response.get("body");
+    
+        Map<String, Object> preFundedReqMap = new HashMap<>();
+        preFundedReqMap.put("user_id", "123");
+        preFundedReqMap.put("hsp_id", "123");
+        preFundedReqMap.put("partnered_user_id", null);
+        preFundedReqMap.put("tpa_desk_id", khId);
+        preFundedReqMap.put("status", "PENDING");
+        preFundedReqMap.put("type", "TPA");
+        preFundedReqMap.put("processed_at", null);
+        preFundedReqMap.put("requested_amount", null);
+        preFundedReqMap.put("disbursement_amount", null);
+        preFundedReqMap.put("is_active", true);
+        preFundedReqMap.put("claim_no", claimNo);
+    
+        Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
+    
+        Map<String, Object> preFundedEmailerMap = new HashMap<>();
+        preFundedEmailerMap.put("type", "FINAL BILL AND DISCHARGE SUMMARY");
+        preFundedEmailerMap.put("subject", subject);
+        preFundedEmailerMap.put("is_active", true);
+        preFundedEmailerMap.put("claim_no", claimNo);
+        preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
+    
+        Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
+    
+        Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put("tpa_desk_id", khId);
+        emailerItems.put("claim_no", claimNo);
+        emailerItems.put("initial_amt_req", null);
+        emailerItems.put("initial_amt_approved", null);
+        emailerItems.put("final_adj_amt_req", null);
+        emailerItems.put("final_adj_amt_approved", null);
+        emailerItems.put("metadata", subject + body);
+        emailerItems.put("patient_name", patientName);
+    
+        Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
+    
+        Map<String, Object> adjudicationDataMap = new HashMap<>();
+        adjudicationDataMap.put("partnered_user_id", null);
+        adjudicationDataMap.put("tpa_desk_id", khId);
+    }
+
+    //Additional Information flow db calls
+    private void handleAdditionalInformation(Map<String, String> response) {
+        String employeeCode = response.get("employee_code");
+        String claimNo = response.get("claim_no");
+        String documentRequired = response.get("document_required");
+        String patientName = response.get("patient_name");
+        String subject = response.get("subject");
+        String body = response.get("body");
+    
+        Map<String, Object> preFundedReqMap = new HashMap<>();
+        preFundedReqMap.put("user_id", "123");
+        preFundedReqMap.put("hsp_id", "123");
+        preFundedReqMap.put("partnered_user_id", employeeCode);
+        preFundedReqMap.put("tpa_desk_id", null);
+        preFundedReqMap.put("status", "PENDING");
+        preFundedReqMap.put("type", "TPA");
+        preFundedReqMap.put("processed_at", null);
+        preFundedReqMap.put("requested_amount", null);
+        preFundedReqMap.put("disbursement_amount", null);
+        preFundedReqMap.put("is_active", true);
+        preFundedReqMap.put("claim_no", claimNo);
+    
+        Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
+    
+        Map<String, Object> preFundedEmailerMap = new HashMap<>();
+        preFundedEmailerMap.put("type", "ADDITIONAL INFORMATION");
+        preFundedEmailerMap.put("subject", subject);
+        preFundedEmailerMap.put("is_active", true);
+        preFundedEmailerMap.put("claim_no", claimNo);
+        preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
+    
+        Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
+    
+        Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put("tpa_desk_id", null);
+        emailerItems.put("claim_no", claimNo);
+        emailerItems.put("initial_amt_req", null);
+        emailerItems.put("initial_amt_approved", null);
+        emailerItems.put("final_adj_amt_req", null);
+        emailerItems.put("final_adj_amt_approved", null);
+        emailerItems.put("metadata", subject + body);
+        emailerItems.put("patient_name", patientName);
+    
+        Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
+    
+        Map<String, Object> adjudicationDataMap = new HashMap<>();
+        adjudicationDataMap.put("partnered_user_id", employeeCode);
+        adjudicationDataMap.put("tpa_desk_id", null);
+    }
 }
+
+// @POST
+// @Path("/emailDataStore")
+// @Consumes(MediaType.APPLICATION_JSON)
+// public Response emailDataStore(@Context HttpServletRequest request,
+// Map<String, String> requestBody) {
+// try {
+// //ApiResponse<Object> dApiResponse =
+// masterService.mailDataStore(requestBody);
+// return Response.status(Response.Status.OK)
+// .entity(new ApiResponse<>(true, "Data stored successfully", null))
+// .build();
+// } catch (Exception e) {
+// e.printStackTrace();
+// return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+// .entity(new ApiResponse<>(false, "Error storing data", null))
+// .build();
+// }
+// }
