@@ -171,7 +171,7 @@ public class MailController extends BaseController {
     //Cashless to check Initial Or Final
     private void handleCashlessCreditRequest(Map<String, String> response) throws IOException, MessagingException {
         
-        String body = response.get(body);
+        String body = response.get("body");
         String[] bodyLines = body.split("\n");
         for (String line : bodyLines) {
             if (line.startsWith("Initial Cashless Approved Amount:-")) {
