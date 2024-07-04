@@ -17,4 +17,22 @@ public class LoansService extends BaseServiceClient{
         return resp.getData();
     }
 
+    public Object adjudicationDataStore(Map<String, Object> body) {
+        String url = configuration.getLoansUrl() + "/transactions/addAdjudicationData";
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp.getData();
+    }
+
+    public Object adjudicationItemsStore(Map<String, Object> body) {
+        String url = configuration.getLoansUrl() + "/transactions/addAdjudicationItems";
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp.getData();
+    }
+
+    public Object adjudicationQueryStore(Map<String, Object> body) {
+        String url = configuration.getLoansUrl() + "/transactions/addAdjudicationQuery";
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp.getData();
+    }
+
 }
