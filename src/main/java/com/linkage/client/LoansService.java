@@ -11,10 +11,10 @@ public class LoansService extends BaseServiceClient{
         super(configuration);
     }
 
-    public Object preFundedrequestStore(Map<String, Object> body) {
+    public Integer preFundedrequestStore(Map<String, Object> body) {
         String url = configuration.getLoansUrl() + "/transactions/addPrefundedRequest";
         ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
-        return resp.getData();
+        return Integer.parseInt(resp.getData().toString());
     }
 
     public Object adjudicationDataStore(Map<String, Object> body) {

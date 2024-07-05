@@ -58,21 +58,43 @@ public class MailReaderService extends EmailFetcher {
             }
 
             // Fetch and upload attachments
-            String userId = responseMap.get(EmailKeywords.USER_ID);
-
-            if (message != null && userId != null) {
+            if (message != null && responseMap.containsKey("user_id")) {
+                String userId = responseMap.get("user_id");
                 Map<String, String> gcpResponse = fetchAttachments(message, userId);
                 gcpPath = gcpResponse.get(EmailKeywords.GCP_PATH);
                 gcpFileName = gcpResponse.get(EmailKeywords.GCP_FILE_NAME);
+
+                // Include the GCP URL in the response map
+                if (gcpPath != null || gcpFileName != null) {
+                    responseMap.put(EmailKeywords.GCP_PATH, gcpPath);
+                    responseMap.put(EmailKeywords.GCP_FILE_NAME, gcpFileName);
+                    markAsRead(message);
+                } else {
+                    markAsUnread(message);
+                    responseMap.put("error", "Failed to upload attachments to GCP");
+                    return responseMap;
+                }
             }
 
-            // Include the GCP URL in the response map
-            if (gcpPath != null || gcpFileName != null) {
-                responseMap.put(EmailKeywords.GCP_PATH, gcpPath);
-                responseMap.put(EmailKeywords.GCP_FILE_NAME, gcpFileName);
-            }
+            // Fetch and upload attachments
+            // String userId = responseMap.get(EmailKeywords.USER_ID);
 
-            markAsRead(message);
+            // if (message != null && userId != null) {
+            //     Map<String, String> gcpResponse = fetchAttachments(message, userId);
+            //     gcpPath = gcpResponse.get(EmailKeywords.GCP_PATH);
+            //     gcpFileName = gcpResponse.get(EmailKeywords.GCP_FILE_NAME);
+            // }
+
+            // // Include the GCP URL in the response map
+            // if (gcpPath != null || gcpFileName != null) {
+            //     responseMap.put(EmailKeywords.GCP_PATH, gcpPath);
+            //     responseMap.put(EmailKeywords.GCP_FILE_NAME, gcpFileName);
+            //     markAsRead(message);
+            // } else {
+            //     markAsUnread(message);
+            //     responseMap.put("error", "Failed to upload attachments to GCP");
+            //     return responseMap;
+            // }
 
         } catch (Exception e) {
             // Mark email as unread
@@ -376,6 +398,7 @@ public class MailReaderService extends EmailFetcher {
         Map<String, String> responseMap = new HashMap<>();
 
         if (khId != null && partneredUserId != null && patientName != null) {
+            responseMap.put(EmailKeywords.TYPE, "PRE AUTH");
             responseMap.put(EmailKeywords.PATIENT_NAME, patientName);
             responseMap.put(EmailKeywords.TPA_DESK_ID, khId);
             responseMap.put(EmailKeywords.POLICY_NO, partneredUserId);
