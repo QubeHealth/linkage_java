@@ -94,6 +94,11 @@ public class MailController extends BaseController {
         preFundedReqMap.put("disbursement_amount",null);
         preFundedReqMap.put(EmailKeywords.IS_ACTIVE,true);
         preFundedReqMap.put(EmailKeywords.CLAIM_NO,null);
+        preFundedReqMap.put("claim_id", null);
+        preFundedReqMap.put("approved_amount_initial",null);
+        preFundedReqMap.put("approved_amount_final", null);
+        preFundedReqMap.put("initial_request_resolved_at", null);
+        preFundedReqMap.put("final_request_resolved_at", null);
 
         Long preFundedRequest = (Long)this.loansService.preFundedrequestStore(preFundedReqMap);
        
@@ -170,6 +175,11 @@ public class MailController extends BaseController {
         preFundedReqMap.put("disbursement_amount",null);
         preFundedReqMap.put(EmailKeywords.IS_ACTIVE,true);
         preFundedReqMap.put(EmailKeywords.CLAIM_NO,claimNo);
+        preFundedReqMap.put("claim_id", null);
+        preFundedReqMap.put("approved_amount_initial",null);
+        preFundedReqMap.put("approved_amount_final", null);
+        preFundedReqMap.put("initial_request_resolved_at", null);
+        preFundedReqMap.put("final_request_resolved_at", null);
 
         Long preFundedRequest = (Long)this.loansService.preFundedrequestStore(preFundedReqMap);
        
@@ -265,6 +275,11 @@ public class MailController extends BaseController {
         preFundedReqMap.put("disbursement_amount", null);
         preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
         preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
+        preFundedReqMap.put("claim_id", null);
+        preFundedReqMap.put("approved_amount_initial",initialCashlessApprovedAmount);
+        preFundedReqMap.put("approved_amount_final", null);
+        preFundedReqMap.put("initial_request_resolved_at", null);
+        preFundedReqMap.put("final_request_resolved_at", null);
     
         Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
     
@@ -339,6 +354,11 @@ public class MailController extends BaseController {
         preFundedReqMap.put("disbursement_amount", null);
         preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
         preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
+        preFundedReqMap.put("claim_id", null);
+        preFundedReqMap.put("approved_amount_initial",null);
+        preFundedReqMap.put("approved_amount_final", finalCashlessApprovedAmount);
+        preFundedReqMap.put("initial_request_resolved_at", null);
+        preFundedReqMap.put("final_request_resolved_at", null);
     
         Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
     
@@ -412,7 +432,12 @@ public class MailController extends BaseController {
         preFundedReqMap.put("disbursement_amount", null);
         preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
         preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
-    
+        preFundedReqMap.put("claim_id", null);
+        preFundedReqMap.put("approved_amount_initial",null);
+        preFundedReqMap.put("approved_amount_final", null);
+        preFundedReqMap.put("initial_request_resolved_at", null);
+        preFundedReqMap.put("final_request_resolved_at", null);
+
         Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
     
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
@@ -468,76 +493,81 @@ public class MailController extends BaseController {
 
         return null;
 
-        // String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
-        // String claimNo = response.get(EmailKeywords.CLAIM_NO);
-        // String documentRequired = response.get(EmailKeywords.DOCUMENT_REQUIRED);
-        // String patientName = response.get(EmailKeywords.PATIENT_NAME);
-        // String subject = response.get(EmailKeywords.SUBJECT);
-        // String body = response.get(EmailKeywords.BODY);
-        // String gcpPath = response.get(EmailKeywords.GCP_PATH);
-        // String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME); 
+    //     String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
+    //     String claimNo = response.get(EmailKeywords.CLAIM_NO);
+    //     String documentRequired = response.get(EmailKeywords.DOCUMENT_REQUIRED);
+    //     String patientName = response.get(EmailKeywords.PATIENT_NAME);
+    //     String subject = response.get(EmailKeywords.SUBJECT);
+    //     String body = response.get(EmailKeywords.BODY);
+    //     String gcpPath = response.get(EmailKeywords.GCP_PATH);
+    //     String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME); 
     
-        // Map<String, Object> preFundedReqMap = new HashMap<>();
-        // preFundedReqMap.put(EmailKeywords.USER_ID, "123");
-        // preFundedReqMap.put("hsp_id", "123");
-        // preFundedReqMap.put("partnered_user_id", employeeCode);
-        // preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, null);
-        // preFundedReqMap.put("status", "PENDING");
-        // preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
-        // preFundedReqMap.put("processed_at", null);
-        // preFundedReqMap.put("requested_amount", null);
-        // preFundedReqMap.put("disbursement_amount", null);
-        // preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
-        // preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
+    // Map<String, Object> preFundedReqMap = new HashMap<>();
+    // preFundedReqMap.put(EmailKeywords.USER_ID, "123");
+    // preFundedReqMap.put("hsp_id", "123");
+    // preFundedReqMap.put("partnered_user_id", employeeCode);
+    // preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, null);
+    // preFundedReqMap.put("status", "PENDING");
+    // preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
+    // preFundedReqMap.put("processed_at", null);
+    // preFundedReqMap.put("requested_amount", null);
+    // preFundedReqMap.put("disbursement_amount", null);
+    // preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
+    // preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
+    // preFundedReqMap.put("claim_id", null);
+    // preFundedReqMap.put("approved_amount_initial", null);
+    // preFundedReqMap.put("approved_amount_final", null);
+    // preFundedReqMap.put("initial_request_resolved_at", null);
+    // preFundedReqMap.put("final_request_resolved_at", null);  
     
-        // Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
+    //     Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
     
-        // Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        // preFundedEmailerMap.put(EmailKeywords.TYPE, "ADDITIONAL INFORMATION");
-        // preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
-        // preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
-        // preFundedEmailerMap.put(EmailKeywords.CLAIM_NO, claimNo);
-        // preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
+    //     Map<String, Object> preFundedEmailerMap = new HashMap<>();
+    //     preFundedEmailerMap.put(EmailKeywords.TYPE, "ADDITIONAL INFORMATION");
+    //     preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
+    //     preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
+    //     preFundedEmailerMap.put(EmailKeywords.CLAIM_NO, claimNo);
+    //     preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
     
-        // Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
+    //     Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
     
-        // Map<String, Object> emailerItems = new HashMap<>();
-        // emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
-        // emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
-        // emailerItems.put("initial_amt_req", null);
-        // emailerItems.put("initial_amt_approved", null);
-        // emailerItems.put("final_adj_amt_req", null);
-        // emailerItems.put("final_adj_amt_approved", null);
-        // emailerItems.put("metadata", subject + body);
-        // emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
+    //     Map<String, Object> emailerItems = new HashMap<>();
+    //     emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
+    //     emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+    //     emailerItems.put("initial_amt_req", null);
+    //     emailerItems.put("initial_amt_approved", null);
+    //     emailerItems.put("final_adj_amt_req", null);
+    //     emailerItems.put("final_adj_amt_approved", null);
+    //     emailerItems.put("metadata", subject + body);
+    //     emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
     
-        // Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
+    //     Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
     
-        // Map<String, Object> adjudicationDataMap = new HashMap<>();
-        // adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID,null);
-        // adjudicationDataMap.put("pf_req_id", prefundedEmail);
-        // adjudicationDataMap.put("requested_amount", null);
-        // adjudicationDataMap.put("estimated_amount", null);
-        // adjudicationDataMap.put("file_path", gcpPath);
-        // adjudicationDataMap.put("file_name", gcpFileName);
-        // adjudicationDataMap.put(EmailKeywords.USER_ID, null);
-        // adjudicationDataMap.put("offer_id", null);
-        // adjudicationDataMap.put("hsp_id",123);
-        // adjudicationDataMap.put("document_id", null);
-        // adjudicationDataMap.put("associated_user_id", null);
-        // adjudicationDataMap.put("status", "PENDING");
-        // adjudicationDataMap.put("created_by", "TPA DESK");
-        // adjudicationDataMap.put("requested_by", null);
+    //     Map<String, Object> adjudicationDataMap = new HashMap<>();
+    //     adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID,null);
+    //     adjudicationDataMap.put("pf_req_id", prefundedEmail);
+    //     adjudicationDataMap.put("requested_amount", null);
+    //     adjudicationDataMap.put("estimated_amount", null);
+    //     adjudicationDataMap.put("file_path", gcpPath);
+    //     adjudicationDataMap.put("file_name", gcpFileName);
+    //     adjudicationDataMap.put(EmailKeywords.USER_ID, null);
+    //     adjudicationDataMap.put("offer_id", null);
+    //     adjudicationDataMap.put("hsp_id",123);
+    //     adjudicationDataMap.put("document_id", null);
+    //     adjudicationDataMap.put("associated_user_id", null);
+    //     adjudicationDataMap.put("status", "PENDING");
+    //     adjudicationDataMap.put("created_by", "TPA DESK");
+    //     adjudicationDataMap.put("requested_by", null);
 
-        // Long adjudicationDataId = (Long)this.loansService.adjudicationDataStore(adjudicationDataMap);
+    //     Long adjudicationDataId = (Long)this.loansService.adjudicationDataStore(adjudicationDataMap);
 
-        // Map<String, Object> adjudicationItems = new HashMap<>();
-        // adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
-        // adjudicationItems.put("pf_document_id",prefundedEmail);
-        // adjudicationItems.put("document_url", gcpPath);
-        // adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
+    //     Map<String, Object> adjudicationItems = new HashMap<>();
+    //     adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
+    //     adjudicationItems.put("pf_document_id",prefundedEmail);
+    //     adjudicationItems.put("document_url", gcpPath);
+    //     adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
-       // Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
+    //    Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
     }
 }
 

@@ -29,6 +29,10 @@ public final class Constants {
         public static final String POLICY_NO = "policy_no";
         public static final String INITIAL_CASHLESS_APPROVED_AMT = "initial_cashless_approved_amount";
         public static final String INITIAL_CASHLESS_REQUEST_AMT = "initial_cashless_request_amount";
+        public static final String GCP_PATH = "gcp_path";
+        public static final String GCP_FILE_NAME = "gcp_file_name";
+        public static final String IS_ACTIVE = "is_active";
+
 
         public static final String[] keywordsList = { SUPPORTING_DOCUMENT, QUERY_REPLY,
             FINAL_BILL_AND_DISCHARGE_SUMMARY, PRE_AUTH,
