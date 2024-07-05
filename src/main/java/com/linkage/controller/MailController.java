@@ -75,7 +75,7 @@ public class MailController extends BaseController {
     //Pre-Auth flow db calls
     private void handlePreAuth(Map<String, String> response) {
 
-        String policyNo = response.get(EmailKeywords.POLICY_NO);
+        String partneredUserId = response.get(EmailKeywords.POLICY_NO);
         String khId = response.get(EmailKeywords.TPA_DESK_ID);
         String subject = response.get(EmailKeywords.SUBJECT);
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
@@ -85,7 +85,7 @@ public class MailController extends BaseController {
         Map<String, Object> preFundedReqMap = new HashMap<>();
         preFundedReqMap.put(EmailKeywords.USER_ID,"123");
         preFundedReqMap.put("hsp_id","123");
-        preFundedReqMap.put("partnered_user_id",policyNo);
+        preFundedReqMap.put("partnered_user_id",partneredUserId);
         preFundedReqMap.put(EmailKeywords.TPA_DESK_ID,khId);
         preFundedReqMap.put("status","PENDING");
         preFundedReqMap.put(EmailKeywords.TYPE,"TPA");
@@ -130,7 +130,7 @@ public class MailController extends BaseController {
         adjudicationDataMap.put("estimated_amount", null);
         adjudicationDataMap.put("file_path", gcpPath);
         adjudicationDataMap.put("file_name", gcpFileName);
-        adjudicationDataMap.put(EmailKeywords.USER_ID, policyNo);
+        adjudicationDataMap.put(EmailKeywords.USER_ID, partneredUserId);
         adjudicationDataMap.put("offer_id", null);
         adjudicationDataMap.put("hsp_id",123);
         adjudicationDataMap.put("document_id", null);

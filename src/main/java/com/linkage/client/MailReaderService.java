@@ -353,7 +353,7 @@ public class MailReaderService extends EmailFetcher {
 
     private Map<String,String> handlePreAuth(String subject) {
         String khId = null;
-        String policyNo = null;
+        String partneredUserId" = null;
         String patientName = null;
 
         String[] parts = subject.split("\\s+");
@@ -365,7 +365,7 @@ public class MailReaderService extends EmailFetcher {
             } else if (parts[i].equalsIgnoreCase("Policy") && i < parts.length - 1
                     && parts[i + 1].equalsIgnoreCase("No:")) {
                 if (i + 2 < parts.length) {
-                    policyNo = parts[i + 2].trim();
+                    partneredUserId" = parts[i + 2].trim();
                 }
             } else if (patientName == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
                 patientName = parts[i + 1] + " " + parts[i + 2];
@@ -375,12 +375,12 @@ public class MailReaderService extends EmailFetcher {
         // Storing the data in a hashmap
         Map<String, String> responseMap = new HashMap<>();
 
-        if (khId != null && policyNo != null && patientName != null) {
+        if (khId != null && partneredUserId" != null && patientName != null) {
             responseMap.put(EmailKeywords.PATIENT_NAME, patientName);
             responseMap.put(EmailKeywords.TPA_DESK_ID, khId);
-            responseMap.put(EmailKeywords.POLICY_NO, policyNo);
+            responseMap.put(EmailKeywords.POLICY_NO, partneredUserId");
             responseMap.put(EmailKeywords.SUBJECT,subject);
-            responseMap.put(EmailKeywords.USER_ID, policyNo);
+            responseMap.put(EmailKeywords.USER_ID, partneredUserId");
         } else {
             return Collections.emptyMap();
         }

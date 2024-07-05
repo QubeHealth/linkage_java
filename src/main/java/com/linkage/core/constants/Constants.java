@@ -26,7 +26,7 @@ public final class Constants {
         public static final String FINAL_CASHLESS_APPROVED_AMT = "final_cashless_approved_amount";
         public static final String FINAL_CASHLESS_REQUEST_AMT = "final_cashless_request_amount";
         public static final String DOCUMENT_REQUIRED = "document_required";
-        public static final String POLICY_NO = "policy_no";
+        public static final String POLICY_NO = "partnered_user_id";
         public static final String INITIAL_CASHLESS_APPROVED_AMT = "initial_cashless_approved_amount";
         public static final String INITIAL_CASHLESS_REQUEST_AMT = "initial_cashless_request_amount";
         public static final String GCP_PATH = "gcp_path";
