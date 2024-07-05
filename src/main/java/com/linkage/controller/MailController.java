@@ -15,7 +15,7 @@ import com.linkage.client.MailReaderService;
 import com.linkage.client.MailWriterService;
 import com.linkage.client.MasterService;
 import com.linkage.core.constants.Constants;
-import com.linkage.core.constants.Constants.EmailSubjectKeywords;
+import com.linkage.core.constants.Constants.EmailKeywords;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Validator;
@@ -52,18 +52,18 @@ public class MailController extends BaseController {
         Map<String, String> response = this.mailReaderService.fetchAndProcessEmail();
 
         // Extract common details from the response
-        String type = response.get("type");
+        String type = response.get(EmailKeywords.TYPE);
 
         // Based on the type, call different db functions using if-else conditions
-        if (EmailSubjectKeywords.PRE_AUTH.equalsIgnoreCase(type)) {
+        if (EmailKeywords.PRE_AUTH.equalsIgnoreCase(type)) {
             handlePreAuth(response);
-        } else if (EmailSubjectKeywords.QUERY_REPLY.equalsIgnoreCase(type)) {
+        } else if (EmailKeywords.QUERY_REPLY.equalsIgnoreCase(type)) {
             handleQueryReply(response);
-        } else if (EmailSubjectKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY.equalsIgnoreCase(type)) {
+        } else if (EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY.equalsIgnoreCase(type)) {
             handleFinalBillAndDischargeSummary(response);
-        } else if (EmailSubjectKeywords.CASHLESS_CREDIT_REQUEST.equalsIgnoreCase(type)) {
+        } else if (EmailKeywords.CASHLESS_CREDIT_REQUEST.equalsIgnoreCase(type)) {
             handleCashlessCreditRequest(response);
-        } else if (EmailSubjectKeywords.ADDITIONAL_INFORMATION.equalsIgnoreCase(type)) {
+        } else if (EmailKeywords.ADDITIONAL_INFORMATION.equalsIgnoreCase(type)) {
             handleAdditionalInformation(response);
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("Unknown type: " + type).build();
@@ -75,57 +75,57 @@ public class MailController extends BaseController {
     //Pre-Auth flow db calls
     private void handlePreAuth(Map<String, String> response) {
 
-        String policyNo = response.get("policy_no");
-        String khId = response.get("kh_id");
-        String subject = response.get("subject");
-        String patientName = response.get("patient_name");
-        String gcpPath = response.get("gcp_path");
-        String gcpFileName = response.get("gcp_file_name");
+        String policyNo = response.get(EmailKeywords.POLICY_NO);
+        String khId = response.get(EmailKeywords.TPA_DESK_ID);
+        String subject = response.get(EmailKeywords.SUBJECT);
+        String patientName = response.get(EmailKeywords.PATIENT_NAME);
+        String gcpPath = response.get(EmailKeywords.GCP_PATH);
+        String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
 
         Map<String, Object> preFundedReqMap = new HashMap<>();
-        preFundedReqMap.put("user_id","123");
+        preFundedReqMap.put(EmailKeywords.USER_ID,"123");
         preFundedReqMap.put("hsp_id","123");
         preFundedReqMap.put("partnered_user_id",policyNo);
-        preFundedReqMap.put("tpa_desk_id",khId);
+        preFundedReqMap.put(EmailKeywords.TPA_DESK_ID,khId);
         preFundedReqMap.put("status","PENDING");
-        preFundedReqMap.put("type","TPA");
+        preFundedReqMap.put(EmailKeywords.TYPE,"TPA");
         preFundedReqMap.put("processed_at",null);
         preFundedReqMap.put("requested_amount",null);
         preFundedReqMap.put("disbursement_amount",null);
-        preFundedReqMap.put("is_active",true);
-        preFundedReqMap.put("claim_no",null);
+        preFundedReqMap.put(EmailKeywords.IS_ACTIVE,true);
+        preFundedReqMap.put(EmailKeywords.CLAIM_NO,null);
 
         Long preFundedRequest = (Long)this.loansService.preFundedrequestStore(preFundedReqMap);
        
         Map<String,Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put("type","PRE AUTH");
-        preFundedEmailerMap.put("subject",subject);
-        preFundedEmailerMap.put("is_active",true);
-        preFundedEmailerMap.put("claim_no",null);
+        preFundedEmailerMap.put(EmailKeywords.TYPE,"PRE AUTH");
+        preFundedEmailerMap.put(EmailKeywords.SUBJECT,subject);
+        preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE,true);
+        preFundedEmailerMap.put(EmailKeywords.CLAIM_NO,null);
         preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
 
         Long prefundedEmail = (Long)this.masterService.prefundedEmail(preFundedEmailerMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
-        emailerItems.put("tpa_desk_id",khId);
-        emailerItems.put("claim_no", null);
+        emailerItems.put(EmailKeywords.TPA_DESK_ID,khId);
+        emailerItems.put(EmailKeywords.CLAIM_NO, null);
         emailerItems.put("initial_amt_req",null);
         emailerItems.put("initial_amt_approved",null);
         emailerItems.put("final_adj_amt_req", null);
         emailerItems.put("final_adj_amt_approved",null);
         emailerItems.put("metadata",subject);
-        emailerItems.put("patient_name",patientName);
+        emailerItems.put(EmailKeywords.PATIENT_NAME,patientName);
 
         Long emailItems = (Long)this.masterService.emailInsert(emailerItems);
 
         Map<String, Object> adjudicationDataMap = new HashMap<>();
-        adjudicationDataMap.put("tpa_desk_id",khId);
+        adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID,khId);
         adjudicationDataMap.put("pf_req_id", prefundedEmail);
         adjudicationDataMap.put("requested_amount", null);
         adjudicationDataMap.put("estimated_amount", null);
         adjudicationDataMap.put("file_path", gcpPath);
         adjudicationDataMap.put("file_name", gcpFileName);
-        adjudicationDataMap.put("user_id", policyNo);
+        adjudicationDataMap.put(EmailKeywords.USER_ID, policyNo);
         adjudicationDataMap.put("offer_id", null);
         adjudicationDataMap.put("hsp_id",123);
         adjudicationDataMap.put("document_id", null);
@@ -140,7 +140,7 @@ public class MailController extends BaseController {
         adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
         adjudicationItems.put("pf_document_id",prefundedEmail);
         adjudicationItems.put("document_url", gcpPath);
-        adjudicationItems.put("is_active", 1);
+        adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
 
@@ -149,59 +149,59 @@ public class MailController extends BaseController {
     //Query reply flow db calls
     private void handleQueryReply(Map<String, String> response) {
         
-        String claimNo = response.get("claim_no");
-        String khId = response.get("tpa_desk_id");
-        String subject = response.get("subject");
-        String patientName = response.get("patient_name");
-        String body = response.get("body");
-        String gcpPath = response.get("gcp_path");
-        String gcpFileName = response.get("gcp_file_name");
+        String claimNo = response.get(EmailKeywords.CLAIM_NO);
+        String khId = response.get(EmailKeywords.TPA_DESK_ID);
+        String subject = response.get(EmailKeywords.SUBJECT);
+        String patientName = response.get(EmailKeywords.PATIENT_NAME);
+        String body = response.get(EmailKeywords.BODY);
+        String gcpPath = response.get(EmailKeywords.GCP_PATH);
+        String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
 
 
         Map<String, Object> preFundedReqMap = new HashMap<>();
-        preFundedReqMap.put("user_id","123");
+        preFundedReqMap.put(EmailKeywords.USER_ID,"123");
         preFundedReqMap.put("hsp_id","123");
         preFundedReqMap.put("partnered_user_id",null);
-        preFundedReqMap.put("tpa_desk_id",khId);
+        preFundedReqMap.put(EmailKeywords.TPA_DESK_ID,khId);
         preFundedReqMap.put("status","PENDING");
-        preFundedReqMap.put("type","TPA");
+        preFundedReqMap.put(EmailKeywords.TYPE,"TPA");
         preFundedReqMap.put("processed_at",null);
         preFundedReqMap.put("requested_amount",null);
         preFundedReqMap.put("disbursement_amount",null);
-        preFundedReqMap.put("is_active",true);
-        preFundedReqMap.put("claim_no",claimNo);
+        preFundedReqMap.put(EmailKeywords.IS_ACTIVE,true);
+        preFundedReqMap.put(EmailKeywords.CLAIM_NO,claimNo);
 
         Long preFundedRequest = (Long)this.loansService.preFundedrequestStore(preFundedReqMap);
        
         Map<String,Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put("type","QUERY REPLY");
-        preFundedEmailerMap.put("subject",subject);
-        preFundedEmailerMap.put("is_active",true);
-        preFundedEmailerMap.put("claim_no",claimNo);
+        preFundedEmailerMap.put(EmailKeywords.TYPE,"QUERY REPLY");
+        preFundedEmailerMap.put(EmailKeywords.SUBJECT,subject);
+        preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE,true);
+        preFundedEmailerMap.put(EmailKeywords.CLAIM_NO,claimNo);
         preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
 
         Long prefundedEmail = (Long)this.masterService.prefundedEmail(preFundedEmailerMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
-        emailerItems.put("tpa_desk_id",khId);
-        emailerItems.put("claim_no", claimNo);
+        emailerItems.put(EmailKeywords.TPA_DESK_ID,khId);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("initial_amt_req",null);
         emailerItems.put("initial_amt_approved",null);
         emailerItems.put("final_adj_amt_req", null);
         emailerItems.put("final_adj_amt_approved",null);
         emailerItems.put("metadata",subject + body);
-        emailerItems.put("patient_name",patientName);
+        emailerItems.put(EmailKeywords.PATIENT_NAME,patientName);
 
         Long emailItems = (Long)this.masterService.emailInsert(emailerItems);
 
         Map<String, Object> adjudicationDataMap = new HashMap<>();
-        adjudicationDataMap.put("tpa_desk_id",khId);
+        adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID,khId);
         adjudicationDataMap.put("pf_req_id", prefundedEmail);
         adjudicationDataMap.put("requested_amount", null);
         adjudicationDataMap.put("estimated_amount", null);
         adjudicationDataMap.put("file_path", gcpPath);
         adjudicationDataMap.put("file_name", gcpFileName);
-        adjudicationDataMap.put("user_id", null);
+        adjudicationDataMap.put(EmailKeywords.USER_ID, null);
         adjudicationDataMap.put("offer_id", null);
         adjudicationDataMap.put("hsp_id",123);
         adjudicationDataMap.put("document_id", null);
@@ -216,7 +216,7 @@ public class MailController extends BaseController {
         adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
         adjudicationItems.put("pf_document_id",prefundedEmail);
         adjudicationItems.put("document_url", gcpPath);
-        adjudicationItems.put("is_active", 1);
+        adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
     }   
@@ -224,7 +224,7 @@ public class MailController extends BaseController {
     //Cashless to check Initial Or Final
     private void handleCashlessCreditRequest(Map<String, String> response) throws IOException, MessagingException {
         
-        String body = response.get("body");
+        String body = response.get(EmailKeywords.BODY);
         String[] bodyLines = body.split("\n");
         for (String line : bodyLines) {
             if (line.startsWith("Initial Cashless Approved Amount:-")) {
@@ -244,59 +244,59 @@ public class MailController extends BaseController {
 
     //Initial Cashless Credit Request flow db calls
     private void handleInitialCashlessCreditRequest(Map<String, String> response) {
-        String employeeCode = response.get("employee_code");
-        String claimNo = response.get("claim_no");
-        String initialCashlessApprovedAmount = response.get("initial_cashless_approved_amount");
-        String initialCashlessRequestAmount = response.get("initial_cashless_request_amount");
-        String subject = response.get("subject");
-        String body = response.get("body");
-        String gcpPath = response.get("gcp_path");
-        String gcpFileName = response.get("gcp_file_name");
+        String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
+        String claimNo = response.get(EmailKeywords.CLAIM_NO);
+        String initialCashlessApprovedAmount = response.get(EmailKeywords.INITIAL_CASHLESS_APPROVED_AMT);
+        String initialCashlessRequestAmount = response.get(EmailKeywords.INITIAL_CASHLESS_REQUEST_AMT);
+        String subject = response.get(EmailKeywords.SUBJECT);
+        String body = response.get(EmailKeywords.BODY);
+        String gcpPath = response.get(EmailKeywords.GCP_PATH);
+        String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
 
         Map<String, Object> preFundedReqMap = new HashMap<>();
-        preFundedReqMap.put("user_id", "123");
+        preFundedReqMap.put(EmailKeywords.USER_ID, "123");
         preFundedReqMap.put("hsp_id", "123");
         preFundedReqMap.put("partnered_user_id", employeeCode);
-        preFundedReqMap.put("tpa_desk_id", null);
+        preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, null);
         preFundedReqMap.put("status", "PENDING");
-        preFundedReqMap.put("type", "TPA");
+        preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
         preFundedReqMap.put("processed_at", null);
         preFundedReqMap.put("requested_amount", null); //check wheather initial or final
         preFundedReqMap.put("disbursement_amount", null);
-        preFundedReqMap.put("is_active", true);
-        preFundedReqMap.put("claim_no", claimNo);
+        preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
+        preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
     
         Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
     
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put("type", "INITIAL CASHLESS CREDIT REQUEST");
-        preFundedEmailerMap.put("subject", subject);
-        preFundedEmailerMap.put("is_active", true);
-        preFundedEmailerMap.put("claim_no", claimNo);
+        preFundedEmailerMap.put(EmailKeywords.TYPE, "INITIAL CASHLESS CREDIT REQUEST");
+        preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
+        preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
+        preFundedEmailerMap.put(EmailKeywords.CLAIM_NO, claimNo);
         preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
     
         Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
     
         Map<String, Object> emailerItems = new HashMap<>();
-        emailerItems.put("tpa_desk_id", null);
-        emailerItems.put("claim_no", claimNo);
+        emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("initial_amt_req", initialCashlessRequestAmount);
         emailerItems.put("initial_amt_approved", initialCashlessApprovedAmount);
         emailerItems.put("final_adj_amt_req", null);
         emailerItems.put("final_adj_amt_approved", null);
         emailerItems.put("metadata", subject + body);
-        emailerItems.put("patient_name", null);
+        emailerItems.put(EmailKeywords.PATIENT_NAME, null);
     
         Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
 
         Map<String, Object> adjudicationDataMap = new HashMap<>();
-        adjudicationDataMap.put("tpa_desk_id",null);
+        adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID,null);
         adjudicationDataMap.put("pf_req_id", prefundedEmail);
         adjudicationDataMap.put("requested_amount", null);
         adjudicationDataMap.put("estimated_amount", null);
         adjudicationDataMap.put("file_path", gcpPath);
         adjudicationDataMap.put("file_name", gcpFileName);
-        adjudicationDataMap.put("user_id", null);
+        adjudicationDataMap.put(EmailKeywords.USER_ID, null);
         adjudicationDataMap.put("offer_id", null);
         adjudicationDataMap.put("hsp_id",123);
         adjudicationDataMap.put("document_id", null); //document_id??
@@ -311,66 +311,66 @@ public class MailController extends BaseController {
         adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
         adjudicationItems.put("pf_document_id",prefundedEmail);
         adjudicationItems.put("document_url", gcpPath);
-        adjudicationItems.put("is_active", 1);
+        adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
     }
 
     //Final Cashless Credit Request flow db calls
     private void handleFinalCashlessCreditRequest(Map<String, String> response) {
-        String employeeCode = response.get("employee_code");
-        String claimNo = response.get("claim_no");
-        String finalCashlessApprovedAmount = response.get("final_cashless_approved_amount");
-        String finalCashlessRequestAmount = response.get("final_cashless_request_amount");
-        String subject = response.get("subject");
-        String body = response.get("body");
-        String gcpPath = response.get("gcp_path");
-        String gcpFileName = response.get("gcp_file_name"); 
+        String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
+        String claimNo = response.get(EmailKeywords.CLAIM_NO);
+        String finalCashlessApprovedAmount = response.get(EmailKeywords.INITIAL_CASHLESS_REQUEST_AMT);
+        String finalCashlessRequestAmount = response.get(EmailKeywords.FINAL_CASHLESS_REQUEST_AMT);
+        String subject = response.get(EmailKeywords.SUBJECT);
+        String body = response.get(EmailKeywords.BODY);
+        String gcpPath = response.get(EmailKeywords.GCP_PATH);
+        String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME); 
     
         Map<String, Object> preFundedReqMap = new HashMap<>();
-        preFundedReqMap.put("user_id", "123");
+        preFundedReqMap.put(EmailKeywords.USER_ID, "123");
         preFundedReqMap.put("hsp_id", "123");
         preFundedReqMap.put("partnered_user_id", employeeCode);
-        preFundedReqMap.put("tpa_desk_id", null);
+        preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, null);
         preFundedReqMap.put("status", "PENDING");
-        preFundedReqMap.put("type", "TPA");
+        preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
         preFundedReqMap.put("processed_at", null);
         preFundedReqMap.put("requested_amount", null); //check wheather initial or final
         preFundedReqMap.put("disbursement_amount", null);
-        preFundedReqMap.put("is_active", true);
-        preFundedReqMap.put("claim_no", claimNo);
+        preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
+        preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
     
         Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
     
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put("type", "FINAL CASHLESS CREDIT REQUEST");
-        preFundedEmailerMap.put("subject", subject);
-        preFundedEmailerMap.put("is_active", true);
-        preFundedEmailerMap.put("claim_no", claimNo);
+        preFundedEmailerMap.put(EmailKeywords.TYPE, "FINAL CASHLESS CREDIT REQUEST");
+        preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
+        preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
+        preFundedEmailerMap.put(EmailKeywords.CLAIM_NO, claimNo);
         preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
     
         Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
     
         Map<String, Object> emailerItems = new HashMap<>();
-        emailerItems.put("tpa_desk_id", null);
-        emailerItems.put("claim_no", claimNo);
+        emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("initial_amt_req", null);
         emailerItems.put("initial_amt_approved", null);
         emailerItems.put("final_adj_amt_req", finalCashlessRequestAmount);
         emailerItems.put("final_adj_amt_approved", finalCashlessApprovedAmount);
         emailerItems.put("metadata", subject + body);
-        emailerItems.put("patient_name", null);
+        emailerItems.put(EmailKeywords.PATIENT_NAME, null);
     
         Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
     
         Map<String, Object> adjudicationDataMap = new HashMap<>();
-        adjudicationDataMap.put("tpa_desk_id",null);
+        adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID,null);
         adjudicationDataMap.put("pf_req_id", prefundedEmail);
         adjudicationDataMap.put("requested_amount", finalCashlessRequestAmount);
         adjudicationDataMap.put("estimated_amount", finalCashlessApprovedAmount);
         adjudicationDataMap.put("file_path", gcpPath);
         adjudicationDataMap.put("file_name", gcpFileName);
-        adjudicationDataMap.put("user_id", null);
+        adjudicationDataMap.put(EmailKeywords.USER_ID, null);
         adjudicationDataMap.put("offer_id", null);
         adjudicationDataMap.put("hsp_id",123);
         adjudicationDataMap.put("document_id", null);
@@ -385,65 +385,65 @@ public class MailController extends BaseController {
         adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
         adjudicationItems.put("pf_document_id",prefundedEmail);
         adjudicationItems.put("document_url", gcpPath);
-        adjudicationItems.put("is_active", 1);
+        adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
     }
 
     //Final Bill And Discharge Summary flow db calls
     private void handleFinalBillAndDischargeSummary(Map<String, String> response) {
-        String patientName = response.get("patient_name");
-        String claimNo = response.get("claim_no");
-        String khId = response.get("kh_id");
-        String subject = response.get("subject");
-        String body = response.get("body");
-        String gcpPath = response.get("gcp_path");
-        String gcpFileName = response.get("gcp_file_name"); 
+        String patientName = response.get(EmailKeywords.PATIENT_NAME);
+        String claimNo = response.get(EmailKeywords.CLAIM_NO);
+        String khId = response.get(EmailKeywords.TPA_DESK_ID);
+        String subject = response.get(EmailKeywords.SUBJECT);
+        String body = response.get(EmailKeywords.BODY);
+        String gcpPath = response.get(EmailKeywords.GCP_PATH);
+        String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME); 
     
         Map<String, Object> preFundedReqMap = new HashMap<>();
-        preFundedReqMap.put("user_id", "123");
+        preFundedReqMap.put(EmailKeywords.USER_ID, "123");
         preFundedReqMap.put("hsp_id", "123");
         preFundedReqMap.put("partnered_user_id", null);
-        preFundedReqMap.put("tpa_desk_id", khId);
+        preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, khId);
         preFundedReqMap.put("status", "PENDING");
-        preFundedReqMap.put("type", "TPA");
+        preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
         preFundedReqMap.put("processed_at", null);
         preFundedReqMap.put("requested_amount", null);
         preFundedReqMap.put("disbursement_amount", null);
-        preFundedReqMap.put("is_active", true);
-        preFundedReqMap.put("claim_no", claimNo);
+        preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
+        preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
     
         Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
     
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put("type", "FINAL BILL AND DISCHARGE SUMMARY");
-        preFundedEmailerMap.put("subject", subject);
-        preFundedEmailerMap.put("is_active", true);
-        preFundedEmailerMap.put("claim_no", claimNo);
+        preFundedEmailerMap.put(EmailKeywords.TYPE, "FINAL BILL AND DISCHARGE SUMMARY");
+        preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
+        preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
+        preFundedEmailerMap.put(EmailKeywords.CLAIM_NO, claimNo);
         preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
     
         Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
     
         Map<String, Object> emailerItems = new HashMap<>();
-        emailerItems.put("tpa_desk_id", khId);
-        emailerItems.put("claim_no", claimNo);
+        emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("initial_amt_req", null);
         emailerItems.put("initial_amt_approved", null);
         emailerItems.put("final_adj_amt_req", null);
         emailerItems.put("final_adj_amt_approved", null);
         emailerItems.put("metadata", subject + body);
-        emailerItems.put("patient_name", patientName);
+        emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
     
         Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
     
         Map<String, Object> adjudicationDataMap = new HashMap<>();
-        adjudicationDataMap.put("tpa_desk_id",khId);
+        adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID,khId);
         adjudicationDataMap.put("pf_req_id", prefundedEmail);
         adjudicationDataMap.put("requested_amount", null);
         adjudicationDataMap.put("estimated_amount", null);
         adjudicationDataMap.put("file_path", gcpPath);
         adjudicationDataMap.put("file_name", gcpFileName);
-        adjudicationDataMap.put("user_id", null);
+        adjudicationDataMap.put(EmailKeywords.USER_ID, null);
         adjudicationDataMap.put("offer_id", null);
         adjudicationDataMap.put("hsp_id",123);
         adjudicationDataMap.put("document_id", null);
@@ -458,7 +458,7 @@ public class MailController extends BaseController {
         adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
         adjudicationItems.put("pf_document_id",prefundedEmail);
         adjudicationItems.put("document_url", gcpPath);
-        adjudicationItems.put("is_active", 1);
+        adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
     }
@@ -468,59 +468,59 @@ public class MailController extends BaseController {
 
         return null;
 
-        // String employeeCode = response.get("employee_code");
-        // String claimNo = response.get("claim_no");
-        // String documentRequired = response.get("document_required");
-        // String patientName = response.get("patient_name");
-        // String subject = response.get("subject");
-        // String body = response.get("body");
-        // String gcpPath = response.get("gcp_path");
-        // String gcpFileName = response.get("gcp_file_name"); 
+        // String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
+        // String claimNo = response.get(EmailKeywords.CLAIM_NO);
+        // String documentRequired = response.get(EmailKeywords.DOCUMENT_REQUIRED);
+        // String patientName = response.get(EmailKeywords.PATIENT_NAME);
+        // String subject = response.get(EmailKeywords.SUBJECT);
+        // String body = response.get(EmailKeywords.BODY);
+        // String gcpPath = response.get(EmailKeywords.GCP_PATH);
+        // String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME); 
     
         // Map<String, Object> preFundedReqMap = new HashMap<>();
-        // preFundedReqMap.put("user_id", "123");
+        // preFundedReqMap.put(EmailKeywords.USER_ID, "123");
         // preFundedReqMap.put("hsp_id", "123");
         // preFundedReqMap.put("partnered_user_id", employeeCode);
-        // preFundedReqMap.put("tpa_desk_id", null);
+        // preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, null);
         // preFundedReqMap.put("status", "PENDING");
-        // preFundedReqMap.put("type", "TPA");
+        // preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
         // preFundedReqMap.put("processed_at", null);
         // preFundedReqMap.put("requested_amount", null);
         // preFundedReqMap.put("disbursement_amount", null);
-        // preFundedReqMap.put("is_active", true);
-        // preFundedReqMap.put("claim_no", claimNo);
+        // preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
+        // preFundedReqMap.put(EmailKeywords.CLAIM_NO, claimNo);
     
         // Long preFundedRequest = (Long) this.loansService.preFundedrequestStore(preFundedReqMap);
     
         // Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        // preFundedEmailerMap.put("type", "ADDITIONAL INFORMATION");
-        // preFundedEmailerMap.put("subject", subject);
-        // preFundedEmailerMap.put("is_active", true);
-        // preFundedEmailerMap.put("claim_no", claimNo);
+        // preFundedEmailerMap.put(EmailKeywords.TYPE, "ADDITIONAL INFORMATION");
+        // preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
+        // preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
+        // preFundedEmailerMap.put(EmailKeywords.CLAIM_NO, claimNo);
         // preFundedEmailerMap.put("pf_req_id", preFundedRequest.toString());
     
         // Long prefundedEmail = (Long) this.masterService.prefundedEmail(preFundedEmailerMap);
     
         // Map<String, Object> emailerItems = new HashMap<>();
-        // emailerItems.put("tpa_desk_id", null);
-        // emailerItems.put("claim_no", claimNo);
+        // emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
+        // emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         // emailerItems.put("initial_amt_req", null);
         // emailerItems.put("initial_amt_approved", null);
         // emailerItems.put("final_adj_amt_req", null);
         // emailerItems.put("final_adj_amt_approved", null);
         // emailerItems.put("metadata", subject + body);
-        // emailerItems.put("patient_name", patientName);
+        // emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
     
         // Long emailItems = (Long) this.masterService.emailInsert(emailerItems);
     
         // Map<String, Object> adjudicationDataMap = new HashMap<>();
-        // adjudicationDataMap.put("tpa_desk_id",null);
+        // adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID,null);
         // adjudicationDataMap.put("pf_req_id", prefundedEmail);
         // adjudicationDataMap.put("requested_amount", null);
         // adjudicationDataMap.put("estimated_amount", null);
         // adjudicationDataMap.put("file_path", gcpPath);
         // adjudicationDataMap.put("file_name", gcpFileName);
-        // adjudicationDataMap.put("user_id", null);
+        // adjudicationDataMap.put(EmailKeywords.USER_ID, null);
         // adjudicationDataMap.put("offer_id", null);
         // adjudicationDataMap.put("hsp_id",123);
         // adjudicationDataMap.put("document_id", null);
@@ -535,7 +535,7 @@ public class MailController extends BaseController {
         // adjudicationItems.put("adjduciation_data_id",adjudicationDataId);
         // adjudicationItems.put("pf_document_id",prefundedEmail);
         // adjudicationItems.put("document_url", gcpPath);
-        // adjudicationItems.put("is_active", 1);
+        // adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
        // Long adjudicationItemsId = (Long)this.loansService.adjudicationItemsStore(adjudicationItems);
     }
