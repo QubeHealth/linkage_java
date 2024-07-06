@@ -202,7 +202,7 @@ public class MailController extends BaseController {
         preFundedReqMap.put("final_request_resolved_at", null);
 
         ApiResponse<Object> preFundedRequest = this.loansService.preFundedrequestStore(preFundedReqMap);
-       Map<String, Object> responseData = (Map<String, Object>) preFundedRequest.getData();
+        Map<String, Object> responseData = (Map<String, Object>) preFundedRequest.getData();
         String preFundedRequestId = String.valueOf(responseData.get("data"));
        
         Map<String,Object> preFundedEmailerMap = new HashMap<>();
