@@ -11,17 +11,17 @@ public class MasterService extends BaseServiceClient{
         super(configuration);
     }
 
-    public Object prefundedEmail(Map<String, Object> body) {
+    public ApiResponse<Object> prefundedEmail(Map<String, Object> body) {
 
         String url = configuration.getMasterurl() + "/prefunded/prefundedEmailer";
         ApiResponse<Object> predundedEmail = this.networkCallInternalService(url, "post", body, null);
-        return predundedEmail.getData();
+        return predundedEmail;
     }
 
-    public Object emailInsert(Map<String, Object> body){
+    public ApiResponse<Object> emailInsert(Map<String, Object> body){
         String url = configuration.getMasterurl() + "/prefunded/emailInsert";
         ApiResponse<Object> predundedEmail = this.networkCallInternalService(url, "post", body, null);
-        return predundedEmail.getData();
+        return predundedEmail;
     }
 
 }
