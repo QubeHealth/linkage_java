@@ -32,10 +32,10 @@ public class LoansService extends BaseServiceClient{
        
     }
 
-    public Object adjudicationQueryStore(Map<String, Object> body) {
+    public ApiResponse<Object> adjudicationQueryStore(Map<String, Object> body) {
         String url = configuration.getLoansUrl() + "/transactions/addAdjudicationQuery";
         ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
-        return resp.getData();
+        return resp;
     }
 
 }
