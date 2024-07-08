@@ -266,14 +266,12 @@ public class MailController extends BaseController {
     private void handleInitialCashlessCreditRequest(Map<String, String> response) {
         String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
         String claimNo = response.get(EmailKeywords.CLAIM_NO);
-        String initialCashlessApprovedAmount = response.get(EmailKeywords.INITIAL_CASHLESS_APPROVED_AMT);
-        String initialCashlessRequestAmount = response.get(EmailKeywords.INITIAL_CASHLESS_REQUEST_AMT);
+        String initialApprovedAmount = response.get(EmailKeywords.INITIAL_CASHLESS_APPROVED_AMT);
+        String initialRequestAmount = response.get(EmailKeywords.INITIAL_CASHLESS_REQUEST_AMT);
         String subject = response.get(EmailKeywords.SUBJECT);
         String body = response.get(EmailKeywords.BODY);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
-
-        this.loansService.checkQueryStatus(claimNo);
 
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
@@ -296,8 +294,8 @@ public class MailController extends BaseController {
        Map<String, Object> emailerItems = new HashMap<>();
        emailerItems.put(EmailKeywords.TPA_DESK_ID,null);
        emailerItems.put("claim_no", claimNo);
-       emailerItems.put("initial_amt_req",initialCashlessRequestAmount);
-       emailerItems.put("initial_amt_approved",initialCashlessApprovedAmount);
+       emailerItems.put("initial_amt_req",initialRequestAmount);
+       emailerItems.put("initial_amt_approved",initialApprovedAmount);
        emailerItems.put("final_adj_amt_req", null);
        emailerItems.put("final_adj_amt_approved",null);
        emailerItems.put("metadata",subject);
@@ -325,6 +323,10 @@ public class MailController extends BaseController {
        ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
        Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
        String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
+
+        this.loansService.checkQueryStatus(claimNo);
+        this.loansService.updateInitialAmountsPrefunded(claimNo, initialRequestAmount, initialApprovedAmount);
+
 
     }
 
