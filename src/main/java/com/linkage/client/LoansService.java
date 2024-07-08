@@ -48,7 +48,7 @@ public class LoansService extends BaseServiceClient{
         return resp;
     }
 
-    public ApiResponse<Object> updateStatus(String claimNo, String status) {
+    public ApiResponse<Object> updateStatusAdjudicationData(String claimNo, String status) {
         String url = configuration.getLoansUrl() + "/transactions/updateStatusAdjudicationData";
         Map<String, Object> body= new HashMap<>();
         body.put("claim_no",claimNo);
@@ -91,6 +91,16 @@ public class LoansService extends BaseServiceClient{
     }
 
     public ApiResponse<Object> updateInitialAmountsPrefunded(String claimNo, String requestedAmountInitial, String approvedAmountInitial) {
+        String url = configuration.getLoansUrl() + "/transactions/checkForQuery";
+        Map<String, Object> body= new HashMap<>();
+        body.put("claim_no",claimNo);
+        body.put("claim_no",requestedAmountInitial);
+        body.put("claim_no",approvedAmountInitial);
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp;
+    }
+
+    public ApiResponse<Object> updateFinalAmountsPrefunded(String claimNo, String requestedAmountInitial, String approvedAmountInitial) {
         String url = configuration.getLoansUrl() + "/transactions/checkForQuery";
         Map<String, Object> body= new HashMap<>();
         body.put("claim_no",claimNo);
