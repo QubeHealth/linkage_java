@@ -128,6 +128,7 @@ public class MailController extends BaseController {
         emailerItems.put("final_adj_amt_approved",null);
         emailerItems.put("metadata",subject);
         emailerItems.put(EmailKeywords.PATIENT_NAME,patientName);
+        emailerItems.put("policy_no",partneredUserId);
 
         //Long emailItems = (Long)this.masterService.emailInsert(emailerItems);
 
