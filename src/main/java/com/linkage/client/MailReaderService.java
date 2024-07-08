@@ -380,7 +380,6 @@ public class MailReaderService extends EmailFetcher {
         String khId = null;
         String partneredUserId = null;
         String patientName = null;
-
         String[] parts = subject.split("\\s+");
 
         // Extraction of data values from the subject of pre-auth email

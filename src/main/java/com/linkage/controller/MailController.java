@@ -120,7 +120,7 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID,khId);
-        emailerItems.put(EmailKeywords.CLAIM_NO, null);
+        emailerItems.put("claim_no", null);
         emailerItems.put("initial_amt_req",null);
         emailerItems.put("initial_amt_approved",null);
         emailerItems.put("final_adj_amt_req", null);
@@ -220,7 +220,7 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID,khId);
-        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+        emailerItems.put("claim_no", claimNo);
         emailerItems.put("initial_amt_req",null);
         emailerItems.put("initial_amt_approved",null);
         emailerItems.put("final_adj_amt_req", null);
@@ -338,7 +338,7 @@ public class MailController extends BaseController {
     
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
-        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+        emailerItems.put("claim_no", claimNo);
         emailerItems.put("initial_amt_req", initialCashlessRequestAmount);
         emailerItems.put("initial_amt_approved", initialCashlessApprovedAmount);
         emailerItems.put("final_adj_amt_req", null);
@@ -437,7 +437,7 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
-        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+        emailerItems.put("claim_no", claimNo);
         emailerItems.put("initial_amt_req", null);
         emailerItems.put("initial_amt_approved", null);
         emailerItems.put("final_adj_amt_req", finalCashlessRequestAmount);
@@ -532,7 +532,7 @@ public class MailController extends BaseController {
     
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
-        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+        emailerItems.put("claim_no", claimNo);
         emailerItems.put("initial_amt_req", null);
         emailerItems.put("initial_amt_approved", null);
         emailerItems.put("final_adj_amt_req", null);
@@ -610,7 +610,7 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
-        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+        emailerItems.put("claim_no", claimNo);
         emailerItems.put("initial_amt_req", null);
         emailerItems.put("initial_amt_approved", null);
         emailerItems.put("final_adj_amt_req", null);
@@ -642,22 +642,3 @@ public class MailController extends BaseController {
 
     }
 }
-
-// @POST
-// @Path("/emailDataStore")
-// @Consumes(MediaType.APPLICATION_JSON)
-// public Response emailDataStore(@Context HttpServletRequest request,
-// Map<String, String> requestBody) {
-// try {
-// //ApiResponse<Object> dApiResponse =
-// masterService.mailDataStore(requestBody);
-// return Response.status(Response.Status.OK)
-// .entity(new ApiResponse<>(true, "Data stored successfully", null))
-// .build();
-// } catch (Exception e) {
-// e.printStackTrace();
-// return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-// .entity(new ApiResponse<>(false, "Error storing data", null))
-// .build();
-// }
-// }
