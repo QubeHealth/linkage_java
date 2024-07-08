@@ -272,6 +272,8 @@ public class MailController extends BaseController {
         String body = response.get(EmailKeywords.BODY);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
+        String status = "APPROVED";
+
 
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
@@ -324,7 +326,13 @@ public class MailController extends BaseController {
        Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
        String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
 
-        this.loansService.checkQueryStatus(claimNo);
+       ApiResponse<Object> checkQueryStatusData = this.loansService.checkQueryStatus(claimNo);
+       Map<String, Object> checkQueryStatusResponseData = (Map<String, Object>) checkQueryStatusData.getData();
+       String checkStatus = String.valueOf(checkQueryStatusResponseData.get("data"));
+        if(checkStatus == "1"){
+            this.loansService.updateStatusAdjudicationData(claimNo,status);
+        }
+
         this.loansService.updateInitialAmountsPrefunded(claimNo, initialRequestAmount, initialApprovedAmount);
 
     }
@@ -399,7 +407,7 @@ public class MailController extends BaseController {
             this.loansService.updateStatusAdjudicationData(claimNo,status);
         } 
 
-        this.loansService.updateFinalAmountsPrefunded(claimNo, finalRequestAmount, finalApprovedAmount);
+        //this.loansService.updateInitialAmountsPrefunded(claimNo, finalRequestAmount, finalApprovedAmount);
 
     }
 
