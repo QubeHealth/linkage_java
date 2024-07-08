@@ -147,7 +147,7 @@ public class MailReaderService extends EmailFetcher {
             if (parts[i].startsWith("KH")) {
                 khId = parts[i].trim();
             } else if (parts[i].startsWith("CL-")) {
-                claimNo = parts[i].trim();
+                claimNo = parts[i].substring(3).trim();
             } else if (patientName == null && parts.length > i + 1 && parts[i].equalsIgnoreCase("For")) {
                 patientName = parts[i + 1] + " " + parts[i + 2];
             } else if (patientName == null && parts.length > i  && parts[i].equalsIgnoreCase("For")) {
