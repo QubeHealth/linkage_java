@@ -57,4 +57,20 @@ public class LoansService extends BaseServiceClient{
         return resp;
     }
 
+    public ApiResponse<Object> handleQueryReply(String claimNo, String status) {
+        String url = configuration.getLoansUrl() + "/transactions/handleQueryReply";
+        Map<String, Object> body= new HashMap<>();
+        body.put("claim_no",claimNo);
+        body.put("status", status);
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp;
+    }
+
+    public ApiResponse<Object> getAdjudicationDataId(String claimNo) {
+        String url = configuration.getLoansUrl() + "/transactions/getAdjudicationDataId";
+        Map<String, Object> body= new HashMap<>();
+        body.put("claim_no",claimNo);
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp;
+    }
 }
