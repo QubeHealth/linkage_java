@@ -99,14 +99,4 @@ public class LoansService extends BaseServiceClient{
         ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
         return resp;
     }
-
-    public ApiResponse<Object> updateFinalAmountsPrefunded(String claimNo, String requestedAmountInitial, String approvedAmountInitial) {
-        String url = configuration.getLoansUrl() + "/transactions/checkForQuery";
-        Map<String, Object> body= new HashMap<>();
-        body.put("claim_no",claimNo);
-        body.put("claim_no",requestedAmountInitial);
-        body.put("claim_no",approvedAmountInitial);
-        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
-        return resp;
-    }
 }
