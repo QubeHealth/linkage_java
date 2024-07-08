@@ -111,6 +111,7 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE,true);
         preFundedEmailerMap.put("partnered_claim_no","22");
         preFundedEmailerMap.put("pf_request_id", preFundedRequestId);
+        preFundedEmailerMap.put("policy_no",partneredUserId);
 
         //Long prefundedEmail = (Long)this.masterService.prefundedEmail(preFundedEmailerMap);
 
@@ -149,6 +150,7 @@ public class MailController extends BaseController {
         adjudicationDataMap.put("status", "PENDING");
         adjudicationDataMap.put("created_by", "TPA DESK");
         adjudicationDataMap.put("requested_by", null);
+        adjudicationDataMap.put("updated_by", "ADJUDICATOR");
 
         //Long adjudicationDataId = (Long)this.loansService.adjudicationDataStore(adjudicationDataMap);
 
