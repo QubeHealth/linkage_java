@@ -186,13 +186,16 @@ public class MailController extends BaseController {
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
         String status = "RESPONDED";
 
+        ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
+       Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
+       String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
 
         Map<String,Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put(EmailKeywords.TYPE,"PRE AUTH");
+        preFundedEmailerMap.put(EmailKeywords.TYPE,"QUERY REPLY");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT,subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE,true);
         preFundedEmailerMap.put("partnered_claim_no",claimNo);
-        preFundedEmailerMap.put("pf_request_id", null);
+        preFundedEmailerMap.put("pf_request_id", prefundedRequestId);
         preFundedEmailerMap.put("policy_no",null);
 
         //Long prefundedEmail = (Long)this.masterService.prefundedEmail(preFundedEmailerMap);

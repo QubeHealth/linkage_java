@@ -73,4 +73,12 @@ public class LoansService extends BaseServiceClient{
         ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
         return resp;
     }
+
+    public ApiResponse<Object> getPrefundedRequestId(String claimNo) {
+        String url = configuration.getLoansUrl() + "/transactions/getPrefundedRequestId";
+        Map<String, Object> body= new HashMap<>();
+        body.put("claim_no",claimNo);
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp;
+    }
 }
