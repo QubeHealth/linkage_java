@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.security.auth.Subject;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.core.constants.Constants.EmailKeywords;
@@ -68,6 +69,8 @@ public class MailReaderService extends EmailFetcher {
                 if (gcpPath != null || gcpFileName != null) {
                     responseMap.put(EmailKeywords.GCP_PATH, gcpPath);
                     responseMap.put(EmailKeywords.GCP_FILE_NAME, gcpFileName);
+                    responseMap.put(EmailKeywords.SUBJECT, subject);
+                    responseMap.put(EmailKeywords.BODY, body);
                     markAsRead(message);
                 } else {
                     markAsUnread(message);

@@ -19,7 +19,7 @@ public class MasterService extends BaseServiceClient{
     }
 
     public ApiResponse<Object> emailInsert(Map<String, Object> body){
-        String url = configuration.getMasterurl() + "/prefunded/emailInsert";
+        String url = configuration.getMasterurl() + "/prefunded/emailItems";
         ApiResponse<Object> predundedEmail = this.networkCallInternalService(url, "post", body, null);
         return predundedEmail;
     }

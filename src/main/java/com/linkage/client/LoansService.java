@@ -1,5 +1,6 @@
 package com.linkage.client;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.rpc.Help;
@@ -34,6 +35,24 @@ public class LoansService extends BaseServiceClient{
 
     public ApiResponse<Object> adjudicationQueryStore(Map<String, Object> body) {
         String url = configuration.getLoansUrl() + "/transactions/addAdjudicationQuery";
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp;
+    }
+
+    public ApiResponse<Object> updateClaimNo(String partneredUserId, String claimNo) {
+        String url = configuration.getLoansUrl() + "/transactions/updateClaimNo";
+        Map<String, Object> body= new HashMap<>();
+        body.put("partnered_user_id",partneredUserId);
+        body.put("claim_no", claimNo);
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
+        return resp;
+    }
+
+    public ApiResponse<Object> updateStatus(String claimNo, String status) {
+        String url = configuration.getLoansUrl() + "/transactions/updateStatusAdjudicationData";
+        Map<String, Object> body= new HashMap<>();
+        body.put("claim_no",claimNo);
+        body.put("status", status);
         ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
         return resp;
     }
