@@ -26,10 +26,8 @@ public class MailWriterService extends EmailFetcher {
         try {
             // Fetch the latest email
             connect();
-            Message mailMessage = fetchLatestEmail();
+            MimeMessage mailMessage = (MimeMessage) fetchLatestEmail();
             String subject = fetchSubject(mailMessage);
-            String body = fetchBody(mailMessage);
-            Object content = mailMessage.getContent();
 
             String keyword = parseSubjectForKeyword(subject);
 
@@ -66,29 +64,26 @@ public class MailWriterService extends EmailFetcher {
                 }
             });
 
-            // Create a default MimeMessage object.
+            //Create a default MimeMessage object.
             MimeMessage message = new MimeMessage(session);
 
-            // Set From: header field
+            //Set From: header field
             message.setFrom(new InternetAddress(from));
 
-            // Set To: header field
+            //Set To: header field
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 
             // Set Subject: header field
             message.setSubject(subject);
 
             // Now set the actual message
-            message.setText(body);
-
-            MimeMultipart multipart = (MimeMultipart) content;
-            message.setContent(multipart);
+            message.setContent(mailMessage.getContent(), mailMessage.getContentType());
 
             // Send message
             Transport.send(message);
             System.out.println("Sent message successfully...");
             close();
-            return "success";
+            return "Mail delivered successfully";
         } catch (MessagingException | IOException e) {
             e.printStackTrace();
             return "failure";
