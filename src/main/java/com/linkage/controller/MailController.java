@@ -68,19 +68,25 @@ public class MailController extends BaseController {
 
         for (Message message : msgList) {
             try {
-                Map<String, String> response = this.mailReaderService.fetchAndProcessEmail(message);
+                Response processedMail = this.mailReaderService.fetchAndProcessEmail(message);
+                ApiResponse<Object> apiResponse = (ApiResponse<Object>) processedMail.getEntity();
+                if (processedMail.getStatus() == 0) {
+                    // Log the error or handle as needed
+                    throw new Exception("Error processing email");
+                }
+                Map<String, String> responseData = (Map<String, String>) apiResponse.getData();
 
                 // Extract common type from the response
-                String type = response.get(EmailKeywords.TYPE);
+                String type = String.valueOf(responseData.get(EmailKeywords.TYPE));
 
                 // Map to store handlers for different types
                 Map<String, Runnable> emailType = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-                emailType.put(EmailKeywords.PRE_AUTH, () -> handlePreAuth(response));
-                emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(response));
+                emailType.put(EmailKeywords.PRE_AUTH, () -> handlePreAuth(responseData));
+                emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(responseData));
                 emailType.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY,
-                        () -> handleFinalBillAndDischargeSummary(response));
-                emailType.put(EmailKeywords.CASHLESS_CREDIT_REQUEST, () -> handleCashlessCreditRequest(response));
-                emailType.put(EmailKeywords.ADDITIONAL_INFORMATION, () -> handleAdditionalInformation(response));
+                        () -> handleFinalBillAndDischargeSummary(responseData));
+                emailType.put(EmailKeywords.CASHLESS_CREDIT_REQUEST, () -> handleCashlessCreditRequest(responseData));
+                emailType.put(EmailKeywords.ADDITIONAL_INFORMATION, () -> handleAdditionalInformation(responseData));
 
                 // Execute handler based on the type
                 Runnable handler = emailType.get(type);
@@ -93,9 +99,8 @@ public class MailController extends BaseController {
             } catch (Exception e) {
                 // Log the exception and continue with the next message
                 this.mailWriterService.markEmailUnread(message.getSubject());
-                // return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error
-                // processing email with subject '" + message.getSubject() + "': " +
-                // e.getMessage()).build();
+                // return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error");
+                
             }
         }
 
