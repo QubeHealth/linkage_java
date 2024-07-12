@@ -8,7 +8,7 @@ public final class Constants {
         public static final String SUPPORTING_DOCUMENT = "supporting document";
         public static final String FINAL_BILL_AND_DISCHARGE_SUMMARY = "final bill and discharge summary";
         public static final String PRE_AUTH = "pre auth";
-        public static final String CASHLESS_CREDIT_REQUEST = "cashless credit request";
+        public static final String CASHLESS_CREDIT_REQUEST = "CASHLESS CREDIT REQUEST";
         public static final String ADDITIONAL_INFORMATION = "addtional information";
         public static final String ERROR = "error";
         public static final String INITIAL_CASHLESS_APPROVED = "Initial Cashless Approved Amount:-";

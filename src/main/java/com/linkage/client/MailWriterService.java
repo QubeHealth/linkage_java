@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
+import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -13,6 +14,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.search.SubjectTerm;
 
 import com.linkage.LinkageConfiguration;
 
@@ -22,11 +24,11 @@ public class MailWriterService extends EmailFetcher {
         super("imap.gmail.com", "993", "qubetestemailssend@gmail.com", "vuopgzdlbsyzmwoo", configuration);
     }
 
-    public String mailSender() {
+    public String mailSender(Message sendMessage) throws MessagingException {
         try {
             // Fetch the latest email
             connect();
-            MimeMessage mailMessage = (MimeMessage) fetchLatestEmail();
+            MimeMessage mailMessage = (MimeMessage) sendMessage;
             String subject = fetchSubject(mailMessage);
 
             String keyword = parseSubjectForKeyword(subject);
@@ -38,7 +40,7 @@ public class MailWriterService extends EmailFetcher {
                 recipient = "tmt.9@qubehealth.com";
             } else if ("pre auth".equalsIgnoreCase(keyword) || "cashless credit request".equalsIgnoreCase(keyword)
                     || "final bill and discharge summary".equalsIgnoreCase(keyword)) {
-                recipient = "tmt.8@qubehealth.com";
+                recipient = "tmt.9@qubehealth.com";
             }
 
             // Sender's email ID
@@ -82,11 +84,12 @@ public class MailWriterService extends EmailFetcher {
             // Send message
             Transport.send(message);
             System.out.println("Sent message successfully...");
-            close();
             return "Mail delivered successfully";
         } catch (MessagingException | IOException e) {
             e.printStackTrace();
             return "failure";
+        } finally {
+            close(); // Ensure close is called in all cases
         }
     }
 
@@ -102,4 +105,31 @@ public class MailWriterService extends EmailFetcher {
         }
         return null;
     }
+
+    public String markEmailUnread(String subject) throws MessagingException {
+        try {
+            connect(); // Ensure inbox is initialized
+    
+            if (inbox == null || !inbox.isOpen()) {
+                throw new MessagingException("INBOX folder is not initialized or not open");
+            }
+    
+            Message[] messages = inbox.search(new SubjectTerm(subject));
+    
+            for (int i = messages.length - 1; i >= 0; i--) {
+                Message message = messages[i];
+                message.setFlag(Flags.Flag.SEEN, false); // Mark message as unread
+                return "Email marked as unread"; // Exit method after marking the first matching message
+            }
+
+            
+            return "Email not found"; // If no message with the specified subject is found
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return "Failure: " + e.getMessage(); // Handle and log the exception
+        } finally {
+            close();
+        }
+    }
+    
 }

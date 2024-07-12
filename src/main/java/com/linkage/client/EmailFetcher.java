@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
 import javax.mail.BodyPart;
+import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -18,6 +21,7 @@ import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.search.FlagTerm;
 
 import org.jsoup.Jsoup;
 
@@ -56,17 +60,37 @@ public abstract class EmailFetcher extends BaseServiceClient {
         inbox.open(Folder.READ_WRITE);
     }
 
-    public Message fetchLatestEmail() throws MessagingException {
-        Message message = null;
-        int messageCount = inbox.getMessageCount();
+    public List<Message> fetchLatestEmail() throws MessagingException {
+        connect();
+        List<Message> unreadMessages = new ArrayList<>();
 
-        if (messageCount > 0) {
-            message = inbox.getMessage(messageCount);
+        Folder inbox = store.getFolder("INBOX");
+        inbox.open(Folder.READ_WRITE);
+
+        // Use FlagTerm to search for unread messages
+        FlagTerm unreadFlagTerm = new FlagTerm(new Flags(Flags.Flag.SEEN), false);
+        Message[] messages = inbox.search(unreadFlagTerm);
+
+        // Iterate over messages and store them in the list in the order they are fetched
+        for (Message message : messages) {
+            if (!isMessageInList(unreadMessages, message)) {
+                unreadMessages.add(message);
+                message.setFlag(Flags.Flag.SEEN, true); // Mark message as read
+            }
         }
-        
-        return message;
+        int x = unreadMessages.size();
+        return unreadMessages;
     }
 
+    private boolean isMessageInList(List<Message> messageList, Message message) throws MessagingException {
+        for (Message msg : messageList) {
+            // Compare messages based on unique identifiers like Message-ID
+            if (msg.getSubject().equals(message.getSubject()) && msg.getSentDate().equals(message.getSentDate())) {
+                return true; // Message is already in the list
+            }
+        }
+        return false; // Message is not in the list
+    }
 
     public String fetchSubject(Message message) throws MessagingException {
         return message.getSubject();
@@ -82,36 +106,6 @@ public abstract class EmailFetcher extends BaseServiceClient {
             }
         return textContent;
     }
-
-    // public Map<String,String>  fetchAttachments(Message message, String userId) throws IOException, MessagingException {
-    //     Object content = message.getContent();
-    //     Map<String,String> gcpResponse = new HashMap<>();
-    //     gcpResponse.put("gcp_path", "gcpUrl");
-    //     gcpResponse.put("gcp_file_name", "gcpFileName");
-
-    //     if (content instanceof MimeMultipart) {
-    //         MimeMultipart multipart = (MimeMultipart) content;
-    //         for (int i = 0; i < multipart.getCount(); i++) {
-    //             BodyPart bodyPart = multipart.getBodyPart(i);
-    //             if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
-    //                 String fileName = bodyPart.getFileName();
-    //                 if (fileName != null && !fileName.isEmpty()) {
-    //                     String filePath = "C:\\Users\\ADMIN\\Downloads" + File.separator + fileName;
-
-    //                     try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-    //                         bodyPart.getInputStream().transferTo(outputStream);
-    //                     } catch (IOException | MessagingException e) {
-    //                         e.printStackTrace();
-    //                         throw new IOException("Error downloading attachment: " + fileName, e);
-    //                     }
-
-    //                     System.out.println("Attachment downloaded");
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return gcpResponse;
-    // }
 
     public Map<String,String> fetchAttachments(Message message, String userId) throws IOException, MessagingException {
         Object content = message.getContent();

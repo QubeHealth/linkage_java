@@ -3,20 +3,32 @@ package com.linkage.client;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.security.auth.Subject;
 
+import org.json.JSONObject;
+
 import com.linkage.LinkageConfiguration;
+import com.linkage.api.ApiResponse;
 import com.linkage.core.constants.Constants.EmailKeywords;
 
+
 public class MailReaderService extends EmailFetcher {
+
+    private MasterService masterService;
 
     public MailReaderService(String host, String port, String user, String password,
             LinkageConfiguration configuration) {
         super("imap.gmail.com", "993", "qubetestemailssend@gmail.com", "vuopgzdlbsyzmwoo", configuration);
+        this.masterService = new MasterService(configuration);
     }
 
     @Override
@@ -24,49 +36,48 @@ public class MailReaderService extends EmailFetcher {
         super.connect();
     }
 
-    public Map<String, String> fetchAndProcessEmail() throws MessagingException, IOException {
-
+    public Map<String, String> fetchAndProcessEmail(Message message) throws MessagingException, IOException {
         connect();
-        Message message = fetchLatestEmail();
-
+        // Message message = fetchLatestEmail();
         Map<String, String> responseMap = new HashMap<>();
         String gcpPath = null;
         String gcpFileName = null;  
+        
         try {
             String subject = fetchSubject(message);
             String body = fetchBody(message);
             String keyword = parseSubjectForKeyword(subject);
+    
+            // Define a map to store handlers for each keyword
+            Map<String, Function<String[], Map<String, String>>> handlerMap = new HashMap<>();
+            
+            // Define handlers for each keyword
+            handlerMap.put(EmailKeywords.QUERY_REPLY, args -> handleQueryReply(args[0], args[1]));
+            handlerMap.put(EmailKeywords.SUPPORTING_DOCUMENT, args -> handleSupportingDocument());
+            handlerMap.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY, args -> handleFinalBillAndDischargeSummary(args[0], args[1]));
+            handlerMap.put(EmailKeywords.PRE_AUTH, args -> handlePreAuth(args[0]));
+            handlerMap.put(EmailKeywords.CASHLESS_CREDIT_REQUEST, args -> handleCashlessCreditRequest(args[0], args[1], message));
+            handlerMap.put(EmailKeywords.ADDITIONAL_INFORMATION, args -> handleAdditionalInformation(args[0], args[1], message));
+    
+            // Execute the appropriate handler based on the keyword
+            Function<String[], Map<String, String>> handler = handlerMap.getOrDefault(keyword, 
+                args -> {
+                    Map<String, String> errorMap = new HashMap<>();
+                    errorMap.put(EmailKeywords.ERROR, "No matching function found for keyword: " + keyword);
+                    return errorMap;
+                });
+    
+            // Call the handler and populate responseMap
+            responseMap = handler.apply(new String[]{subject, body});
 
-            if (keyword == null) {
-                // Mark email as unread
-                markAsUnread(message);
-                responseMap = new HashMap<>();
-                responseMap.put(EmailKeywords.ERROR, "No matching function found for keyword: " + keyword);
-            } else if (EmailKeywords.QUERY_REPLY.equalsIgnoreCase(keyword)) {
-                responseMap = handleQueryReply(subject, body);
-            } else if (EmailKeywords.SUPPORTING_DOCUMENT.equalsIgnoreCase(keyword)) {
-                responseMap = handleSupportingDocument();
-            } else if (EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY.equalsIgnoreCase(keyword)) {
-                responseMap = handleFinalBillAndDischargeSummary(subject, body);
-            } else if (EmailKeywords.PRE_AUTH.equalsIgnoreCase(keyword)) {
-                responseMap = handlePreAuth(subject);
-            } else if (EmailKeywords.CASHLESS_CREDIT_REQUEST.equalsIgnoreCase(keyword)) {
-                responseMap = handleCashlessCreditRequest(subject, body, message);
-            } else if (EmailKeywords.ADDITIONAL_INFORMATION.equalsIgnoreCase(keyword)) {
-                responseMap = handleAdditionalInformation(subject, body, message);
-            } else {
-                responseMap = new HashMap<>();
-                responseMap.put(EmailKeywords.ERROR, "No matching function found for keyword: " + keyword);
-            }
-
-            // Fetch and upload attachments
+            // Fetch and upload attachments if user_id is present
             if (message != null && responseMap.containsKey("user_id")) {
                 String userId = responseMap.get("user_id");
                 Map<String, String> gcpResponse = fetchAttachments(message, userId);
                 gcpPath = gcpResponse.get(EmailKeywords.GCP_PATH);
                 gcpFileName = gcpResponse.get(EmailKeywords.GCP_FILE_NAME);
-
-                // Include the GCP URL in the response map
+    
+                // Include the GCP URL in the response map if successful
                 if (gcpPath != null || gcpFileName != null) {
                     responseMap.put(EmailKeywords.GCP_PATH, gcpPath);
                     responseMap.put(EmailKeywords.GCP_FILE_NAME, gcpFileName);
@@ -79,16 +90,18 @@ public class MailReaderService extends EmailFetcher {
                     return responseMap;
                 }
             }
-
+    
         } catch (Exception e) {
-            // Mark email as unread
+            // Mark email as unread and rethrow the exception
             markAsUnread(message);
             throw e;
         } finally {
             close();
         }
+        
         return responseMap;
     }
+    
 
     private String parseSubjectForKeyword(String subject) {
         String[] keywords = EmailKeywords.keywordsList;
@@ -125,7 +138,7 @@ public class MailReaderService extends EmailFetcher {
         String[] parts = subject.split("\\s+");
 
         for (int i = 0; i < parts.length; i++) {
-            if (parts[i].startsWith("KH")) {
+            if (parts[i].startsWith("KH")) { //use regular expression
                 khId = parts[i].trim();
             } else if (parts[i].startsWith("CL-")) {
                 claimNo = parts[i].substring(3).trim();
@@ -153,8 +166,7 @@ public class MailReaderService extends EmailFetcher {
         return responseMap;
     }
 
-    private Map<String, String> handleCashlessCreditRequest(String subject, String body, Message message)
-            throws IOException, MessagingException {
+    private Map<String, String> handleCashlessCreditRequest(String subject, String body, Message message) {
         String[] bodyLines = body.split("\n");
         for (String line : bodyLines) {
             if (line.startsWith(EmailKeywords.INITIAL_CASHLESS_APPROVED)) {
@@ -393,6 +405,38 @@ public class MailReaderService extends EmailFetcher {
         }
 
         return responseMap;
+    }
+
+    private Map<String, String> extractKeywords(String subject, String body, String keyword) {
+
+        //Will make a call to the database and pick up the matching regex for the given keyword
+        Map<String, String> emailKeyword = new HashMap<>();
+        emailKeyword.put("keyword", keyword);
+
+        ApiResponse<Object> emailTemplateRequest = this.masterService.emailTemplate(emailKeyword);
+       Map<String, Object> emailTemplateResponseData = (Map<String, Object>) emailTemplateRequest.getData();
+       String emailTemplate = String.valueOf(emailTemplateResponseData.get("data"));  //"225";
+
+        String regex = null;
+        
+        JSONObject regexJson = new JSONObject(emailTemplate);
+
+        Map<String, String> extractedData = new HashMap<>();
+
+        for (String key : regexJson.keySet()) {
+            regex = regexJson.getString(key);
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(subject);
+
+            // Attempt to find and extract data
+            if (matcher.find()) {
+                String extractedValue = matcher.group(1); // Assuming single group capture
+                extractedData.put(key, extractedValue);
+            } else {
+                extractedData.put(key, ""); // Handle case where regex does not match
+            }
+        }
+        return extractedData;
     }
 
     @Override
