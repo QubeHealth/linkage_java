@@ -1,10 +1,17 @@
 package com.linkage.controller;
 
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -63,49 +70,61 @@ public class MailController extends BaseController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response emailReader(@Context HttpServletRequest request) throws MessagingException, IOException {
-        // Fetch and process the email
-        List<Message> msgList = this.mailReaderService.fetchLatestEmail();
+        try {
+            // Fetch and process the email
+            List<Message> msgList = this.mailReaderService.fetchLatestEmail();
 
-        for (Message message : msgList) {
-            try {
-                Response processedMail = this.mailReaderService.fetchAndProcessEmail(message);
-                ApiResponse<Object> apiResponse = (ApiResponse<Object>) processedMail.getEntity();
-                if (processedMail.getStatus() == 0) {
-                    // Log the error or handle as needed
-                    throw new Exception("Error processing email");
+            for (Message message : msgList) {
+                try {
+                    Response processedMail = this.mailReaderService.fetchAndProcessEmail(message);
+                    ApiResponse<Object> apiResponse = (ApiResponse<Object>) processedMail.getEntity();
+                    if (processedMail.getStatus() == 0) {
+                        // Log the error or handle as needed
+                        throw new Exception("Error processing email");
+                    }
+                    Map<String, String> responseData = (Map<String, String>) apiResponse.getData();
+
+                    // Extract common type from the response
+                    String type = String.valueOf(responseData.get(EmailKeywords.TYPE));
+
+                    // Map to store handlers for different types
+                    Map<String, Runnable> emailType = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+                    emailType.put(EmailKeywords.PRE_AUTH, () -> handlePreAuth(responseData));
+                    emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(responseData));
+                    emailType.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY,
+                            () -> handleFinalBillAndDischargeSummary(responseData));
+                    emailType.put(EmailKeywords.CASHLESS_CREDIT_REQUEST,
+                            () -> handleCashlessCreditRequest(responseData));
+                    emailType.put("final cashless credit request",
+                            () -> handleFinalCashlessCreditRequest(responseData));
+                    emailType.put("initial cashless credit request",
+                            () -> handleInitialCashlessCreditRequest(responseData));
+                    emailType.put(EmailKeywords.ADDITIONAL_INFORMATION,
+                            () -> handleAdditionalInformation(responseData));
+
+                    // Execute handler based on the type
+                    Runnable handler = emailType.get(type);
+                    if (handler != null) {
+                        handler.run();
+                        this.mailWriterService.mailSender(message);
+                        // return Response.ok().entity("mail Sender Response").build();
+                    }
+                } catch (Exception e) {
+                    // Log the exception and continue with the next message
+                    this.mailWriterService.markEmailUnread(message.getSubject());
+                    // return
+                    // Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error");
+
                 }
-                Map<String, String> responseData = (Map<String, String>) apiResponse.getData();
-
-                // Extract common type from the response
-                String type = String.valueOf(responseData.get(EmailKeywords.TYPE));
-
-                // Map to store handlers for different types
-                Map<String, Runnable> emailType = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-                emailType.put(EmailKeywords.PRE_AUTH, () -> handlePreAuth(responseData));
-                emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(responseData));
-                emailType.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY,
-                        () -> handleFinalBillAndDischargeSummary(responseData));
-                emailType.put(EmailKeywords.CASHLESS_CREDIT_REQUEST, () -> handleCashlessCreditRequest(responseData));
-                emailType.put(EmailKeywords.ADDITIONAL_INFORMATION, () -> handleAdditionalInformation(responseData));
-
-                // Execute handler based on the type
-                Runnable handler = emailType.get(type);
-                if (handler != null) {
-                    handler.run();
-
-                    String mailSenderResponse = this.mailWriterService.mailSender(message);
-                    return Response.ok().entity(mailSenderResponse).build();
-                }
-            } catch (Exception e) {
-                // Log the exception and continue with the next message
-                this.mailWriterService.markEmailUnread(message.getSubject());
-                // return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error");
-                
             }
-        }
+            return Response.ok().entity("All emails processed successfully.").build();
 
-        // Return a default response if no messages were processed
-        return Response.status(Response.Status.NO_CONTENT).entity("No emails processed.").build();
+        } catch (Exception e) {
+            // Handle any unexpected exceptions
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error processing emails: " + e.getMessage())
+                    .build();
+        }
     }
 
     // Pre-Auth flow db calls
@@ -117,6 +136,7 @@ public class MailController extends BaseController {
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
+        //String uniqueId = UUID.randomUUID().toString();
 
         Map<String, Object> preFundedReqMap = new HashMap<>();
         preFundedReqMap.put(EmailKeywords.USER_ID, "123");
@@ -130,11 +150,12 @@ public class MailController extends BaseController {
         preFundedReqMap.put("disbursement_amount", null);
         preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
         preFundedReqMap.put(EmailKeywords.CLAIM_NO, null);
-        preFundedReqMap.put("claim_id", null);
+        preFundedReqMap.put("claim_id", null); /// can pass uniqueId
         preFundedReqMap.put("approved_amount_initial", null);
         preFundedReqMap.put("approved_amount_final", null);
         preFundedReqMap.put("initial_request_resolved_at", null);
         preFundedReqMap.put("final_request_resolved_at", null);
+
 
         ApiResponse<Object> preFundedRequest = this.loansService.preFundedrequestStore(preFundedReqMap);
         Map<String, Object> responseData = (Map<String, Object>) preFundedRequest.getData();
@@ -305,8 +326,8 @@ public class MailController extends BaseController {
     private void handleInitialCashlessCreditRequest(Map<String, String> response) {
         String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
         String claimNo = response.get(EmailKeywords.CLAIM_NO);
-        String initialApprovedAmount = response.get(EmailKeywords.INITIAL_CASHLESS_APPROVED_AMT);
-        String initialRequestAmount = response.get(EmailKeywords.INITIAL_CASHLESS_REQUEST_AMT);
+        String initialApprovedAmount = response.get("initial_cashless_approved_amount");
+        String initialRequestAmount = response.get("initial_cashless_request_amount");
         String subject = response.get(EmailKeywords.SUBJECT);
         String body = response.get(EmailKeywords.BODY);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
@@ -592,4 +613,87 @@ public class MailController extends BaseController {
         // this.loansService.updateStatus(claimNo, "QUERY");
 
     }
+
+    // Pre-Auth flow db calls
+    // private void handlePreAuth(Map<String, String> response) {
+
+    //     String partneredUserId = response.get(EmailKeywords.POLICY_NO);
+    //     String khId = response.get(EmailKeywords.TPA_DESK_ID);
+    //     String subject = response.get(EmailKeywords.SUBJECT);
+    //     String patientName = response.get(EmailKeywords.PATIENT_NAME);
+    //     String gcpPath = response.get(EmailKeywords.GCP_PATH);
+    //     String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
+    //     String uniqueId = UUID.randomUUID().toString();
+
+    //     Map<String, Object> preFundedEmailerMap = new HashMap<>();
+    //     preFundedEmailerMap.put(EmailKeywords.TYPE, "PRE AUTH");
+    //     preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
+    //     preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
+    //     preFundedEmailerMap.put("partnered_claim_no", "22");
+    //     preFundedEmailerMap.put("pf_request_id", uniqueId);
+    //     preFundedEmailerMap.put("policy_no", partneredUserId);
+
+    //     Map<String, Object> emailerItems = new HashMap<>();
+    //     emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
+    //     emailerItems.put("claim_no", null);
+    //     emailerItems.put("initial_amt_req", null);
+    //     emailerItems.put("initial_amt_approved", null);
+    //     emailerItems.put("final_adj_amt_req", null);
+    //     emailerItems.put("final_adj_amt_approved", null);
+    //     emailerItems.put("metadata", subject);
+    //     emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
+    //     emailerItems.put("policy_no", partneredUserId);
+
+    //     Map<String, Object> preFundedReqMap = new HashMap<>();
+    //     preFundedReqMap.put(EmailKeywords.USER_ID, "123");
+    //     preFundedReqMap.put("hsp_id", "123");
+    //     preFundedReqMap.put("partnered_user_id", partneredUserId);
+    //     preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, khId);
+    //     preFundedReqMap.put("status", "PENDING");
+    //     preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
+    //     preFundedReqMap.put("processed_at", null);
+    //     preFundedReqMap.put("requested_amount", null);
+    //     preFundedReqMap.put("disbursement_amount", null);
+    //     preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
+    //     preFundedReqMap.put(EmailKeywords.CLAIM_NO, null);
+    //     preFundedReqMap.put("claim_id", null); /// can pass uniqueId
+    //     preFundedReqMap.put("approved_amount_initial", null);
+    //     preFundedReqMap.put("approved_amount_final", null);
+    //     preFundedReqMap.put("initial_request_resolved_at", null);
+    //     preFundedReqMap.put("final_request_resolved_at", null);
+    //     preFundedReqMap.put("unique_id",uniqueId);
+        
+    //     Map<String, Object> adjudicationDataMap = new HashMap<>();
+    //     adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID, khId);
+    //     adjudicationDataMap.put("pf_req_id", uniqueId);
+    //     adjudicationDataMap.put("requested_amount", null);
+    //     adjudicationDataMap.put("estimated_amount", null);
+    //     adjudicationDataMap.put("file_path", gcpPath);
+    //     adjudicationDataMap.put("file_name", gcpFileName);
+    //     adjudicationDataMap.put(EmailKeywords.USER_ID, partneredUserId);
+    //     adjudicationDataMap.put("offer_id", null);
+    //     adjudicationDataMap.put("hsp_id", 123);
+    //     adjudicationDataMap.put("document_id", null);
+    //     adjudicationDataMap.put("associated_user_id", null);
+    //     adjudicationDataMap.put("status", "PENDING");
+    //     adjudicationDataMap.put("created_by", "TPA DESK");
+    //     adjudicationDataMap.put("requested_by", null);
+    //     adjudicationDataMap.put("updated_by", "ADJUDICATOR");
+
+    //     Map<String, Object> adjudicationItems = new HashMap<>();
+    //     adjudicationItems.put("adjudication_data_id", uniqueId);
+    //     adjudicationItems.put("pf_document_id", uniqueId);
+    //     adjudicationItems.put("document_url", gcpPath);
+    //     adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
+
+    //     Map<String, Object> emailerData = new HashMap<>();
+    //     emailerData.putAll(preFundedReqMap);
+    //     emailerData.putAll(adjudicationDataMap);
+    //     emailerData.putAll(adjudicationItems);
+
+    //     // ApiResponse<Object> insertEmailDataData = this.loansService.insertEmailData(emailerData);
+        
+    //     ApiResponse<Object> insertEmailDataData = this.loansService.insertEmailData(emailerData);
+
+    // }
 }

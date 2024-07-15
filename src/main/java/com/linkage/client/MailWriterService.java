@@ -21,10 +21,10 @@ import com.linkage.LinkageConfiguration;
 public class MailWriterService extends EmailFetcher {
 
     public MailWriterService(LinkageConfiguration configuration) {
-        super("imap.gmail.com", "993", "qubetestemailssend@gmail.com", "vuopgzdlbsyzmwoo", configuration);
+        super("imap.gmail.com", "993", "qubetestemailssend@gmail.com", "obflrwzjtuidmyae", configuration);
     }
 
-    public String mailSender(Message sendMessage) throws MessagingException {
+    public void mailSender(Message sendMessage) throws MessagingException {
         try {
             // Fetch the latest email
             connect();
@@ -62,7 +62,7 @@ public class MailWriterService extends EmailFetcher {
             Session session = Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication("qubetestemailssend@gmail.com", "vuopgzdlbsyzmwoo");
+                    return new PasswordAuthentication("qubetestemailssend@gmail.com", "obflrwzjtuidmyae");
                 }
             });
 
@@ -84,10 +84,10 @@ public class MailWriterService extends EmailFetcher {
             // Send message
             Transport.send(message);
             System.out.println("Sent message successfully...");
-            return "Mail delivered successfully";
+            //return "Mail delivered successfully";
         } catch (MessagingException | IOException e) {
             e.printStackTrace();
-            return "failure";
+            //return "failure";
         } finally {
             close(); // Ensure close is called in all cases
         }

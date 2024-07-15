@@ -31,7 +31,7 @@ public class MailReaderService extends EmailFetcher {
 
     public MailReaderService(String host, String port, String user, String password,
             LinkageConfiguration configuration) {
-        super("imap.gmail.com", "993", "qubetestemailssend@gmail.com", "vuopgzdlbsyzmwoo", configuration);
+        super("imap.gmail.com", "993", "qubetestemailssend@gmail.com", "obflrwzjtuidmyae", configuration);
         this.masterService = new MasterService(configuration);
     }
 
@@ -77,7 +77,7 @@ public class MailReaderService extends EmailFetcher {
             // Call the handler and populate responseMap
             responseMap = handler.apply(new String[]{subject, body, keyword});
             
-            String userId = responseMap.get("claim_no") != null ? responseMap.get("claim_no") : responseMap.get("policy_no");
+            String userId = responseMap.get("claim_no") != null ? responseMap.get("claim_no") : responseMap.get("partnered_user_id");
             responseMap.put("user_id", userId);
 
             // Fetch and upload attachments if user_id is present
@@ -106,9 +106,9 @@ public class MailReaderService extends EmailFetcher {
             markAsUnread(message);
             throw e;
         } 
-        // finally {
-        //     close();
-        // }
+        finally {
+            close();
+        }
         return Response.status(Response.Status.OK)
                 .entity(new ApiResponse<>(true,
                         "Successfully processed email",
@@ -240,9 +240,10 @@ public class MailReaderService extends EmailFetcher {
                     if (matcher.find()) {
                         String extractedValue = matcher.group(1); // Assuming single group capture
                         extractedData.put(key, extractedValue);
-                    } else {
-                        extractedData.put(key, ""); // Handle case where regex does not match
-                    }
+                    } 
+                    // else {
+                    //     extractedData.put(key, ""); // Handle case where regex does not match
+                    // }
                 }
             }
 
