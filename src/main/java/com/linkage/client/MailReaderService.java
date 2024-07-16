@@ -51,6 +51,7 @@ public class MailReaderService extends EmailFetcher {
             String subject = fetchSubject(message);
             String body = fetchBody(message);
             String keyword = parseSubjectForKeyword(subject);
+            logger.info("Email Parsed Successfully: Subject = {}, Body = {}, Keyword = {}", subject, body, keyword);
 
             responseMap.put(EmailKeywords.SUBJECT, subject);
             responseMap.put(EmailKeywords.BODY, body);
@@ -69,14 +70,22 @@ public class MailReaderService extends EmailFetcher {
             // Execute the appropriate handler based on the keyword
             Function<String[], Map<String, String>> handler = handlerMap.getOrDefault(keyword, 
                 args -> {
+                    logger.error("No matching function found for keyword: {}", keyword);
                     Map<String, String> errorMap = new HashMap<>();
                     errorMap.put(EmailKeywords.ERROR, "No matching function found for keyword: " + keyword);
                     return errorMap;
                 });
     
             // Call the handler and populate responseMap
-            responseMap = handler.apply(new String[]{subject, body, keyword});
-            
+            responseMap = handler.apply(new String[] { subject, body, keyword });
+
+            // Log after execution
+            if (responseMap.containsKey(EmailKeywords.ERROR)) {
+                logger.error("Handler execution failed for keyword: {}", keyword);
+            } else {
+                logger.info("Handler execution successful for keyword: {}", keyword);
+            }
+
             String userId = responseMap.get("claim_no") != null ? responseMap.get("claim_no") : responseMap.get("partnered_user_id");
             responseMap.put("user_id", userId);
 
@@ -104,11 +113,13 @@ public class MailReaderService extends EmailFetcher {
         } catch (Exception e) {
             // Mark email as unread and rethrow the exception
             markAsUnread(message);
+            logger.error("Error processing email for message: {}", message.getSubject(), e);
             throw e;
         } 
         finally {
             close();
         }
+        logger.info("Successfully processed email for message");
         return Response.status(Response.Status.OK)
                 .entity(new ApiResponse<>(true,
                         "Successfully processed email",
@@ -207,6 +218,8 @@ public class MailReaderService extends EmailFetcher {
             Map<String, Object> emailTemplateResponseData = (Map<String, Object>) emailTemplateRequest.getData();
             String emailTemplate = String.valueOf(emailTemplateResponseData.get("data")); // "225";
 
+            logger.info("Email template retrieved");
+
             extractedData.put("type", keyword);
             extractedData.put("subject", subject);
             extractedData.put("body", body);
@@ -248,10 +261,12 @@ public class MailReaderService extends EmailFetcher {
             }
 
         } catch (Exception e) {
+            logger.error("An error occurred while extracting keywords: {}", e.getMessage(), e);
             extractedData.clear();
             extractedData.put("ERROR", "An error occurred while extracting keywords: " + e.getMessage());
             throw e;
         }
+        logger.info("Keyword extraction completed successfully for keyword: {}", keyword);
         return extractedData;
     }
 
