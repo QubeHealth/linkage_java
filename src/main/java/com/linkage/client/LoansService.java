@@ -109,4 +109,10 @@ public class LoansService extends BaseServiceClient{
         ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
         return resp;
     }
+
+    public ApiResponse<Object> preAuthCall(Map<String, Object> emailerData) {
+        String url = configuration.getLoansUrl() + "/transactions/preAuthCall";
+        ApiResponse<Object> resp = this.networkCallInternalService(url, "post", emailerData, null);
+        return resp;
+    }
 }

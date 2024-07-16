@@ -29,4 +29,10 @@ public class MasterService extends BaseServiceClient{
         ApiResponse<Object> emailTemplate = this.networkCallInternalService(url, "post", keyword, null);
         return emailTemplate;
     }
+    //new api
+    public ApiResponse<Object> prefundedEmailFull(Map<String, Object> body) {
+        String url = configuration.getMasterurl() + "/prefunded/prefundedEmailFull";
+        ApiResponse<Object> predundedEmail = this.networkCallInternalService(url, "post", body, null);
+        return predundedEmail;
+    }
 }
