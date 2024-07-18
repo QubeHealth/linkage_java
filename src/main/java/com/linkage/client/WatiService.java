@@ -8,8 +8,11 @@ import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.BillRejectedSchema;
 import com.linkage.core.validations.BillVerifiedMsgSchema;
+import com.linkage.core.validations.CashbackTypeMessageSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
+
+
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
 public class WatiService extends BaseServiceClient {
@@ -19,6 +22,7 @@ public class WatiService extends BaseServiceClient {
     private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024";
     private static final String BILL_PARTIAL_VERIFIED_TEMPLATE = "qp_ubpv_24may2024";
     private static final String BILL_REJECTED_TEMPLATE = "qp_ubr_new24may2024";
+    private static final String APP_REVIEWER_TEMPLATE = "cashback_appreviews_05june2024";
 
     public WatiService(LinkageConfiguration configuration) {
         super(configuration);
@@ -39,22 +43,40 @@ public class WatiService extends BaseServiceClient {
     // Referrer gets cashback after referee registers with message invite
     public ApiResponse<Object> referrerCashbackMessage(RefereeInviteMsgSchema body) {
 
+        Integer cbReferer = Integer.parseInt(body.getCashbackAmt().toString());
+
         // Arraylist of key value pairs then added to hashmap
         Map<String, String> parameter = new HashMap<>();
         parameter.put("name", "cashback_amount");
-        parameter.put("value", body.getCashbackAmt().toString());
+        parameter.put("value", cbReferer.toString());
 
         return sendMessage(body.getMobile(), REFERER_CASHBACK_TEMPLATE, "REFERER_CASHBACK", List.of(parameter));
 
+    }
+    public ApiResponse<Object> cashbackTypeMessage(CashbackTypeMessageSchema body){
+        // Arraylist of key value pairs then added to hashmap
+        Map<String, String> parameter1 = new HashMap<>();
+        parameter1.put("name", "first_name");
+        parameter1.put("value", body.getFirstName());
+        Map<String, String> parameter2 = new HashMap<>();
+        parameter2.put("name", "cashback_amount");
+        parameter2.put("value", body.getCashbackAmt().toString());
+        Map<String, String> parameter3 = new HashMap<>();
+        parameter3.put("name", "online_store");
+        parameter3.put("value", body.getOnlineStore());
+
+        return sendMessage(body.getMobile(), APP_REVIEWER_TEMPLATE, "APP_REVIEWER", List.of(parameter1,parameter2,parameter3));
     }
 
     // Referee gets cashback after registering with message invite
     public ApiResponse<Object> refereeCashbackMessage(RefereeCashbackMsgSchema body) {
 
+        Integer cbReferee = Integer.parseInt(body.getCashbackAmt().toString());
+
         // Arraylist of key value pairs then added to hashmap
         Map<String, String> parameter1 = new HashMap<>();
         parameter1.put("name", "cashback_amount");
-        parameter1.put("value", body.getCashbackAmt().toString());
+        parameter1.put("value", cbReferee.toString());
         Map<String, String> parameter2 = new HashMap<>();
         parameter2.put("name", "company_name");
         parameter2.put("value", body.getCompany());
