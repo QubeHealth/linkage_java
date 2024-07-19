@@ -1,6 +1,5 @@
 package com.linkage.client;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +39,7 @@ public class MailReaderService extends EmailFetcher {
         super.connect();
     }
 
-    public Response fetchAndProcessEmail(Message message) throws MessagingException, IOException {
+    public Response fetchAndProcessEmail(Message message) throws Exception {
         // Message message = fetchLatestEmail();
         connect();
         Map<String, String> responseMap = new HashMap<>();

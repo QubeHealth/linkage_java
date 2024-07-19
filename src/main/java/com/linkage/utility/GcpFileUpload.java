@@ -84,14 +84,11 @@ public final class GcpFileUpload {
     }
 
     public static ApiResponse<String> uploadEmailAttachments(String bucketName, String outputFileNamePath,
-            byte[] fileContent,
-            String contentType, boolean isSignUrl) {
+            byte[] fileContent, String contentType, boolean isSignUrl) throws Exception {
         try {
             Storage storage = getStorage();
-            // Define the path for staging environment
-            if (!"PROD".equals(System.getenv("Environment"))) {
-                outputFileNamePath = "testing/" + outputFileNamePath;
-            }
+
+            outputFileNamePath = "testing/" + outputFileNamePath;
 
             BlobId blobId = BlobId.of(bucketName, outputFileNamePath);
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
@@ -108,7 +105,8 @@ public final class GcpFileUpload {
 
             return new ApiResponse<>(true, "File Uploaded Successfully", signedUrl);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "File Upload Failed", e.getMessage());
+            throw e;
+            // return new ApiResponse<>(false, "File Upload Failed", e.getMessage());
         }
     }
 }

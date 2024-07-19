@@ -239,7 +239,7 @@ public class MailController extends BaseController {
         Map<String, Object> adjudicationItems = new HashMap<>();
         adjudicationItems.put("adjudication_data_id", adjudicationDataId);
         adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpPath);
+        adjudicationItems.put("document_url", gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         // Long adjudicationItemsId =
@@ -330,7 +330,7 @@ public class MailController extends BaseController {
         Map<String, Object> adjudicationItems = new HashMap<>();
         adjudicationItems.put("adjudication_data_id", adjudicationDataId);
         adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpPath);
+        adjudicationItems.put("document_url", gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         // Long adjudicationItemsId =
@@ -445,7 +445,7 @@ public class MailController extends BaseController {
         Map<String, Object> adjudicationItems = new HashMap<>();
         adjudicationItems.put("adjudication_data_id", adjudicationDataId);
         adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpPath);
+        adjudicationItems.put("document_url", gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         // Long adjudicationItemsId =
@@ -555,7 +555,7 @@ public class MailController extends BaseController {
         Map<String, Object> adjudicationItems = new HashMap<>();
         adjudicationItems.put("adjudication_data_id", adjudicationDataId);
         adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpPath);
+        adjudicationItems.put("document_url", gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         // Long adjudicationItemsId =
@@ -657,7 +657,7 @@ public class MailController extends BaseController {
         Map<String, Object> adjudicationItems = new HashMap<>();
         adjudicationItems.put("adjudication_data_id", adjudicationDataId);
         adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpPath);
+        adjudicationItems.put("document_url", gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         // Long adjudicationItemsId =
@@ -739,7 +739,7 @@ public class MailController extends BaseController {
         Map<String, Object> adjudicationQuery = new HashMap<>();
         adjudicationQuery.put("adjudication_data_id", adjudicationDataId);
         adjudicationQuery.put("remark", documentRequired);
-        adjudicationQuery.put("document_url", gcpPath);
+        adjudicationQuery.put("document_url", gcpFileName);
         adjudicationQuery.put(EmailKeywords.IS_ACTIVE, 1);
         adjudicationQuery.put("responded_at", null);
         adjudicationQuery.put("resolved_at", null);
@@ -813,7 +813,7 @@ public class MailController extends BaseController {
         Map<String, Object> adjudicationItems = new HashMap<>();
         adjudicationItems.put("adjudication_data_id", uniqueId);
         adjudicationItems.put("pf_document_id", uniqueId);
-        adjudicationItems.put("document_url", gcpPath);
+        adjudicationItems.put("document_url", gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         Map<String, Object> emailerData = new HashMap<>();
@@ -835,6 +835,7 @@ public class MailController extends BaseController {
         String subject = response.get(EmailKeywords.SUBJECT);
         String body = response.get(EmailKeywords.BODY);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
+        String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
 
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
         preFundedEmailerMap.put(EmailKeywords.TYPE, "ADDTIONAL INFORMATION");
@@ -857,7 +858,7 @@ public class MailController extends BaseController {
         Map<String, Object> adjudicationQuery = new HashMap<>();
         adjudicationQuery.put("adjudication_data_id", null); // adjudicationDataId updated in loan service
         adjudicationQuery.put("remark", documentRequired);
-        adjudicationQuery.put("document_url", gcpPath);
+        adjudicationQuery.put("document_url", gcpFileName);
         adjudicationQuery.put(EmailKeywords.IS_ACTIVE, true);
         adjudicationQuery.put("status", "PENDING");
 

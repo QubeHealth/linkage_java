@@ -107,10 +107,10 @@ public abstract class EmailFetcher extends BaseServiceClient {
         return textContent;
     }
 
-    public Map<String,String> fetchAttachments(Message message, String userId) throws IOException, MessagingException {
+    public Map<String,String> fetchAttachments(Message message, String userId) throws Exception {
         Object content = message.getContent();
         String gcpUrl = null;
-        String gcpFileName = null;
+        String gcpFileName = null;  //testing/25d55ad283aa400af464c76d713c07ad/estimation/98bf951e-48ac-48c5-ba47-1402ee21c080.pdf
         Map<String,String> gcpResponse = new HashMap<>();
 
         if (content instanceof MimeMultipart) {
@@ -121,10 +121,11 @@ public abstract class EmailFetcher extends BaseServiceClient {
                     String documentId = UUID.randomUUID().toString();
                     gcpFileName = Helper.md5Encryption(userId) + "/estimation/" + documentId + ".pdf";
 
-                    String contentType = bodyPart.getContentType();
+                    //String contentType = bodyPart.getContentType();
+                    String contentType = "APPLICATION/PDF";
                     InputStream fileContent = bodyPart.getInputStream();
 
-                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments(contentType, gcpFileName, fileContent.readAllBytes(), contentType, true);
+                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments("qube-user-data-encrypted", gcpFileName, fileContent.readAllBytes(), contentType, true);
                         gcpUrl = gcpRes.getData();
                 }
             }
