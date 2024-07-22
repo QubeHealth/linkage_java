@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.linkage.api.ApiRequest;
 import com.linkage.api.ApiResponse;
-import com.linkage.client.BaseServiceClient;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -48,10 +47,9 @@ public final class ThirdPartyAPICall {
         // Use GenericType to specify the type parameter for readEntity method
         Map<String, Object> responseBody = response.readEntity(new GenericType<Map<String, Object>>() {
         });
-        logger.info("\nThird party api response => {}", responseBody);
-
+        logger.info("\nThird party api response => {}", Helper.toJsonString(responseBody));
         boolean status = false;
-        if (Response.Status.OK.getStatusCode() >= response.getStatus() && response.getStatus() < 300) {
+        if (Response.Status.OK.getStatusCode() <= response.getStatus() && response.getStatus() < 300) {
             status = true;
         }
         String message = status ? "success" : "failed";
