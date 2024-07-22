@@ -162,10 +162,10 @@ public class MailController extends BaseController {
         ApiResponse<Object> preFundedRequest = this.loansService.preFundedrequestStore(preFundedReqMap);
         Map<String, Object> responseData = (Map<String, Object>) preFundedRequest.getData();
         String preFundedRequestId = String.valueOf(responseData.get("data"));
-        if (preFundedRequestId == null) {
+        if (preFundedRequest.getStatus() == false) {
             logger.error("preFundedRequest returned null response data");
         } else {
-            logger.info("Response data preFundedRequestId", preFundedRequestId);
+            logger.info("PreFunded Request db added at {}", preFundedRequestId);
         }
 
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
@@ -182,10 +182,10 @@ public class MailController extends BaseController {
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
-        if (prefundedEmailId == null) {
+        if (prefundedEmailRequest.getStatus() == false) {
             logger.error("prefundedEmailId returned null response data");
         } else {
-            logger.info("Response data prefundedEmailId", prefundedEmailId);
+            logger.info("prefunded Emailers db added at {}", prefundedEmailId);
         }
 
         Map<String, Object> emailerItems = new HashMap<>();
@@ -204,10 +204,10 @@ public class MailController extends BaseController {
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItems == null) {
+        if (emailItemsRequest.getStatus() == false) {
             logger.error("emailItems returned null response data");
         } else {
-            logger.info("Response data emailItems", emailItems);
+            logger.info("Response data emailItems {}", emailItems);
         }
 
         Map<String, Object> adjudicationDataMap = new HashMap<>();
@@ -230,7 +230,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationData = this.loansService.adjudicationDataStore(adjudicationDataMap);
         Map<String, Object> adjudicationResponseData = (Map<String, Object>) adjudicationData.getData();
         String adjudicationDataId = String.valueOf(adjudicationResponseData.get("data"));
-        if (adjudicationDataId == null) {
+        if (adjudicationData.getStatus() == false) {
             logger.error("adjudicationDataId returned null response data");
         } else {
             logger.info("Response data adjudicationDataId", adjudicationDataId);
@@ -248,10 +248,10 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsId == null) {
+        if (adjudicationItemsData.getStatus() == false) {
             logger.error("adjudicationItemsId returned null response data");
         } else {
-            logger.info("Response data adjudicationItemsId", adjudicationItemsId);
+            logger.info("Response data adjudicationItemsId {}", adjudicationItemsId);
         }
     }
 
@@ -691,14 +691,19 @@ public class MailController extends BaseController {
         ApiResponse<Object> pfRequest = this.loansService.updateClaimNo(employeeCode, claimNo);
         Map<String, Object> pfRequestResponseData = (Map<String, Object>) pfRequest.getData();
         String pfRequestId = String.valueOf(pfRequestResponseData.get("data"));
+        if (pfRequest.getStatus() == false) {
+            logger.error("Clain No. updation Failed");
+        } else {
+            logger.info("Clain No. Updated at pfRequestId {}", pfRequestId);
+        }
 
         ApiResponse<Object> adjudicationDataRequest = this.loansService.updateStatusAdjudicationData(claimNo, "QUERY");
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataId == null) {
-            logger.error("adjudicationDataId returned null response data");
+        if (adjudicationDataRequest.getStatus() == false) {
+            logger.error("Adjudication Data db Status update failed");
         } else {
-            logger.info("Response data adjudicationDataId", adjudicationDataId);
+            logger.info("Adjudication Data db Status update at id {}", adjudicationDataId);
         }
 
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
@@ -712,9 +717,9 @@ public class MailController extends BaseController {
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
         if (prefundedEmailId == null) {
-            logger.error("prefundedEmailId returned null response data");
+            logger.error("prefunded Email tbl update failed");
         } else {
-            logger.info("Response data prefundedEmailId", prefundedEmailId);
+            logger.info("prefunded Email tbl upadted at id {}", prefundedEmailId);
         }
 
         Map<String, Object> emailerItems = new HashMap<>();
@@ -730,10 +735,10 @@ public class MailController extends BaseController {
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItems == null) {
-            logger.error("emailItems returned null response data");
+        if (emailItemsRequest.getStatus() == false) {
+            logger.error("email Items tbl update failed");
         } else {
-            logger.info("Response data emailItems", emailItems);
+            logger.info("email Items tbl upadted at id {}", emailItems);
         }
 
         Map<String, Object> adjudicationQuery = new HashMap<>();
@@ -745,15 +750,14 @@ public class MailController extends BaseController {
         adjudicationQuery.put("resolved_at", null);
         adjudicationQuery.put("status", "PENDING");
 
-        // Long adjudicationQueryId =
-        // (Long)this.loansService.adjudicationQueryStore(adjudicationQuery);
-
         ApiResponse<Object> adjudicationQueryData = this.loansService.adjudicationQueryStore(adjudicationQuery);
         Map<String, Object> adjudicationQueryDataResponseData = (Map<String, Object>) adjudicationQueryData.getData();
         String adjudicationQueryId = String.valueOf(adjudicationQueryDataResponseData.get("data"));
-
-        // this.loansService.updateClaimNo(employeeCode, claimNo);
-        // this.loansService.updateStatus(claimNo, "QUERY");
+        if (adjudicationQueryData.getStatus() == false) {
+            logger.error("adjudication Query tbl update failed");
+        } else {
+            logger.info("adjudication Query tbl upadted at id {}", adjudicationQueryId);
+        }
 
     }
 
