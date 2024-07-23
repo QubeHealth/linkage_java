@@ -5,3 +5,5 @@ logs
 target
 myenv
 .history/
+.DS_Store
+
