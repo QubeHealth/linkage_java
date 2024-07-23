@@ -11,7 +11,7 @@ APP_NAME = 'linkage'
 JAR_FILE = 'target/' + APP_NAME + '-1.0-SNAPSHOT'+'.jar'  # Change this to your actual JAR file path
 CONFIG_FILE = 'config.yml'  # Path to your config.yml file
 OUTPUT_LOG = '/Users/muhammedafthad/MASTER_JAVA/server_log.txt'
-PORT=5012
+PORT=5016
 
 # Remote paths
 REMOTE_PROJECT_DIR = '/root/java_service/' + APP_NAME + '/'
