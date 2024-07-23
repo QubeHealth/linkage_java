@@ -2,5 +2,8 @@
 config.yml
 
 logs
-target/*
-.history
+target
+myenv
+.history/
+.DS_Store
+
