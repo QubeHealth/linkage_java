@@ -17,7 +17,7 @@ PORT=5016
 REMOTE_PROJECT_DIR = '/root/java_service/' + APP_NAME + '/'
 REMOTE_JAR_PATH = REMOTE_PROJECT_DIR + APP_NAME + '.jar'
 REMOTE_CONFIG_PATH = REMOTE_PROJECT_DIR + 'config.yml'
-REMOTE_NOHUP_LOG_PATH = REMOTE_PROJECT_DIR + 'nohup.out'  # Path to the nohup log file
+REMOTE_NOHUP_LOG_PATH = REMOTE_PROJECT_DIR + APP_NAME +'.out'  # Path to the nohup log file
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -66,7 +66,7 @@ def start_server(c):
     """
     with conn.cd(REMOTE_PROJECT_DIR):
         logger.info(f"{bcolors.OKBLUE}Starting the Dropwizard application...{bcolors.ENDC}")
-        conn.run(f'nohup java -jar {REMOTE_JAR_PATH} server {REMOTE_CONFIG_PATH} &')
+        conn.run(f'nohup java -jar {REMOTE_JAR_PATH} server {REMOTE_CONFIG_PATH} > {REMOTE_NOHUP_LOG_PATH} 2>&1 &')
         logger.info(f"{bcolors.OKGREEN}Application started{bcolors.ENDC}")
 
 @task
