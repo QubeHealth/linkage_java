@@ -40,7 +40,7 @@ def build(c):
     example: fab build
     """
     logger.info(f"{bcolors.OKGREEN}Starting to package the local project build...{bcolors.ENDC}")
-    run('mvn clean package')
+    run('mvn clean install')
     logger.info(f"{bcolors.OKGREEN}Packaged local project into {JAR_FILE}{bcolors.ENDC}")
 
 @task
