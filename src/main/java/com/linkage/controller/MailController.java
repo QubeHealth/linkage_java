@@ -95,8 +95,8 @@ public class MailController extends BaseController {
                     emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(responseData));
                     emailType.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY,
                             () -> handleFinalBillAndDischargeSummary(responseData));
-                    emailType.put(EmailKeywords.CASHLESS_CREDIT_REQUEST,
-                            () -> handleCashlessCreditRequest(responseData));
+                    // emailType.put(EmailKeywords.CASHLESS_CREDIT_REQUEST,
+                    //         () -> handleCashlessCreditRequest(responseData));
                     emailType.put("final cashless credit request",
                             () -> handleFinalCashlessCreditRequest(responseData));
                     emailType.put("initial cashless credit request",
@@ -130,6 +130,14 @@ public class MailController extends BaseController {
     }
 
     // Pre-Auth flow db calls
+
+    /**
+     * first mail
+     * sender - tpa desk
+     * receiver - qube
+     * 
+     * @param response
+     */
     private void handlePreAuth(Map<String, String> response) {
 
         String partneredUserId = response.get(EmailKeywords.POLICY_NO);
@@ -255,6 +263,13 @@ public class MailController extends BaseController {
         }
     }
 
+    /**
+     * Reply to the query raised by Adjudicator
+     * sender - Tpa desk
+     * receiver - qube
+     * 
+     * @param response
+     */
     // Query reply flow db calls
     private void handleQueryReply(Map<String, String> response) {
 
@@ -345,31 +360,38 @@ public class MailController extends BaseController {
             logger.info("Response data adjudicationItemsId", adjudicationItemsId);
         }
 
-        this.loansService.handleQueryReply(claimNo, status);
+        ApiResponse<Object> updateStatus = this.loansService.handleQueryReply(claimNo, status);
 
     }
 
-    // Cashless to check Initial Or Final
-    private void handleCashlessCreditRequest(Map<String, String> response) {
+    // // Cashless to check Initial Or Final
+    // private void handleCashlessCreditRequest(Map<String, String> response) {
 
-        String body = response.get(EmailKeywords.BODY);
-        String[] bodyLines = body.split("\n");
-        for (String line : bodyLines) {
-            if (line.startsWith("Initial Cashless Approved Amount:-")) {
-                handleInitialCashlessCreditRequest(response);
-                return;
-            } else if (line.startsWith("Final Cashless Approved Amount:-")) {
-                handleFinalCashlessCreditRequest(response);
-                return;
-            }
-        }
+    //     String body = response.get(EmailKeywords.BODY);
+    //     String[] bodyLines = body.split("\n");
+    //     for (String line : bodyLines) {
+    //         if (line.startsWith("Initial Cashless Approved Amount:-")) {
+    //             handleInitialCashlessCreditRequest(response);
+    //             return;
+    //         } else if (line.startsWith("Final Cashless Approved Amount:-")) {
+    //             handleFinalCashlessCreditRequest(response);
+    //             return;
+    //         }
+    //     }
 
-        // If neither condition matches, handle error case
-        Map<String, Object> errorResponseMap = new HashMap<>();
-        errorResponseMap.put("error", "Neither Initial nor Final Cashless Approved Amount found in body.");
+    //     // If neither condition matches, handle error case
+    //     Map<String, Object> errorResponseMap = new HashMap<>();
+    //     errorResponseMap.put("error", "Neither Initial nor Final Cashless Approved Amount found in body.");
 
-    }
+    // }
 
+    /**
+     * Pre Auth Amount Approved by the Adjudicaotr
+     * sender - Adjudicator
+     * receiver - qube
+     * 
+     * @param response
+     */
     // Initial Cashless Credit Request flow db calls
     private void handleInitialCashlessCreditRequest(Map<String, String> response) {
         String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
@@ -478,6 +500,13 @@ public class MailController extends BaseController {
 
     }
 
+    /**
+     * Final Document and bills approved by Adjudicator 
+     * sender - Adjudicator
+     * receiver - qube
+     * 
+     * @param response
+     */
     // Final Cashless Credit Request flow db calls
     private void handleFinalCashlessCreditRequest(Map<String, String> response) {
         String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
@@ -583,6 +612,13 @@ public class MailController extends BaseController {
 
     }
 
+    /**
+     * Final Document and bills sended by Tpa Desk 
+     * sender - Tpa Desk
+     * receiver - qube
+     * 
+     * @param response
+     */
     // Final Bill And Discharge Summary flow db calls
     private void handleFinalBillAndDischargeSummary(Map<String, String> response) {
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
@@ -676,6 +712,13 @@ public class MailController extends BaseController {
                 status);
     }
 
+    /**
+     * To raised the Document query by Adjudicator
+     * sender - Adjudicator
+     * receiver - qube
+     * 
+     * @param response
+     */
     // Additional Information flow db calls
     private void handleAdditionalInformation(Map<String, String> response) {
 
@@ -760,6 +803,12 @@ public class MailController extends BaseController {
         }
 
     }
+
+
+
+
+
+
 
     // Pre-Auth flow db calls
     private void handlePreAuthcall(Map<String, String> response) {
