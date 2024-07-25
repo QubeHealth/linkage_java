@@ -2,6 +2,7 @@
 config.yml
 
 logs
-target/*
-.history
-serviceAccount.json
+target
+myenv
+.history/
+.DS_Store
