@@ -11,9 +11,9 @@ public class UserService extends BaseServiceClient {
         super(configuration);
     }
     
-    public ApiResponse<Object> getQbUserId(Map<String, Object> body) {
+    public ApiResponse<Object> getQbUserId(String partneredUserId) {
 
         String url = configuration.getUserJavaUrl() + "/emailerUser/getQbUserId";
-        return this.networkCallInternalService(url, "post", body, null);
+        return this.networkCallInternalService(url, "post", partneredUserId, null);
     }
 }
