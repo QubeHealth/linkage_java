@@ -169,6 +169,10 @@ public final class Helper {
         return currentDate.format(formatter);
     }
 
+    public static String convertMapToJsonString(Map<String, Object> map) {
+        return toJsonString(map);
+    }
+    
     public static String toJsonString(Object obj) {
         // ObjectMapper instance
         ObjectMapper mapper = new ObjectMapper();

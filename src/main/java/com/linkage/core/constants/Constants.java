@@ -33,6 +33,8 @@ public final class Constants {
         public static final String GCP_PATH = "gcp_path";
         public static final String GCP_FILE_NAME = "gcp_file_name";
         public static final String IS_ACTIVE = "is_active";
+        
+        public static final String PRE_AUTH_MESSAGE = "Your documents are being verified";
 
 
         public static final String[] keywordsList = { SUPPORTING_DOCUMENT, QUERY_REPLY,
@@ -40,4 +42,18 @@ public final class Constants {
             CASHLESS_CREDIT_REQUEST, ADDITIONAL_INFORMATION };
     }
 
+    public static final class NotificationKeywords {
+        public static final String PRE_AUTH_MESSAGE = "PRE_AUTH_MESSAGE";
+        public static final String REPLY_QUERY_ADJ = "REPLY_QUERY_ADJ";
+        public static final String PRE_AUTH_AMOUNT_APPROVED = "PRE_AUTH_AMOUNT_APPROVED";
+        public static final String RAISE_QUERY = "RAISE_QUERY";
+        public static final String FINAL_DOCUMENT_SENT = "FINAL_DOCUMENT_SENT";
+        public static final String FINAL_AMOUNT_APPROVED = "FINAL_AMOUNT_APPROVED";
+        public static final String TYPE = "type";
+        public static final String USER_ID = "user_id";
+        public static final Integer USER_ID_VALUE = 123;
+
+        
+
+    }
 }

@@ -1,22 +1,14 @@
 package com.linkage.controller;
 
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.security.SecureRandom;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-
-import org.apache.commons.lang3.ObjectUtils.Null;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
@@ -24,8 +16,12 @@ import com.linkage.client.LoansService;
 import com.linkage.client.MailReaderService;
 import com.linkage.client.MailWriterService;
 import com.linkage.client.MasterService;
-import com.linkage.core.constants.Constants;
 import com.linkage.core.constants.Constants.EmailKeywords;
+import com.linkage.core.constants.Constants.NotificationKeywords;
+import com.linkage.utility.Helper;
+import com.linkage.utility.sqs.ExecutionsConstants;
+import com.linkage.utility.sqs.Producer;
+import com.linkage.utility.sqs.QueueConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Validator;
@@ -148,6 +144,8 @@ public class MailController extends BaseController {
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
         //String uniqueId = UUID.randomUUID().toString();
 
+        
+
         Map<String, Object> preFundedReqMap = new HashMap<>();
         preFundedReqMap.put(EmailKeywords.USER_ID, "123");
         preFundedReqMap.put("hsp_id", "123");
@@ -261,6 +259,18 @@ public class MailController extends BaseController {
         } else {
             logger.info("Response data adjudicationItemsId {}", adjudicationItemsId);
         }
+
+        Map<String, Object> sendNotification = new HashMap<>();
+        sendNotification.put("policy_no", partneredUserId);
+        sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.PRE_AUTH_MESSAGE);
+        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        try {
+            Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -361,6 +371,17 @@ public class MailController extends BaseController {
         }
 
         ApiResponse<Object> updateStatus = this.loansService.handleQueryReply(claimNo, status);
+
+        Map<String, Object> sendNotification = new HashMap<>();
+        sendNotification.put("claim_no", claimNo);
+        sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.REPLY_QUERY_ADJ);
+        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        try {
+            Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
     }
 
@@ -498,6 +519,19 @@ public class MailController extends BaseController {
             logger.info("Response data update Initial Amounts Prefunded Data");
         }
 
+        Map<String, Object> sendNotification = new HashMap<>();
+        sendNotification.put("claim_no", claimNo);
+        sendNotification.put("requested_amount", initialRequestAmount);
+        sendNotification.put("approved_amount", initialApprovedAmount);
+        sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.PRE_AUTH_AMOUNT_APPROVED);
+        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        try {
+            Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -610,6 +644,19 @@ public class MailController extends BaseController {
         ApiResponse<Object> updateFinalAmountsPrefundedData = this.loansService.updateFinalAmountsPrefunded(claimNo,
                 finalRequestAmount, finalApprovedAmount);
 
+        Map<String, Object> sendNotification = new HashMap<>();
+        sendNotification.put("claim_no", claimNo);
+        sendNotification.put("approved_amount", finalApprovedAmount);
+        sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.FINAL_AMOUNT_APPROVED);
+        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        try {
+            Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        
     }
 
     /**
@@ -710,6 +757,17 @@ public class MailController extends BaseController {
 
         ApiResponse<Object> updateStatusAdjudicationData = this.loansService.updateStatusAdjudicationData(claimNo,
                 status);
+
+        Map<String, Object> sendNotification = new HashMap<>();
+        sendNotification.put("claim_no", claimNo);
+        sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.FINAL_DOCUMENT_SENT);
+        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        try {
+            Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -800,6 +858,18 @@ public class MailController extends BaseController {
             logger.error("adjudication Query tbl update failed");
         } else {
             logger.info("adjudication Query tbl upadted at id {}", adjudicationQueryId);
+        }
+
+        Map<String, Object> sendNotification = new HashMap<>();
+        sendNotification.put("claim_no", claimNo);
+        sendNotification.put("document_required", documentRequired);
+        sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.RAISE_QUERY);
+        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        try {
+            Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
     }
