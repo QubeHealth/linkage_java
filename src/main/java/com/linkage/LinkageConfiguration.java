@@ -24,6 +24,8 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String masterUrl;
 
+    private String userJavaUrl;
+
     public String getxApiKey() {
         return xApiKey;
     }
@@ -87,5 +89,12 @@ public class LinkageConfiguration extends Configuration {
     }
     public void setLoansurl(String loansUrl) {
         this.loansUrl = loansUrl;
+    }
+
+    public String getUserJavaUrl(){
+        return userJavaUrl;
+    }
+    public void SetUserJavaUrl(String userJavaUrl) {
+        this.userJavaUrl = userJavaUrl;
     }
 }

@@ -36,7 +36,7 @@ public abstract class EmailFetcher extends BaseServiceClient {
     protected Store store;
     protected Folder inbox;
 
-    public EmailFetcher(String host, String port, String user, String password, LinkageConfiguration configuration) {
+    protected EmailFetcher(String host, String port, String user, String password, LinkageConfiguration configuration) {
         super(configuration);
         this.host = host;
         this.port = port;
@@ -76,7 +76,6 @@ public abstract class EmailFetcher extends BaseServiceClient {
                 message.setFlag(Flags.Flag.SEEN, true); // Mark message as read
             }
         }
-        int x = unreadMessages.size();
         return unreadMessages;
     }
 
@@ -118,8 +117,6 @@ public abstract class EmailFetcher extends BaseServiceClient {
                 if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
                     String documentId = UUID.randomUUID().toString();
                     gcpFileName = Helper.md5Encryption(userId) + "/estimation/" + documentId + ".pdf";
-
-                    //String contentType = bodyPart.getContentType();
                     String contentType = "APPLICATION/PDF";
                     InputStream fileContent = bodyPart.getInputStream();
 
