@@ -4,6 +4,8 @@ config.yml
 logs
 target
 myenv
-.history/
+.history
+
+sslPrivateKey.p12/
 .DS_Store
 
