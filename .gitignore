@@ -6,6 +6,7 @@ target
 myenv
 .history
 
-sslPrivateKey.p12/
+sslPrivateKey.p12
+
 .DS_Store
 
