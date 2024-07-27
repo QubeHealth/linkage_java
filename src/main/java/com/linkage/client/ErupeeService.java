@@ -1,9 +1,8 @@
 package com.linkage.client;
 
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,12 +12,14 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.ErupeeSchema.VoucherRequest;
 import com.linkage.utility.Helper;
 
-import java.nio.charset.StandardCharsets;
+import java.io.FileInputStream;
 import java.security.*;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
@@ -38,9 +39,8 @@ public class ErupeeService extends BaseServiceClient {
 
             String body = Helper.toJsonString(request);
             System.out.println(body);
-            body = encryptRequest(body);
 
-            System.out.println(body);
+            body = encryptRequest(body);
 
             ApiResponse<Object> res = this.networkCallExternalService(url, "POST", body, header);
 
@@ -48,9 +48,14 @@ public class ErupeeService extends BaseServiceClient {
 
             String encryptedKey = data.get("encryptedKey").toString();
 
-            decrypt(data.get("encryptedData").toString(), encryptedKey, "");
+            String decrptedRes = decrypt(data.get("encryptedData").toString(), encryptedKey);
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            return res;
+            HashMap<String, Object> map = objectMapper.readValue(decrptedRes,
+                    new TypeReference<HashMap<String, Object>>() {
+                    });
+
+            return new ApiResponse<>(true, "success", map);
 
         } catch (Exception e) {
             return new ApiResponse<>(false, e.getMessage(), null);
@@ -84,7 +89,7 @@ public class ErupeeService extends BaseServiceClient {
         // 5. Build the complete request object
         JSONObject request = new JSONObject();
         request.put("requestId", UUID.randomUUID());
-        request.put("service", "CreateVouchers");
+        request.put("service", "AccountCreation");
         request.put("encryptedKey", encodedEncryptedKey);
         request.put("oaepHashingAlgorithm", "NONE");
         request.put("iv", encodedIv);
@@ -117,33 +122,59 @@ public class ErupeeService extends BaseServiceClient {
         return cipher.doFinal(data);
     }
 
-    public static String decrypt(String encryptedData, String encryptedKey, String privateKey) throws Exception {
+    public static String decrypt(String base64EncryptedData, String base64EncryptedKey) throws Exception {
 
-        // 1. Get the IV
-        byte[] decodedData = Base64.getDecoder().decode(encryptedData);
-        byte[] iv = Arrays.copyOfRange(decodedData, 0, 16);
-        byte[] encryptedResponse = Arrays.copyOfRange(decodedData, 16, decodedData.length);
+        PrivateKey clientPrivateKey = getPrivateKeyFromP12();
 
-        // 2. Decrypt the session key
-        byte[] privateKeyBytes = privateKey.getBytes();
-        PrivateKey clientPrivateKey = getPrivateKeyFromPKCS12(privateKeyBytes);
-        Cipher keyCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        keyCipher.init(Cipher.DECRYPT_MODE, clientPrivateKey);
-        byte[] decodedKey = keyCipher.doFinal(Base64.getDecoder().decode(encryptedKey));
+        // Decode the base64 encoded encrypted key
+        byte[] encryptedKey = Base64.getDecoder().decode(base64EncryptedKey);
 
-        // 3. Decrypt the response
-        SecretKeySpec sessionKeySpec = new SecretKeySpec(decodedKey, "AES");
-        Cipher responseCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        responseCipher.init(Cipher.DECRYPT_MODE, sessionKeySpec, new IvParameterSpec(iv));
-        byte[] decryptedResponse = responseCipher.doFinal(encryptedResponse);
+        // Decrypt the session key using RSA
+        byte[] sessionKeyBytes = decryptRSA(encryptedKey, clientPrivateKey);
 
-        // 4. Skip the IV and return the decrypted response
-        return new String(decryptedResponse, StandardCharsets.UTF_8);
+        // Decode the base64 encoded encrypted data
+        byte[] encryptedDataBytes = Base64.getDecoder().decode(base64EncryptedData);
+
+        // Extract the IV (first 16 bytes) and the encrypted response (rest of the
+        // bytes)
+        byte[] iv = new byte[16];
+        byte[] encryptedResponse = new byte[encryptedDataBytes.length - 16];
+        System.arraycopy(encryptedDataBytes, 0, iv, 0, 16);
+        System.arraycopy(encryptedDataBytes, 16, encryptedResponse, 0, encryptedDataBytes.length - 16);
+
+        // Decrypt the response using AES
+        byte[] responseBytes = decryptAES(encryptedResponse, sessionKeyBytes, iv);
+
+        // Convert the decrypted response to a string (if it is text)
+        String response = new String(responseBytes);
+
+        System.out.println("Decrypted Response: " + response);
+
+        return response;
     }
 
-    private static PrivateKey getPrivateKeyFromPKCS12(byte[] keystoreBytes) throws Exception {
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keystoreBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return keyFactory.generatePrivate(keySpec);
+    private static byte[] decryptRSA(byte[] encryptedData, PrivateKey privateKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        return cipher.doFinal(encryptedData);
+    }
+
+    private static byte[] decryptAES(byte[] encryptedData, byte[] key, byte[] iv) throws Exception {
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+        return cipher.doFinal(encryptedData);
+    }
+
+    private static PrivateKey getPrivateKeyFromP12() throws Exception {
+        String filePath = "sslPrivateKey.p12";
+        String password = "";
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        try (FileInputStream fis = new FileInputStream(filePath)) {
+            keyStore.load(fis, password.toCharArray());
+        }
+        String alias = keyStore.aliases().nextElement();
+        return (PrivateKey) keyStore.getKey(alias, password.toCharArray());
     }
 }

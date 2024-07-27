@@ -11,16 +11,16 @@ public class ErupeeSchema {
 
     @Data
     public static class VoucherRequest {
-        private Long merchantId;
+        private String merchantId;
         private String merchantTranId;
-        private Long subMerchantId;
+        private String subMerchantId;
         private String beneficiaryID;
-        private Long mobileNumber;
+        private String mobileNumber;
         private String beneficiaryName;
-        private Float amount;
+        private String amount;
         private String expiry;
         private String purposeCode;
-        private Integer mcc;
+        private String mcc;
         @JsonProperty("VoucherRedemptionType")
         private String VoucherRedemptionType;
         @JsonProperty("PayerVA")
