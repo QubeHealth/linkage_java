@@ -7,6 +7,8 @@ public final class Constants {
         public static final String QUERY_REPLY = "query reply";
         public static final String SUPPORTING_DOCUMENT = "supporting document";
         public static final String FINAL_BILL_AND_DISCHARGE_SUMMARY = "final bill and discharge summary";
+        public static final String FINAL_CASHLESS_CREDIT_REQUEST = "final cashless credit request";
+        public static final String INITIAL_CASHLESS_CREDIT_REQUEST = "initial cashless credit request";
         public static final String PRE_AUTH = "pre auth";
         public static final String CASHLESS_CREDIT_REQUEST = "CASHLESS CREDIT REQUEST";
         public static final String ADDITIONAL_INFORMATION = "addtional information";
@@ -27,12 +29,25 @@ public final class Constants {
         public static final String FINAL_CASHLESS_APPROVED_AMT = "final_cashless_approved_amount";
         public static final String FINAL_CASHLESS_REQUEST_AMT = "final_cashless_request_amount";
         public static final String DOCUMENT_REQUIRED = "document_required";
-        public static final String POLICY_NO = "partnered_user_id";
+        public static final String PARTNERED_USER_ID = "partnered_user_id";
         public static final String INITIAL_CASHLESS_APPROVED_AMT = "requested_amount_initial";
         public static final String INITIAL_CASHLESS_REQUEST_AMT = "approved_amount_initial";
         public static final String GCP_PATH = "gcp_path";
         public static final String GCP_FILE_NAME = "gcp_file_name";
         public static final String IS_ACTIVE = "is_active";
+        public static final String PF_REQUEST_ID = "pf_request_id";
+        public static final String POLICY_NO = "policy_no";
+        public static final String STATUS = "status";
+        public static final String METADATA = "metadata";
+        public static final String FILE_PATH = "file_path";
+        public static final String FILE_NAME = "file_name";
+        public static final String HSP_ID = "hsp_id";
+        public static final String ADJUDICATION_DATA_ID = "adjudication_data_id";
+        public static final String PF_DOCUMENT_ID = "pf_document_id";
+        public static final String DOCUMENT_URL = "document_url";
+
+        public static final String PENDING = "PENDING";
+        public static final String APPROVED = "APPROVED";
 
 
         public static final String[] keywordsList = { SUPPORTING_DOCUMENT, QUERY_REPLY,
