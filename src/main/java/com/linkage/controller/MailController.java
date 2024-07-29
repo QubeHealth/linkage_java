@@ -141,7 +141,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> preFundedRequest = this.loansService.preFundedrequestStore(preFundedReqMap);
         Map<String, Object> responseData = (Map<String, Object>) preFundedRequest.getData();
         String preFundedRequestId = String.valueOf(responseData.get("data"));
-        if (preFundedRequest.getStatus()) {
+        if (!preFundedRequest.getStatus()) {
             logger.error("preFundedRequest Data insertion failed");
         } else {
             logger.info("Data Successfully updated at {}", preFundedRequestId);
@@ -158,7 +158,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
-        if (prefundedEmailRequest.getStatus()) {
+        if (!prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -173,7 +173,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus()) {
+        if (!emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -193,7 +193,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationData = this.loansService.adjudicationDataStore(adjudicationDataMap);
         Map<String, Object> adjudicationResponseData = (Map<String, Object>) adjudicationData.getData();
         String adjudicationDataId = String.valueOf(adjudicationResponseData.get("data"));
-        if (adjudicationData.getStatus()) {
+        if (!adjudicationData.getStatus()) {
             logger.error("adjudicationData insertion failed");
         } else {
             logger.info("adjudicationData Successfully updated at {}", adjudicationDataId);
@@ -208,7 +208,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus()) {
+        if (!adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
@@ -234,7 +234,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
         String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
-        if (getPrefundedRequestIdRequest.getStatus()) {
+        if (!getPrefundedRequestIdRequest.getStatus()) {
             logger.error("prefundedRequestId data not found");
         } else {
             logger.info("Found preFundedRequestId {}", prefundedRequestId);
@@ -250,7 +250,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
-        if (prefundedEmailRequest.getStatus()) {
+        if (!prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -265,7 +265,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus()) {
+        if (!emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -274,7 +274,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.getAdjudicationDataId(claimNo);
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus()) {
+        if (!adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
@@ -296,7 +296,7 @@ public class MailController extends BaseController {
         }
 
         ApiResponse<Object> updateStatus = this.loansService.handleQueryReply(claimNo, status);
-        if (updateStatus.getStatus()) {
+        if (!updateStatus.getStatus()) {
             logger.error("Status not updated as RESPONDED");
         } else {
             logger.info("Status updated as RESPONDED");
@@ -323,7 +323,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
         String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
-        if (getPrefundedRequestIdRequest.getStatus()) {
+        if (!getPrefundedRequestIdRequest.getStatus()) {
             logger.error("prefundedRequestId data not found");
         } else {
             logger.info("Found preFundedRequestId {}", prefundedRequestId);
@@ -340,7 +340,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
-        if (prefundedEmailRequest.getStatus()) {
+        if (!prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -357,7 +357,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus()) {
+        if (!emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -366,7 +366,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.getAdjudicationDataId(claimNo);
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus()) {
+        if (!adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
@@ -381,7 +381,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus()) {
+        if (!adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
@@ -396,7 +396,7 @@ public class MailController extends BaseController {
 
         ApiResponse<Object> updateInitialAmountsPrefundedData = this.loansService.updateInitialAmountsPrefunded(claimNo,
                 initialRequestAmount, initialApprovedAmount);
-        if (updateInitialAmountsPrefundedData.getStatus()) {
+        if (!updateInitialAmountsPrefundedData.getStatus()) {
             logger.error("Initial amount update failed");
         } else {
             logger.info("Initial amount Successfully updated");
@@ -425,7 +425,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
         String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
-        if (getPrefundedRequestIdRequest.getStatus()) {
+        if (!getPrefundedRequestIdRequest.getStatus()) {
             logger.error("prefundedRequestId data not found");
         } else {
             logger.info("Found preFundedRequestId {}", prefundedRequestId);
@@ -443,7 +443,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
-        if (prefundedEmailRequest.getStatus()) {
+        if (!prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -460,7 +460,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus()) {
+        if (!emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -469,7 +469,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.getAdjudicationDataId(claimNo);
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus()) {
+        if (!adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
@@ -484,7 +484,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus()) {
+        if (!adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
@@ -498,7 +498,7 @@ public class MailController extends BaseController {
         }
 
         ApiResponse<Object> updateFinalAmountsPrefundedData = this.loansService.updateFinalAmountsPrefunded(claimNo, finalRequestAmount, finalApprovedAmount);
-                if (updateFinalAmountsPrefundedData.getStatus()) {
+                if (!updateFinalAmountsPrefundedData.getStatus()) {
                     logger.error("Final amount update failed");
                 } else {
                     logger.info("Final amount Successfully updated");
@@ -524,7 +524,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
         String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
-        if (getPrefundedRequestIdRequest.getStatus()) {
+        if (!getPrefundedRequestIdRequest.getStatus()) {
             logger.error("prefundedRequestId data not found");
         } else {
             logger.info("Found preFundedRequestId {}", prefundedRequestId);
@@ -540,7 +540,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
-        if (prefundedEmailRequest.getStatus()) {
+        if (!prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -555,7 +555,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus()) {
+        if (!emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -564,7 +564,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.getAdjudicationDataId(claimNo);
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus()) {
+        if (!adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
@@ -579,7 +579,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus()) {
+        if (!adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
@@ -587,7 +587,7 @@ public class MailController extends BaseController {
 
         ApiResponse<Object> updateStatusAdjudicationData = this.loansService.updateStatusAdjudicationData(claimNo,
                 status);
-                if (updateStatusAdjudicationData.getStatus()) {
+                if (!updateStatusAdjudicationData.getStatus()) {
                     logger.error("Status not updated as PENDING");
                 } else {
                     logger.info("Status updated as PENDING");
@@ -614,7 +614,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> pfRequest = this.loansService.updateClaimNo(employeeCode, claimNo);
         Map<String, Object> pfRequestResponseData = (Map<String, Object>) pfRequest.getData();
         String pfRequestId = String.valueOf(pfRequestResponseData.get("data"));
-        if (pfRequest.getStatus()) {
+        if (!pfRequest.getStatus()) {
             logger.error("Clain No. updation Failed");
         } else {
             logger.info("Clain No. Updated at pfRequestId {}", pfRequestId);
@@ -623,7 +623,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.updateStatusAdjudicationData(claimNo, "QUERY");
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus()) {
+        if (!adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
@@ -639,7 +639,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
-        if (prefundedEmailRequest.getStatus()) {
+        if (!prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -654,7 +654,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus()) {
+        if (!emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -672,7 +672,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationQueryData = this.loansService.adjudicationQueryStore(adjudicationQuery);
         Map<String, Object> adjudicationQueryDataResponseData = (Map<String, Object>) adjudicationQueryData.getData();
         String adjudicationQueryId = String.valueOf(adjudicationQueryDataResponseData.get("data"));
-        if (adjudicationQueryData.getStatus()) {
+        if (!adjudicationQueryData.getStatus()) {
             logger.error("adjudicationQuery Data insertion failed");
         } else {
             logger.info("adjudicationQuery Data Successfully updated at {}", adjudicationQueryId);
