@@ -40,7 +40,6 @@ public class MailReaderService extends EmailFetcher {
     }
 
     public Response fetchAndProcessEmail(Message message) throws Exception {
-        // Message message = fetchLatestEmail();
         connect();
         Map<String, String> responseMap = new HashMap<>();
         String gcpPath = null;
@@ -101,7 +100,7 @@ public class MailReaderService extends EmailFetcher {
                 } else {
                     markAsUnread(message);
                     responseMap.put("error", "Failed to upload attachments to GCP");
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    return Response.status(Response.Status.FORBIDDEN)
                             .entity(new ApiResponse<>(false,
                                     "Failed to process email",
                                     responseMap))
@@ -140,10 +139,6 @@ public class MailReaderService extends EmailFetcher {
         return null;
     }
 
-    private void markAsRead(Message message) throws MessagingException {
-        message.setFlag(Flags.Flag.SEEN, true);
-    }
-
     private void markAsUnread(Message message) throws MessagingException {
         message.setFlag(Flags.Flag.SEEN, false);
     }
@@ -155,8 +150,7 @@ public class MailReaderService extends EmailFetcher {
     }
 
     private Map<String, String> handleQueryReply(String subject, String body, String keyword) {
-        Map<String,String> responseMap = extractKeywords(subject, body, keyword);
-        return responseMap;
+        return extractKeywords(subject, body, keyword);
     }
 
     private Map<String, String> handleCashlessCreditRequest(String subject, String body, String keyword, Message message) {
@@ -175,34 +169,23 @@ public class MailReaderService extends EmailFetcher {
     }
 
     private Map<String, String> handleInitialCashlessCreditRequest(String subject, String body, String keyword) {
-        Map<String,String> responseMap = extractKeywords(subject, body, keyword);
-
-        return responseMap;
+        return extractKeywords(subject, body, keyword);
     }
 
     private Map<String, String> handleFinalCashlessCreditRequest(String subject, String body, String keyword){
-        Map<String,String> responseMap = extractKeywords(subject, body, keyword);
-
-        return responseMap;
+        return extractKeywords(subject, body, keyword);
     }
 
     private Map<String, String> handleAdditionalInformation(String subject, String body, String keyword){
-        Map<String,String> responseMap = extractKeywords(subject, body, keyword);
-
-        return responseMap;
+        return extractKeywords(subject, body, keyword);
     }
 
     private Map<String, String> handleFinalBillAndDischargeSummary(String subject, String body, String keyword) {
-        Map<String,String> responseMap = extractKeywords(subject, body, keyword);
-
-        return responseMap;
+        return extractKeywords(subject, body, keyword);
     }
     
     private Map<String,String> handlePreAuth(String subject, String body, String keyword) {
-        
-        Map<String,String> responseMap = extractKeywords(subject, body, keyword);
-
-        return responseMap;
+        return extractKeywords(subject, body, keyword);
     }
 
     private Map<String, String> extractKeywords(String subject, String body, String keyword) {

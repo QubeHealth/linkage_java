@@ -59,7 +59,7 @@ public class MailController extends BaseController {
     @Path("/emailReader")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response emailReader(@Context HttpServletRequest request) throws MessagingException {
+    public Response emailReader(@Context HttpServletRequest request) {
         try {
             // Fetch and process the email
             List<Message> msgList = this.mailReaderService.fetchLatestEmail();
@@ -68,7 +68,7 @@ public class MailController extends BaseController {
                 try {
                     Response processedMail = this.mailReaderService.fetchAndProcessEmail(message);
                     ApiResponse<Object> apiResponse = (ApiResponse<Object>) processedMail.getEntity();
-                    if (processedMail.getStatus() == 0) {
+                    if (apiResponse.getStatus()) {
                         // Log the error or handle as needed
                         throw new Exception("Error processing email");
                     } else {
@@ -77,20 +77,16 @@ public class MailController extends BaseController {
                     Map<String, String> responseData = (Map<String, String>) apiResponse.getData();
 
                     // Extract common type from the response
-                    String type = String.valueOf(responseData.get(EmailKeywords.TYPE));
+                    String type = responseData.get(EmailKeywords.TYPE);
 
                     // Map to store handlers for different types
                     Map<String, Runnable> emailType = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
                     emailType.put(EmailKeywords.PRE_AUTH, () -> handlePreAuth(responseData));
                     emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(responseData));
-                    emailType.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY,
-                            () -> handleFinalBillAndDischargeSummary(responseData));
-                    emailType.put("final cashless credit request",
-                            () -> handleFinalCashlessCreditRequest(responseData));
-                    emailType.put("initial cashless credit request",
-                            () -> handleInitialCashlessCreditRequest(responseData));
-                    emailType.put(EmailKeywords.ADDITIONAL_INFORMATION,
-                            () -> handleAdditionalInformation(responseData));
+                    emailType.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY, () -> handleFinalBillAndDischargeSummary(responseData));
+                    emailType.put(EmailKeywords.FINAL_CASHLESS_CREDIT_REQUEST, () -> handleFinalCashlessCreditRequest(responseData));
+                    emailType.put(EmailKeywords.INITIAL_CASHLESS_CREDIT_REQUEST, () -> handleInitialCashlessCreditRequest(responseData));
+                    emailType.put(EmailKeywords.ADDITIONAL_INFORMATION, () -> handleAdditionalInformation(responseData));
 
                     // Execute handler based on the type
                     Runnable handler = emailType.get(type);
@@ -102,7 +98,6 @@ public class MailController extends BaseController {
                     // Log the exception and continue with the next message
                     logger.error("Failed to process email with subject: {}", message.getSubject(), e);
                     this.mailWriterService.markEmailUnread(message.getSubject());
-
                 }
             }
             return Response.ok().entity("All emails processed successfully.").build();
@@ -110,21 +105,20 @@ public class MailController extends BaseController {
         } catch (Exception e) {
             // Handle any unexpected exceptions
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error processing emails: " + e.getMessage())
+                    .entity(new ApiResponse<Object>(false, "Error processing emails: "+ e.getMessage(), null))
                     .build();
         }
     }
-
-    // Pre-Auth flow db calls
 
     /**
      * first mail
      * sender - tpa desk
      * receiver - qube
      */
+    // Pre-Auth flow db calls
     private void handlePreAuth(Map<String, String> response) {
 
-        String partneredUserId = response.get(EmailKeywords.POLICY_NO);
+        String partneredUserId = response.get(EmailKeywords.PARTNERED_USER_ID);
         String khId = response.get(EmailKeywords.TPA_DESK_ID);
         String subject = response.get(EmailKeywords.SUBJECT);
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
@@ -140,24 +134,14 @@ public class MailController extends BaseController {
         preFundedReqMap.put("hsp_id", "123");
         preFundedReqMap.put("partnered_user_id", partneredUserId);
         preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, khId);
-        preFundedReqMap.put("status", "PENDING");
+        preFundedReqMap.put(EmailKeywords.STATUS, "PENDING");
         preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
-        preFundedReqMap.put("processed_at", null);
-        preFundedReqMap.put("requested_amount", null);
-        preFundedReqMap.put("disbursement_amount", null);
         preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
-        preFundedReqMap.put(EmailKeywords.CLAIM_NO, null);
-        preFundedReqMap.put("claim_id", null); 
-        preFundedReqMap.put("approved_amount_initial", null);
-        preFundedReqMap.put("approved_amount_final", null);
-        preFundedReqMap.put("initial_request_resolved_at", null);
-        preFundedReqMap.put("final_request_resolved_at", null);
-
 
         ApiResponse<Object> preFundedRequest = this.loansService.preFundedrequestStore(preFundedReqMap);
         Map<String, Object> responseData = (Map<String, Object>) preFundedRequest.getData();
         String preFundedRequestId = String.valueOf(responseData.get("data"));
-        if (preFundedRequest.getStatus() == false) {
+        if (preFundedRequest.getStatus()) {
             logger.error("preFundedRequest Data insertion failed");
         } else {
             logger.info("Data Successfully updated at {}", preFundedRequestId);
@@ -167,14 +151,14 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.EMAIL_TYPE, "PRE_AUTH");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
-        preFundedEmailerMap.put("partnered_claim_no", "22");
-        preFundedEmailerMap.put("pf_request_id", preFundedRequestId);
-        preFundedEmailerMap.put("policy_no", partneredUserId);
+        //preFundedEmailerMap.put("partnered_claim_no", "22");
+        preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, preFundedRequestId);
+        preFundedEmailerMap.put(EmailKeywords.POLICY_NO, partneredUserId);
 
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
-        if (prefundedEmailRequest.getStatus() == false) {
+        if (prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -182,19 +166,14 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
-        emailerItems.put("claim_no", null);
-        emailerItems.put("initial_amt_req", null);
-        emailerItems.put("initial_amt_approved", null);
-        emailerItems.put("final_adj_amt_req", null);
-        emailerItems.put("final_adj_amt_approved", null);
-        emailerItems.put("metadata", subject);
+        emailerItems.put(EmailKeywords.METADATA, subject);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
-        emailerItems.put("policy_no", partneredUserId);
+        emailerItems.put(EmailKeywords.POLICY_NO, partneredUserId);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus() == false) {
+        if (emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -202,40 +181,34 @@ public class MailController extends BaseController {
 
         Map<String, Object> adjudicationDataMap = new HashMap<>();
         adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID, khId);
-        adjudicationDataMap.put("pf_req_id", preFundedRequestId);
-        adjudicationDataMap.put("requested_amount", null);
-        adjudicationDataMap.put("estimated_amount", null);
-        adjudicationDataMap.put("file_path", gcpPath);
-        adjudicationDataMap.put("file_name", gcpFileName);
+        adjudicationDataMap.put(EmailKeywords.PF_REQUEST_ID, preFundedRequestId);
+        adjudicationDataMap.put(EmailKeywords.FILE_PATH, gcpPath);
+        adjudicationDataMap.put(EmailKeywords.FILE_NAME, gcpFileName);
         adjudicationDataMap.put(EmailKeywords.USER_ID, partneredUserId);
-        adjudicationDataMap.put("offer_id", null);
-        adjudicationDataMap.put("hsp_id", 123);
-        adjudicationDataMap.put("document_id", null);
-        adjudicationDataMap.put("associated_user_id", null);
-        adjudicationDataMap.put("status", "PENDING");
+        adjudicationDataMap.put(EmailKeywords.HSP_ID, 123);
+        adjudicationDataMap.put(EmailKeywords.STATUS, "PENDING");
         adjudicationDataMap.put("created_by", "TPA DESK");
-        adjudicationDataMap.put("requested_by", null);
         adjudicationDataMap.put("updated_by", "ADJUDICATOR");
 
         ApiResponse<Object> adjudicationData = this.loansService.adjudicationDataStore(adjudicationDataMap);
         Map<String, Object> adjudicationResponseData = (Map<String, Object>) adjudicationData.getData();
         String adjudicationDataId = String.valueOf(adjudicationResponseData.get("data"));
-        if (adjudicationData.getStatus() == false) {
+        if (adjudicationData.getStatus()) {
             logger.error("adjudicationData insertion failed");
         } else {
             logger.info("adjudicationData Successfully updated at {}", adjudicationDataId);
         }
 
         Map<String, Object> adjudicationItems = new HashMap<>();
-        adjudicationItems.put("adjudication_data_id", adjudicationDataId);
-        adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpFileName);
+        adjudicationItems.put(EmailKeywords.ADJUDICATION_DATA_ID, adjudicationDataId);
+        adjudicationItems.put(EmailKeywords.PF_DOCUMENT_ID, prefundedEmailId);
+        adjudicationItems.put(EmailKeywords.DOCUMENT_URL, gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus() == false) {
+        if (adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
@@ -254,7 +227,6 @@ public class MailController extends BaseController {
         String khId = response.get(EmailKeywords.TPA_DESK_ID);
         String subject = response.get(EmailKeywords.SUBJECT);
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
-        String body = response.get(EmailKeywords.BODY);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
         String status = "RESPONDED";
@@ -262,7 +234,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
         String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
-        if (getPrefundedRequestIdRequest.getStatus() == false) {
+        if (getPrefundedRequestIdRequest.getStatus()) {
             logger.error("prefundedRequestId data not found");
         } else {
             logger.info("Found preFundedRequestId {}", prefundedRequestId);
@@ -272,14 +244,13 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.TYPE, "QUERY_REPLY");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
-        preFundedEmailerMap.put("partnered_claim_no", claimNo);
-        preFundedEmailerMap.put("pf_request_id", prefundedRequestId);
-        preFundedEmailerMap.put("policy_no", null);
+        //preFundedEmailerMap.put("partnered_claim_no", claimNo);
+        preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, prefundedRequestId);
 
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
-        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
-        if (prefundedEmailRequest.getStatus() == false) {
+        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
+        if (prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -287,19 +258,14 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
-        emailerItems.put("claim_no", claimNo);
-        emailerItems.put("initial_amt_req", null);
-        emailerItems.put("initial_amt_approved", null);
-        emailerItems.put("final_adj_amt_req", null);
-        emailerItems.put("final_adj_amt_approved", null);
-        emailerItems.put("metadata", subject);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+        emailerItems.put(EmailKeywords.METADATA, subject);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
-        emailerItems.put("policy_no", null);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus() == false) {
+        if (emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -308,29 +274,29 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.getAdjudicationDataId(claimNo);
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus() == false) {
+        if (adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
         }
 
         Map<String, Object> adjudicationItems = new HashMap<>();
-        adjudicationItems.put("adjudication_data_id", adjudicationDataId);
-        adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpFileName);
+        adjudicationItems.put(EmailKeywords.ADJUDICATION_DATA_ID, adjudicationDataId);
+        adjudicationItems.put(EmailKeywords.PF_DOCUMENT_ID, prefundedEmailId);
+        adjudicationItems.put(EmailKeywords.DOCUMENT_URL, gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus() == false) {
+        if (adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
         }
 
         ApiResponse<Object> updateStatus = this.loansService.handleQueryReply(claimNo, status);
-        if (updateStatus.getStatus() == false) {
+        if (updateStatus.getStatus()) {
             logger.error("Status not updated as RESPONDED");
         } else {
             logger.info("Status updated as RESPONDED");
@@ -357,7 +323,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
         String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
-        if (getPrefundedRequestIdRequest.getStatus() == false) {
+        if (getPrefundedRequestIdRequest.getStatus()) {
             logger.error("prefundedRequestId data not found");
         } else {
             logger.info("Found preFundedRequestId {}", prefundedRequestId);
@@ -367,14 +333,14 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.TYPE, "INITIAL_CASHLESS_CREDIT_REQUEST");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
-        preFundedEmailerMap.put("partnered_claim_no", "22");
-        preFundedEmailerMap.put("pf_request_id", prefundedRequestId);
-        preFundedEmailerMap.put("policy_no", employeeCode);
+        //preFundedEmailerMap.put("partnered_claim_no", "22");
+        preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, prefundedRequestId);
+        preFundedEmailerMap.put(EmailKeywords.POLICY_NO, employeeCode);
 
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
-        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
-        if (prefundedEmailRequest.getStatus() == false) {
+        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
+        if (prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -382,19 +348,16 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
-        emailerItems.put("claim_no", claimNo);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("initial_amt_req", initialRequestAmount);
         emailerItems.put("initial_amt_approved", initialApprovedAmount);
-        emailerItems.put("final_adj_amt_req", null);
-        emailerItems.put("final_adj_amt_approved", null);
-        emailerItems.put("metadata", subject + body);
-        emailerItems.put(EmailKeywords.PATIENT_NAME, null);
-        emailerItems.put("policy_no", employeeCode);
+        emailerItems.put(EmailKeywords.METADATA, subject + body);
+        emailerItems.put(EmailKeywords.POLICY_NO, employeeCode);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus() == false) {
+        if (emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -403,22 +366,22 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.getAdjudicationDataId(claimNo);
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus() == false) {
+        if (adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
         }
 
         Map<String, Object> adjudicationItems = new HashMap<>();
-        adjudicationItems.put("adjudication_data_id", adjudicationDataId);
-        adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpFileName);
+        adjudicationItems.put(EmailKeywords.ADJUDICATION_DATA_ID, adjudicationDataId);
+        adjudicationItems.put(EmailKeywords.PF_DOCUMENT_ID, prefundedEmailId);
+        adjudicationItems.put(EmailKeywords.DOCUMENT_URL, gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus() == false) {
+        if (adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
@@ -428,13 +391,12 @@ public class MailController extends BaseController {
         Map<String, Object> checkQueryStatusResponseData = (Map<String, Object>) checkQueryStatusData.getData();
         String checkStatus = String.valueOf(checkQueryStatusResponseData.get("data"));
         if ("0".equals(checkStatus)) {
-            ApiResponse<Object> updateStatusAdjudicationData = this.loansService.updateStatusAdjudicationData(claimNo,
-                    status);
+            ApiResponse<Object> updateStatusAdjudicationData = this.loansService.updateStatusAdjudicationData(claimNo, status);
         }
 
         ApiResponse<Object> updateInitialAmountsPrefundedData = this.loansService.updateInitialAmountsPrefunded(claimNo,
                 initialRequestAmount, initialApprovedAmount);
-        if (updateInitialAmountsPrefundedData.getStatus() == false) {
+        if (updateInitialAmountsPrefundedData.getStatus()) {
             logger.error("Initial amount update failed");
         } else {
             logger.info("Initial amount Successfully updated");
@@ -463,7 +425,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
         String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
-        if (getPrefundedRequestIdRequest.getStatus() == false) {
+        if (getPrefundedRequestIdRequest.getStatus()) {
             logger.error("prefundedRequestId data not found");
         } else {
             logger.info("Found preFundedRequestId {}", prefundedRequestId);
@@ -475,33 +437,30 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
         preFundedEmailerMap.put("partnered_claim_no", "22");
         preFundedEmailerMap.put("pf_request_id", prefundedRequestId);
-        preFundedEmailerMap.put("policy_no", employeeCode);
-        preFundedEmailerMap.put("claim_no", claimNo);
+        preFundedEmailerMap.put(EmailKeywords.POLICY_NO, employeeCode);
+        preFundedEmailerMap.put(EmailKeywords.CLAIM_NO, claimNo);
 
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
-        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
-        if (prefundedEmailRequest.getStatus() == false) {
+        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
+        if (prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
         }
 
         Map<String, Object> emailerItems = new HashMap<>();
-        emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
-        emailerItems.put("claim_no", claimNo);
-        emailerItems.put("initial_amt_req", null);
-        emailerItems.put("initial_amt_approved", null);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("final_adj_amt_req", finalRequestAmount);
         emailerItems.put("final_adj_amt_approved", finalApprovedAmount);
-        emailerItems.put("metadata", subject + body);
+        emailerItems.put(EmailKeywords.METADATA, subject + body);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
-        emailerItems.put("policy_no", employeeCode);
+        emailerItems.put(EmailKeywords.POLICY_NO, employeeCode);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus() == false) {
+        if (emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -510,22 +469,22 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.getAdjudicationDataId(claimNo);
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus() == false) {
+        if (adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
         }
 
         Map<String, Object> adjudicationItems = new HashMap<>();
-        adjudicationItems.put("adjudication_data_id", adjudicationDataId);
-        adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpFileName);
+        adjudicationItems.put(EmailKeywords.ADJUDICATION_DATA_ID, adjudicationDataId);
+        adjudicationItems.put(EmailKeywords.PF_DOCUMENT_ID, prefundedEmailId);
+        adjudicationItems.put(EmailKeywords.DOCUMENT_URL, gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus() == false) {
+        if (adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
@@ -535,13 +494,11 @@ public class MailController extends BaseController {
         Map<String, Object> checkQueryStatusResponseData = (Map<String, Object>) checkQueryStatusData.getData();
         String checkStatus = String.valueOf(checkQueryStatusResponseData.get("data"));
         if ("0".equals(checkStatus)) {
-            ApiResponse<Object> updateStatusAdjudicationData = this.loansService.updateStatusAdjudicationData(claimNo,
-                    status);
+            ApiResponse<Object> updateStatusAdjudicationData = this.loansService.updateStatusAdjudicationData(claimNo, status);
         }
 
-        ApiResponse<Object> updateFinalAmountsPrefundedData = this.loansService.updateFinalAmountsPrefunded(claimNo,
-                finalRequestAmount, finalApprovedAmount);
-                if (updateFinalAmountsPrefundedData.getStatus() == false) {
+        ApiResponse<Object> updateFinalAmountsPrefundedData = this.loansService.updateFinalAmountsPrefunded(claimNo, finalRequestAmount, finalApprovedAmount);
+                if (updateFinalAmountsPrefundedData.getStatus()) {
                     logger.error("Final amount update failed");
                 } else {
                     logger.info("Final amount Successfully updated");
@@ -567,7 +524,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         Map<String, Object> prefundedIdResponseData = (Map<String, Object>) getPrefundedRequestIdRequest.getData();
         String prefundedRequestId = String.valueOf(prefundedIdResponseData.get("data"));
-        if (getPrefundedRequestIdRequest.getStatus() == false) {
+        if (getPrefundedRequestIdRequest.getStatus()) {
             logger.error("prefundedRequestId data not found");
         } else {
             logger.info("Found preFundedRequestId {}", prefundedRequestId);
@@ -577,14 +534,13 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.TYPE, "FINAL_BILL_AND_DISCAHRGE_SUMMARY");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
-        preFundedEmailerMap.put("partnered_claim_no", "22");
-        preFundedEmailerMap.put("pf_request_id", prefundedRequestId);
-        preFundedEmailerMap.put("policy_no", null);
+        //preFundedEmailerMap.put("partnered_claim_no", "22");
+        preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, prefundedRequestId);
 
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
-        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
-        if (prefundedEmailRequest.getStatus() == false) {
+        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
+        if (prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -592,19 +548,14 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
-        emailerItems.put("claim_no", claimNo);
-        emailerItems.put("initial_amt_req", null);
-        emailerItems.put("initial_amt_approved", null);
-        emailerItems.put("final_adj_amt_req", null);
-        emailerItems.put("final_adj_amt_approved", null);
-        emailerItems.put("metadata", subject + body);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+        emailerItems.put(EmailKeywords.METADATA, subject + body);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
-        emailerItems.put("policy_no", null);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus() == false) {
+        if (emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
@@ -613,22 +564,22 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.getAdjudicationDataId(claimNo);
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus() == false) {
+        if (adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
         }
 
         Map<String, Object> adjudicationItems = new HashMap<>();
-        adjudicationItems.put("adjudication_data_id", adjudicationDataId);
-        adjudicationItems.put("pf_document_id", prefundedEmailId);
-        adjudicationItems.put("document_url", gcpFileName);
+        adjudicationItems.put(EmailKeywords.ADJUDICATION_DATA_ID, adjudicationDataId);
+        adjudicationItems.put(EmailKeywords.PF_DOCUMENT_ID, prefundedEmailId);
+        adjudicationItems.put(EmailKeywords.DOCUMENT_URL, gcpFileName);
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
         Map<String, Object> adjudicationItemsDataResponseData = (Map<String, Object>) adjudicationItemsData.getData();
         String adjudicationItemsId = String.valueOf(adjudicationItemsDataResponseData.get("data"));
-        if (adjudicationItemsData.getStatus() == false) {
+        if (adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated at {}", adjudicationItemsId);
@@ -636,7 +587,7 @@ public class MailController extends BaseController {
 
         ApiResponse<Object> updateStatusAdjudicationData = this.loansService.updateStatusAdjudicationData(claimNo,
                 status);
-                if (updateStatusAdjudicationData.getStatus() == false) {
+                if (updateStatusAdjudicationData.getStatus()) {
                     logger.error("Status not updated as PENDING");
                 } else {
                     logger.info("Status updated as PENDING");
@@ -663,7 +614,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> pfRequest = this.loansService.updateClaimNo(employeeCode, claimNo);
         Map<String, Object> pfRequestResponseData = (Map<String, Object>) pfRequest.getData();
         String pfRequestId = String.valueOf(pfRequestResponseData.get("data"));
-        if (pfRequest.getStatus() == false) {
+        if (pfRequest.getStatus()) {
             logger.error("Clain No. updation Failed");
         } else {
             logger.info("Clain No. Updated at pfRequestId {}", pfRequestId);
@@ -672,7 +623,7 @@ public class MailController extends BaseController {
         ApiResponse<Object> adjudicationDataRequest = this.loansService.updateStatusAdjudicationData(claimNo, "QUERY");
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));
-        if (adjudicationDataRequest.getStatus() == false) {
+        if (adjudicationDataRequest.getStatus()) {
             logger.error("adjudicationDataId data not found");
         } else {
             logger.info("Found adjudicationDataId {}", adjudicationDataId);
@@ -682,13 +633,13 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.TYPE, "QUERY_RAISED");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
-        preFundedEmailerMap.put("partnered_claim_no", claimNo);
-        preFundedEmailerMap.put("pf_request_id", pfRequestId);
+        //preFundedEmailerMap.put("partnered_claim_no", claimNo);
+        preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, pfRequestId);
 
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
-        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
-        if (prefundedEmailRequest.getStatus() == false) {
+        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
+        if (prefundedEmailRequest.getStatus()) {
             logger.error("prefundedEmailer Data insertion failed");
         } else {
             logger.info("prefundedEmailer Data Successfully updated at {}", prefundedEmailId);
@@ -696,36 +647,32 @@ public class MailController extends BaseController {
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
-        emailerItems.put("claim_no", claimNo);
-        emailerItems.put("initial_amt_req", null);
-        emailerItems.put("initial_amt_approved", null);
-        emailerItems.put("final_adj_amt_req", null);
-        emailerItems.put("final_adj_amt_approved", null);
-        emailerItems.put("metadata", subject + body);
+        emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
+        emailerItems.put(EmailKeywords.METADATA, body);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         Map<String, Object> emailItemsResponseData = (Map<String, Object>) emailItemsRequest.getData();
         String emailItems = String.valueOf(emailItemsResponseData.get("data"));
-        if (emailItemsRequest.getStatus() == false) {
+        if (emailItemsRequest.getStatus()) {
             logger.error("emailItems Data insertion failed");
         } else {
             logger.info("emailItems Data Successfully updated at {}", emailItems);
         }
 
         Map<String, Object> adjudicationQuery = new HashMap<>();
-        adjudicationQuery.put("adjudication_data_id", adjudicationDataId);
+        adjudicationQuery.put(EmailKeywords.ADJUDICATION_DATA_ID, adjudicationDataId);
         adjudicationQuery.put("remark", documentRequired);
-        adjudicationQuery.put("document_url", gcpFileName);
+        adjudicationQuery.put(EmailKeywords.DOCUMENT_URL, gcpFileName);
         adjudicationQuery.put(EmailKeywords.IS_ACTIVE, 1);
         adjudicationQuery.put("responded_at", null);
         adjudicationQuery.put("resolved_at", null);
-        adjudicationQuery.put("status", "PENDING");
+        adjudicationQuery.put(EmailKeywords.STATUS, "PENDING");
 
         ApiResponse<Object> adjudicationQueryData = this.loansService.adjudicationQueryStore(adjudicationQuery);
         Map<String, Object> adjudicationQueryDataResponseData = (Map<String, Object>) adjudicationQueryData.getData();
         String adjudicationQueryId = String.valueOf(adjudicationQueryDataResponseData.get("data"));
-        if (adjudicationQueryData.getStatus() == false) {
+        if (adjudicationQueryData.getStatus()) {
             logger.error("adjudicationQuery Data insertion failed");
         } else {
             logger.info("adjudicationQuery Data Successfully updated at {}", adjudicationQueryId);
