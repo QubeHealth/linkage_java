@@ -1,5 +1,6 @@
 package com.linkage.client;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.linkage.LinkageConfiguration;
@@ -14,6 +15,8 @@ public class UserService extends BaseServiceClient {
     public ApiResponse<Object> getQbUserId(String partneredUserId) {
 
         String url = configuration.getUserJavaUrl() + "/emailerUser/getQbUserId";
-        return this.networkCallInternalService(url, "post", partneredUserId, null);
+        Map<String, String> body = new HashMap<>();
+        body.put("partnered_user_id", partneredUserId);
+        return this.networkCallInternalService(url, "post", body, null);
     }
 }
