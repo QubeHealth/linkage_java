@@ -44,7 +44,7 @@ public abstract class EmailFetcher extends BaseServiceClient {
         this.password = password;
     }
 
-    public void connect() throws MessagingException {
+    protected void connect() throws MessagingException {
         Properties properties = new Properties();
         properties.put("mail.store.protocol", "imaps");
         properties.put("mail.imap.host", host);
@@ -107,7 +107,7 @@ public abstract class EmailFetcher extends BaseServiceClient {
     public Map<String,String> fetchAttachments(Message message, String userId) throws Exception {
         Object content = message.getContent();
         String gcpUrl = null;
-        String gcpFileName = null;  //testing/25d55ad283aa400af464c76d713c07ad/estimation/98bf951e-48ac-48c5-ba47-1402ee21c080.pdf
+        String gcpFileName = null;
         Map<String,String> gcpResponse = new HashMap<>();
 
         if (content instanceof MimeMultipart) {
@@ -120,7 +120,7 @@ public abstract class EmailFetcher extends BaseServiceClient {
                     String contentType = "APPLICATION/PDF";
                     InputStream fileContent = bodyPart.getInputStream();
 
-                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments("qube-user-data-encrypted", gcpFileName, fileContent.readAllBytes(), contentType, true);
+                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments(GcpFileUpload.USER_DATA_BUCKET, gcpFileName, fileContent.readAllBytes(), contentType, true);
                         gcpUrl = gcpRes.getData();
                 }
             }

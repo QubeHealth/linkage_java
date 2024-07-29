@@ -223,22 +223,16 @@ public class MailReaderService extends EmailFetcher {
                 }
             }
 
-            
-            if (body != null) {
-                JSONObject regexBody = templateJson.getJSONObject("body");
-                for (String key : regexBody.keySet()) {
-                    String regex = regexBody.getString(key);
-                    Pattern pattern = Pattern.compile(regex);
-                    Matcher matcher = pattern.matcher(body);
+            JSONObject regexBody = templateJson.getJSONObject("body");
+            for (String key : regexBody.keySet()) {
+                String regex = regexBody.getString(key);
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(body);
 
-                    // Attempt to find and extract data
-                    if (matcher.find()) {
-                        String extractedValue = matcher.group(1); // Assuming single group capture
-                        extractedData.put(key, extractedValue);
-                    } 
-                    // else {
-                    //     extractedData.put(key, ""); // Handle case where regex does not match
-                    // }
+                // Attempt to find and extract data
+                if (matcher.find()) {
+                    String extractedValue = matcher.group(1); // Assuming single group capture
+                    extractedData.put(key, extractedValue);
                 }
             }
 
