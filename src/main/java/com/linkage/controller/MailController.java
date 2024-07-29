@@ -121,8 +121,6 @@ public class MailController extends BaseController {
      * first mail
      * sender - tpa desk
      * receiver - qube
-     * 
-     * @param response
      */
     private void handlePreAuth(Map<String, String> response) {
 
@@ -248,8 +246,6 @@ public class MailController extends BaseController {
      * Reply to the query raised by Adjudicator
      * sender - Tpa desk
      * receiver - qube
-     * 
-     * @param response
      */
     // Query reply flow db calls
     private void handleQueryReply(Map<String, String> response) {
@@ -345,8 +341,6 @@ public class MailController extends BaseController {
      * Pre Auth Amount Approved by the Adjudicaotr
      * sender - Adjudicator
      * receiver - qube
-     * 
-     * @param response
      */
     // Initial Cashless Credit Request flow db calls
     private void handleInitialCashlessCreditRequest(Map<String, String> response) {
@@ -452,8 +446,6 @@ public class MailController extends BaseController {
      * Final Document and bills approved by Adjudicator 
      * sender - Adjudicator
      * receiver - qube
-     * 
-     * @param response
      */
     // Final Cashless Credit Request flow db calls
     private void handleFinalCashlessCreditRequest(Map<String, String> response) {
@@ -560,8 +552,6 @@ public class MailController extends BaseController {
      * Final Document and bills sended by Tpa Desk 
      * sender - Tpa Desk
      * receiver - qube
-     * 
-     * @param response
      */
     // Final Bill And Discharge Summary flow db calls
     private void handleFinalBillAndDischargeSummary(Map<String, String> response) {
@@ -657,8 +647,6 @@ public class MailController extends BaseController {
      * To raised the Document query by Adjudicator
      * sender - Adjudicator
      * receiver - qube
-     * 
-     * @param response
      */
     // Additional Information flow db calls
     private void handleAdditionalInformation(Map<String, String> response) {
