@@ -14,6 +14,7 @@ import com.linkage.client.LoansService;
 import com.linkage.client.MailReaderService;
 import com.linkage.client.MailWriterService;
 import com.linkage.client.MasterService;
+import com.linkage.client.UserService;
 import com.linkage.core.constants.Constants.EmailKeywords;
 import com.linkage.core.constants.Constants.NotificationKeywords;
 import com.linkage.utility.Helper;
@@ -40,6 +41,7 @@ public class MailController extends BaseController {
     private MasterService masterService;
     private LoansService loansService;
     private MailWriterService mailWriterService;
+    private UserService userService;
 
     public MailController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
@@ -47,6 +49,7 @@ public class MailController extends BaseController {
         this.masterService = new MasterService(configuration);
         this.loansService = new LoansService(configuration);
         this.mailWriterService = new MailWriterService(configuration);
+        this.userService = new UserService(configuration);
     }
 
     @POST
@@ -54,16 +57,14 @@ public class MailController extends BaseController {
     @Consumes(MediaType.APPLICATION_JSON)
     public String markEmailUnread(@Context HttpServletRequest request, String subject) throws MessagingException {
 
-        String response = this.mailWriterService.markEmailUnread(subject);
-
-        return response;
+        return this.mailWriterService.markEmailUnread(subject);
     }
 
     @POST
     @Path("/emailReader")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response emailReader(@Context HttpServletRequest request) throws MessagingException, IOException {
+    public Response emailReader(@Context HttpServletRequest request) throws MessagingException {
         try {
             // Fetch and process the email
             List<Message> msgList = this.mailReaderService.fetchLatestEmail();
@@ -76,7 +77,7 @@ public class MailController extends BaseController {
                         // Log the error or handle as needed
                         throw new Exception("Error processing email");
                     } else {
-                        System.out.println("Email fetch And Process Successfully");
+                        logger.info("Email fetch And Process Successfully");
                     }
                     Map<String, String> responseData = (Map<String, String>) apiResponse.getData();
 
@@ -89,8 +90,6 @@ public class MailController extends BaseController {
                     emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(responseData));
                     emailType.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY,
                             () -> handleFinalBillAndDischargeSummary(responseData));
-                    // emailType.put(EmailKeywords.CASHLESS_CREDIT_REQUEST,
-                    //         () -> handleCashlessCreditRequest(responseData));
                     emailType.put("final cashless credit request",
                             () -> handleFinalCashlessCreditRequest(responseData));
                     emailType.put("initial cashless credit request",
@@ -127,8 +126,6 @@ public class MailController extends BaseController {
      * first mail
      * sender - tpa desk
      * receiver - qube
-     * 
-     * @param response
      */
     private void handlePreAuth(Map<String, String> response) {
 
@@ -142,8 +139,12 @@ public class MailController extends BaseController {
 
         
 
+        ApiResponse<Object> qbUserIdRequest = this.userService.getQbUserId(partneredUserId);
+        Map<String, Object> qbUserIdData = (Map<String, Object>) qbUserIdRequest.getData();
+        String userId = String.valueOf(qbUserIdData.get("data"));
+
         Map<String, Object> preFundedReqMap = new HashMap<>();
-        preFundedReqMap.put(EmailKeywords.USER_ID, "123");
+        preFundedReqMap.put(EmailKeywords.USER_ID, userId);
         preFundedReqMap.put("hsp_id", "123");
         preFundedReqMap.put("partnered_user_id", partneredUserId);
         preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, khId);
@@ -265,8 +266,6 @@ public class MailController extends BaseController {
      * Reply to the query raised by Adjudicator
      * sender - Tpa desk
      * receiver - qube
-     * 
-     * @param response
      */
     // Query reply flow db calls
     private void handleQueryReply(Map<String, String> response) {
@@ -390,8 +389,6 @@ public class MailController extends BaseController {
      * Pre Auth Amount Approved by the Adjudicaotr
      * sender - Adjudicator
      * receiver - qube
-     * 
-     * @param response
      */
     // Initial Cashless Credit Request flow db calls
     private void handleInitialCashlessCreditRequest(Map<String, String> response) {
@@ -497,8 +494,6 @@ public class MailController extends BaseController {
      * Final Document and bills approved by Adjudicator 
      * sender - Adjudicator
      * receiver - qube
-     * 
-     * @param response
      */
     // Final Cashless Credit Request flow db calls
     private void handleFinalCashlessCreditRequest(Map<String, String> response) {
@@ -618,8 +613,6 @@ public class MailController extends BaseController {
      * Final Document and bills sended by Tpa Desk 
      * sender - Tpa Desk
      * receiver - qube
-     * 
-     * @param response
      */
     // Final Bill And Discharge Summary flow db calls
     private void handleFinalBillAndDischargeSummary(Map<String, String> response) {
@@ -726,8 +719,6 @@ public class MailController extends BaseController {
      * To raised the Document query by Adjudicator
      * sender - Adjudicator
      * receiver - qube
-     * 
-     * @param response
      */
     // Additional Information flow db calls
     private void handleAdditionalInformation(Map<String, String> response) {

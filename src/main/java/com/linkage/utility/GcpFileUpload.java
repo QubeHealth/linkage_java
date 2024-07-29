@@ -105,8 +105,8 @@ public final class GcpFileUpload {
 
             return new ApiResponse<>(true, "File Uploaded Successfully", signedUrl);
         } catch (Exception e) {
-            throw e;
-            // return new ApiResponse<>(false, "File Upload Failed", e.getMessage());
+            // throw e;
+            return new ApiResponse<>(false, "File Upload Failed", e.getMessage());
         }
     }
 }

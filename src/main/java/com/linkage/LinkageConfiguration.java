@@ -1,11 +1,7 @@
 package com.linkage;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.dropwizard.core.Configuration;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 
 public class LinkageConfiguration extends Configuration {
     
@@ -24,11 +20,6 @@ public class LinkageConfiguration extends Configuration {
     private String befiscAuthKey;
 
     private String loansUrl;
-
-    @Valid
-    @NotNull
-    @JsonProperty("rabbitmq")
-    private RabbitMqConfig rabbitMqConfig = new RabbitMqConfig();
 
     @NotEmpty
     private String masterUrl;
@@ -176,5 +167,12 @@ public class LinkageConfiguration extends Configuration {
         public void setEnv(String env) {
             this.env = env;
         }
+    }
+
+    public String getUserJavaUrl(){
+        return userJavaUrl;
+    }
+    public void SetUserJavaUrl(String userJavaUrl) {
+        this.userJavaUrl = userJavaUrl;
     }
 }
