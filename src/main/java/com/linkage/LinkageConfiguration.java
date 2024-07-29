@@ -4,27 +4,34 @@ import io.dropwizard.core.Configuration;
 import jakarta.validation.constraints.NotEmpty;
 
 public class LinkageConfiguration extends Configuration {
-    
+    @NotEmpty
     private String jwtTokenSignature;
-    
+    @NotEmpty
     private String authorizationKey;
-    
+    @NotEmpty
     private String xApiKey;
-    
+    @NotEmpty
     private String firebaseWebApiKey;
-    
+    @NotEmpty
     private String watiUrl;
-    
+    @NotEmpty
     private String watiToken;
-    
+    @NotEmpty
     private String befiscAuthKey;
-
+    @NotEmpty
     private String loansUrl;
-
     @NotEmpty
     private String masterUrl;
-
+    @NotEmpty
     private String userJavaUrl;
+    @NotEmpty
+    private String mailHost;
+    @NotEmpty
+    private String mailPort;
+    @NotEmpty
+    private String mailId;
+    @NotEmpty
+    private String passkey;
 
     public String getxApiKey() {
         return xApiKey;
@@ -96,5 +103,33 @@ public class LinkageConfiguration extends Configuration {
     }
     public void SetUserJavaUrl(String userJavaUrl) {
         this.userJavaUrl = userJavaUrl;
+    }
+    
+    public String getMailHost(){
+        return mailHost;
+    }
+    public void setMailHost(String mailHost){
+        this.mailHost = mailHost;
+    }
+
+    public String getMailPort() {
+        return mailPort;
+    }
+    public void setMailPort(String mailPort) {
+        this.mailPort = mailPort;
+    }
+
+    public String getMailId() {
+        return mailId;
+    }
+    public void setMailId(String mailId) {
+        this.mailId = mailId;
+    }
+
+    public String getPasskey() {
+        return passkey;
+    }
+    public void setPasskey(String passkey) {
+        this.passkey = passkey;
     }
 }

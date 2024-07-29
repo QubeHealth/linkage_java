@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.mail.BodyPart;
@@ -58,9 +60,9 @@ public abstract class EmailFetcher extends BaseServiceClient {
         inbox.open(Folder.READ_WRITE);
     }
 
-    public List<Message> fetchLatestEmail() throws MessagingException {
+    public Set<Message> getUnreadEmail() throws MessagingException {
         connect();
-        List<Message> unreadMessages = new ArrayList<>();
+        Set<Message> unreadMessages = new HashSet<>();
 
         Folder inbox = store.getFolder("INBOX");
         inbox.open(Folder.READ_WRITE);
@@ -71,22 +73,10 @@ public abstract class EmailFetcher extends BaseServiceClient {
 
         // Iterate over messages and store them in the list in the order they are fetched
         for (Message message : messages) {
-            if (!isMessageInList(unreadMessages, message)) {
                 unreadMessages.add(message);
                 message.setFlag(Flags.Flag.SEEN, true); // Mark message as read
-            }
         }
         return unreadMessages;
-    }
-
-    private boolean isMessageInList(List<Message> messageList, Message message) throws MessagingException {
-        for (Message msg : messageList) {
-            // Compare messages based on unique identifiers like Message-ID
-            if (msg.getSubject().equals(message.getSubject()) && msg.getSentDate().equals(message.getSentDate())) {
-                return true; // Message is already in the list
-            }
-        }
-        return false; // Message is not in the list
     }
 
     public String fetchSubject(Message message) throws MessagingException {
@@ -120,8 +110,12 @@ public abstract class EmailFetcher extends BaseServiceClient {
                     String contentType = "APPLICATION/PDF";
                     InputStream fileContent = bodyPart.getInputStream();
 
-                  ApiResponse<String> gcpRes =   GcpFileUpload.uploadEmailAttachments(GcpFileUpload.USER_DATA_BUCKET, gcpFileName, fileContent.readAllBytes(), contentType, true);
-                        gcpUrl = gcpRes.getData();
+                    ApiResponse<String> gcpUploadResponse =   GcpFileUpload.uploadEmailAttachments(GcpFileUpload.USER_DATA_BUCKET, gcpFileName, fileContent.readAllBytes(), contentType, true);
+                    if (!gcpUploadResponse.getStatus()){
+                        throw new Exception("Attachments failed to upload");
+                    }
+                    logger.info("Attachments uploaded successfully");
+                    gcpUrl = gcpUploadResponse.getData();
                 }
             }
         }
