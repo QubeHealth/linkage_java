@@ -21,7 +21,7 @@ public final class Constants {
 
         public static final String USER_ID = "user_id";
         public static final String TYPE = "type";
-        public static final String EMAIL_TYPE = "type";
+        public static final String EMAIL_TYPE = "email_type";
         public static final String PATIENT_NAME = "patient_name";
         public static final String CLAIM_NO = "claim_no";
         public static final String SUBJECT = "subject";
@@ -32,7 +32,7 @@ public final class Constants {
         public static final String FINAL_CASHLESS_APPROVED_AMT = "final_cashless_approved_amount";
         public static final String FINAL_CASHLESS_REQUEST_AMT = "final_cashless_request_amount";
         public static final String DOCUMENT_REQUIRED = "document_required";
-        public static final String PARTNERED_USER_ID = "partnered_user_id";
+        public static final String PARTNERED_EMP_ID = "partnered_emp_id";
         public static final String INITIAL_CASHLESS_APPROVED_AMT = "requested_amount_initial";
         public static final String INITIAL_CASHLESS_REQUEST_AMT = "approved_amount_initial";
         public static final String GCP_PATH = "gcp_path";

@@ -83,7 +83,7 @@ public class MailReaderService extends EmailFetcher {
                 logger.info("Handler execution successful for keyword: {}", keyword);
             }
 
-            String userId = responseMap.get("claim_no") != null ? responseMap.get("claim_no") : responseMap.get("partnered_user_id");
+            String userId = responseMap.get("claim_no") != null ? responseMap.get("claim_no") : responseMap.get("partnered_emp_id");
             responseMap.put("user_id", userId);
 
             // Fetch and upload attachments if user_id is present

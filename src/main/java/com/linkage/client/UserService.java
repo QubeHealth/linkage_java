@@ -12,11 +12,11 @@ public class UserService extends BaseServiceClient {
         super(configuration);
     }
     
-    public ApiResponse<Object> getQbUserId(String partneredUserId) {
+    public ApiResponse<Object> getQbUserId(String partneredEmpId) {
 
         String url = configuration.getUserJavaUrl() + "/emailerUser/getQbUserId";
         Map<String, String> body = new HashMap<>();
-        body.put("partnered_user_id", partneredUserId);
+        body.put("partnered_emp_id", partneredEmpId);
         return this.networkCallInternalService(url, "post", body, null);
     }
 }

@@ -70,7 +70,7 @@ public class MailController extends BaseController {
                 try {
                     Response processedMail = this.mailReaderService.fetchAndProcessEmail(message);
                     ApiResponse<Object> apiResponse = (ApiResponse<Object>) processedMail.getEntity();
-                    if (apiResponse.getStatus()) {
+                    if (!apiResponse.getStatus()) {
                         // Log the error or handle as needed
                         throw new Exception("Error processing email");
                     } else {
@@ -120,21 +120,21 @@ public class MailController extends BaseController {
     // Pre-Auth flow db calls
     private void handlePreAuth(Map<String, String> response) {
 
-        String partneredUserId = response.get(EmailKeywords.PARTNERED_USER_ID);
+        String partneredEmpId = response.get("partnered_emp_id");
         String khId = response.get(EmailKeywords.TPA_DESK_ID);
         String subject = response.get(EmailKeywords.SUBJECT);
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
 
-        ApiResponse<Object> qbUserIdRequest = this.userService.getQbUserId(partneredUserId);
+        ApiResponse<Object> qbUserIdRequest = this.userService.getQbUserId(partneredEmpId);
         Map<String, Object> qbUserIdData = (Map<String, Object>) qbUserIdRequest.getData();
         String userId = String.valueOf(qbUserIdData.get("data"));
 
         Map<String, Object> preFundedReqMap = new HashMap<>();
         preFundedReqMap.put(EmailKeywords.USER_ID, userId);
         preFundedReqMap.put("hsp_id", "123");
-        preFundedReqMap.put("partnered_user_id", partneredUserId);
+        preFundedReqMap.put("partnered_emp_id", partneredEmpId);
         preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, khId);
         preFundedReqMap.put(EmailKeywords.STATUS, EmailKeywords.PENDING);
         preFundedReqMap.put(EmailKeywords.TYPE, EmailKeywords.TPA);
@@ -155,7 +155,7 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
         //preFundedEmailerMap.put("partnered_claim_no", "22");
         preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, preFundedRequestId);
-        preFundedEmailerMap.put(EmailKeywords.POLICY_NO, partneredUserId);
+        preFundedEmailerMap.put(EmailKeywords.POLICY_NO, partneredEmpId);
 
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
         if (!prefundedEmailRequest.getStatus()) {
@@ -177,7 +177,8 @@ public class MailController extends BaseController {
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
         emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
-        emailerItems.put(EmailKeywords.POLICY_NO, partneredUserId);
+        emailerItems.put(EmailKeywords.POLICY_NO, partneredEmpId);
+        emailerItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         if (!emailItemsRequest.getStatus()) {
@@ -194,7 +195,7 @@ public class MailController extends BaseController {
         adjudicationDataMap.put(EmailKeywords.PF_REQUEST_ID, preFundedRequestId);
         adjudicationDataMap.put(EmailKeywords.FILE_PATH, gcpPath);
         adjudicationDataMap.put(EmailKeywords.FILE_NAME, gcpFileName);
-        adjudicationDataMap.put(EmailKeywords.USER_ID, partneredUserId);
+        adjudicationDataMap.put(EmailKeywords.USER_ID, partneredEmpId);
         adjudicationDataMap.put(EmailKeywords.HSP_ID, 123);
         adjudicationDataMap.put(EmailKeywords.STATUS, EmailKeywords.PENDING);
         adjudicationDataMap.put(EmailKeywords.CREATED_BY, "TPA DESK");
@@ -254,7 +255,7 @@ public class MailController extends BaseController {
         
 
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put(EmailKeywords.TYPE, "QUERY_REPLY");
+        preFundedEmailerMap.put(EmailKeywords.EMAIL_TYPE, "QUERY_REPLY");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
         preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, prefundedRequestId);
@@ -280,6 +281,7 @@ public class MailController extends BaseController {
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
+        emailerItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         if (!emailItemsRequest.getStatus()) {
@@ -308,7 +310,7 @@ public class MailController extends BaseController {
         adjudicationItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> adjudicationItemsData = this.loansService.adjudicationItemsStore(adjudicationItems);
-        if (adjudicationItemsData.getStatus()) {
+        if (!adjudicationItemsData.getStatus()) {
             logger.error("adjudicationItems Data insertion failed");
         } else {
             logger.info("adjudicationItems Data Successfully updated");
@@ -353,7 +355,7 @@ public class MailController extends BaseController {
         
 
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put(EmailKeywords.TYPE, "INITIAL_CASHLESS_CREDIT_REQUEST");
+        preFundedEmailerMap.put(EmailKeywords.EMAIL_TYPE, "INITIAL_CASHLESS_CREDIT_REQUEST");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
         //preFundedEmailerMap.put("partnered_claim_no", "22");
@@ -383,6 +385,7 @@ public class MailController extends BaseController {
         emailerItems.put("initial_amt_approved", initialApprovedAmount);
         emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.POLICY_NO, employeeCode);
+        emailerItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         if (!emailItemsRequest.getStatus()) {
@@ -466,7 +469,7 @@ public class MailController extends BaseController {
         
 
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put(EmailKeywords.TYPE, "FINAL_CASHLESS_CREDIT_REQUEST");
+        preFundedEmailerMap.put(EmailKeywords.EMAIL_TYPE, "FINAL_CASHLESS_CREDIT_REQUEST");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
         //preFundedEmailerMap.put("partnered_claim_no", "22");
@@ -497,6 +500,7 @@ public class MailController extends BaseController {
         emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
         emailerItems.put(EmailKeywords.POLICY_NO, employeeCode);
+        emailerItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         if (!emailItemsRequest.getStatus()) {
@@ -576,7 +580,7 @@ public class MailController extends BaseController {
         
 
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put(EmailKeywords.TYPE, "FINAL_BILL_AND_DISCAHRGE_SUMMARY");
+        preFundedEmailerMap.put(EmailKeywords.EMAIL_TYPE, "FINAL_BILL_AND_DISCAHRGE SUMMARY");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
         //preFundedEmailerMap.put("partnered_claim_no", "22");
@@ -602,6 +606,7 @@ public class MailController extends BaseController {
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
+        emailerItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         if (!emailItemsRequest.getStatus()) {
@@ -686,7 +691,7 @@ public class MailController extends BaseController {
         
 
         Map<String, Object> preFundedEmailerMap = new HashMap<>();
-        preFundedEmailerMap.put(EmailKeywords.TYPE, "QUERY_RAISED");
+        preFundedEmailerMap.put(EmailKeywords.EMAIL_TYPE, "QUERY_RAISED");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
         //preFundedEmailerMap.put("partnered_claim_no", claimNo);
@@ -713,6 +718,7 @@ public class MailController extends BaseController {
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
+        emailerItems.put(EmailKeywords.IS_ACTIVE, 1);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
         if (!emailItemsRequest.getStatus()) {

@@ -39,10 +39,10 @@ public class LoansService extends BaseServiceClient{
         return resp;
     }
 
-    public ApiResponse<Object> updateClaimNo(String partneredUserId, String claimNo) {
+    public ApiResponse<Object> updateClaimNo(String partneredEmpId, String claimNo) {
         String url = configuration.getLoansUrl() + "/transactions/updateClaimNo";
         Map<String, Object> body= new HashMap<>();
-        body.put("partnered_user_id",partneredUserId);
+        body.put("partnered_emp_id", partneredEmpId);
         body.put("claim_no", claimNo);
         ApiResponse<Object> resp = this.networkCallInternalService(url, "post", body, null);
         return resp;
