@@ -17,6 +17,7 @@ import com.linkage.client.MailWriterService;
 import com.linkage.client.MasterService;
 import com.linkage.client.UserService;
 import com.linkage.core.constants.Constants.EmailKeywords;
+import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Validator;
@@ -165,10 +166,15 @@ public class MailController extends BaseController {
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
         
+        Map<String, String> metadataMap = new HashMap<>();
+        metadataMap.put("subject", subject);
+        metadataMap.put("body", null);
+        
+        String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
-        emailerItems.put(EmailKeywords.METADATA, subject);
+        emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
         emailerItems.put(EmailKeywords.POLICY_NO, partneredUserId);
 
@@ -261,11 +267,16 @@ public class MailController extends BaseController {
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
         
+        Map<String, String> metadataMap = new HashMap<>();
+        metadataMap.put("subject", subject);
+        metadataMap.put("body", null);
+        
+        String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
-        emailerItems.put(EmailKeywords.METADATA, subject);
+        emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
@@ -356,13 +367,18 @@ public class MailController extends BaseController {
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
         
+        Map<String, String> metadataMap = new HashMap<>();
+        metadataMap.put("subject", subject);
+        metadataMap.put("body", body);
+        
+        String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("initial_amt_req", initialRequestAmount);
         emailerItems.put("initial_amt_approved", initialApprovedAmount);
-        emailerItems.put(EmailKeywords.METADATA, subject + body);
+        emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.POLICY_NO, employeeCode);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
@@ -463,13 +479,18 @@ public class MailController extends BaseController {
         }
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
+
+        Map<String, String> metadataMap = new HashMap<>();
+        metadataMap.put("subject", subject);
+        metadataMap.put("body", body);
         
+        String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("final_adj_amt_req", finalRequestAmount);
         emailerItems.put("final_adj_amt_approved", finalApprovedAmount);
-        emailerItems.put(EmailKeywords.METADATA, subject + body);
+        emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
         emailerItems.put(EmailKeywords.POLICY_NO, employeeCode);
 
@@ -564,12 +585,17 @@ public class MailController extends BaseController {
             logger.info("prefundedEmailer Data Successfully updated");
         }Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
-        
+
+        Map<String, String> metadataMap = new HashMap<>();
+        metadataMap.put("subject", subject);
+        metadataMap.put("body", body);
+
+        String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
-        emailerItems.put(EmailKeywords.METADATA, subject + body);
+        emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
@@ -669,12 +695,17 @@ public class MailController extends BaseController {
         }
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
         String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
-        
+  
+        Map<String, String> metadataMap = new HashMap<>();
+        metadataMap.put("subject", subject);
+        metadataMap.put("body", body);
+
+        String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
-        emailerItems.put(EmailKeywords.METADATA, body);
+        emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
 
         ApiResponse<Object> emailItemsRequest = this.masterService.emailInsert(emailerItems);
