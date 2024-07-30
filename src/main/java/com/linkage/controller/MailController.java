@@ -173,6 +173,7 @@ public class MailController extends BaseController {
         String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put(EmailKeywords.PF_EMAILER_ID, prefundedEmailId);
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
         emailerItems.put(EmailKeywords.METADATA, metadata);
         emailerItems.put(EmailKeywords.PATIENT_NAME, patientName);
@@ -274,6 +275,7 @@ public class MailController extends BaseController {
         String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put(EmailKeywords.PF_EMAILER_ID, prefundedEmailId);
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put(EmailKeywords.METADATA, metadata);
@@ -374,6 +376,7 @@ public class MailController extends BaseController {
         String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put(EmailKeywords.PF_EMAILER_ID, prefundedEmailId);
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("initial_amt_req", initialRequestAmount);
@@ -487,6 +490,7 @@ public class MailController extends BaseController {
         String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put(EmailKeywords.PF_EMAILER_ID, prefundedEmailId);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put("final_adj_amt_req", finalRequestAmount);
         emailerItems.put("final_adj_amt_approved", finalApprovedAmount);
@@ -593,6 +597,7 @@ public class MailController extends BaseController {
         String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put(EmailKeywords.PF_EMAILER_ID, prefundedEmailId);
         emailerItems.put(EmailKeywords.TPA_DESK_ID, khId);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put(EmailKeywords.METADATA, metadata);
@@ -703,6 +708,7 @@ public class MailController extends BaseController {
         String metadata = Helper.toJsonString(metadataMap);
 
         Map<String, Object> emailerItems = new HashMap<>();
+        emailerItems.put(EmailKeywords.PF_EMAILER_ID, prefundedEmailId);
         emailerItems.put(EmailKeywords.TPA_DESK_ID, null);
         emailerItems.put(EmailKeywords.CLAIM_NO, claimNo);
         emailerItems.put(EmailKeywords.METADATA, metadata);
