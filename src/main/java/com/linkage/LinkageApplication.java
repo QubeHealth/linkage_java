@@ -6,6 +6,7 @@ import com.linkage.controller.MailController;
 import com.linkage.controller.WatiController;
 import com.linkage.controller.WebhookController;
 import com.linkage.utility.AuthFilter;
+import com.linkage.utility.sqs.QueueConnection;
 
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Environment;
@@ -39,10 +40,13 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         FirebaseController firebaseController = new FirebaseController(configuration, validator);
         WatiController watiController = new WatiController(configuration, validator);
         MailController mailController = new MailController(configuration, validator);
+        QueueConnection queueConnection = new QueueConnection(configuration);
+
         environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
         environment.jersey().register(watiController);
         environment.jersey().register(mailController);
+        environment.jersey().register(queueConnection);
     }
 }

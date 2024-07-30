@@ -1,6 +1,5 @@
 package com.linkage.utility.sqs;
 
-
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.linkage.LinkageConfiguration;

@@ -1,12 +1,11 @@
 package com.linkage.utility.sqs;
 
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.MessageProperties;
 import com.linkage.LinkageConfiguration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.MessageProperties;
 
 public class Producer {
 

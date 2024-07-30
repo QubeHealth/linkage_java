@@ -87,15 +87,15 @@ public class MailController extends BaseController {
                     // Map to store handlers for different types
                     Map<String, Runnable> emailType = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
                     emailType.put(EmailKeywords.PRE_AUTH, () -> handlePreAuth(responseData));
-                    emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(responseData));
+                    emailType.put(EmailKeywords.QUERY_REPLY, () -> handleQueryReply(responseData, type));
                     emailType.put(EmailKeywords.FINAL_BILL_AND_DISCHARGE_SUMMARY,
-                            () -> handleFinalBillAndDischargeSummary(responseData));
+                            () -> handleFinalBillAndDischargeSummary(responseData, type));
                     emailType.put("final cashless credit request",
-                            () -> handleFinalCashlessCreditRequest(responseData));
+                            () -> handleFinalCashlessCreditRequest(responseData, type));
                     emailType.put("initial cashless credit request",
-                            () -> handleInitialCashlessCreditRequest(responseData));
+                            () -> handleInitialCashlessCreditRequest(responseData, type));
                     emailType.put(EmailKeywords.ADDITIONAL_INFORMATION,
-                            () -> handleAdditionalInformation(responseData));
+                            () -> handleAdditionalInformation(responseData, type));
 
                     // Execute handler based on the type
                     Runnable handler = emailType.get(type);
@@ -127,7 +127,8 @@ public class MailController extends BaseController {
      * sender - tpa desk
      * receiver - qube
      */
-    private void handlePreAuth(Map<String, String> response) {
+     
+    private String handlePreAuth(Map<String, String> response) {
 
         String partneredUserId = response.get(EmailKeywords.POLICY_NO);
         String khId = response.get(EmailKeywords.TPA_DESK_ID);
@@ -252,13 +253,14 @@ public class MailController extends BaseController {
         Map<String, Object> sendNotification = new HashMap<>();
         sendNotification.put("policy_no", partneredUserId);
         sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.PRE_AUTH_MESSAGE);
-        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        sendNotification.put(NotificationKeywords.USER_ID, userId);
         try {
             Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return userId;
 
     }
 
@@ -268,7 +270,7 @@ public class MailController extends BaseController {
      * receiver - qube
      */
     // Query reply flow db calls
-    private void handleQueryReply(Map<String, String> response) {
+    private void handleQueryReply(Map<String, String> response, String userId) {
 
         String claimNo = response.get(EmailKeywords.CLAIM_NO);
         String khId = response.get(EmailKeywords.TPA_DESK_ID);
@@ -354,7 +356,7 @@ public class MailController extends BaseController {
         Map<String, Object> sendNotification = new HashMap<>();
         sendNotification.put("claim_no", claimNo);
         sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.REPLY_QUERY_ADJ);
-        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        sendNotification.put(NotificationKeywords.USER_ID, userId);
         try {
             Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
         } catch (IOException e) {
@@ -391,7 +393,7 @@ public class MailController extends BaseController {
      * receiver - qube
      */
     // Initial Cashless Credit Request flow db calls
-    private void handleInitialCashlessCreditRequest(Map<String, String> response) {
+    private void handleInitialCashlessCreditRequest(Map<String, String> response, String userId) {
         String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
         String claimNo = response.get(EmailKeywords.CLAIM_NO);
         String initialApprovedAmount = response.get("initial_cashless_approved_amount");
@@ -488,6 +490,20 @@ public class MailController extends BaseController {
             logger.info("Response data update Initial Amounts Prefunded Data");
         }
 
+        Map<String, Object> sendNotification = new HashMap<>();
+        sendNotification.put("claim_no", claimNo);
+        sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.PRE_AUTH_AMOUNT_APPROVED);
+        sendNotification.put("requested_amount", initialRequestAmount);
+        sendNotification.put("approved_amount", initialApprovedAmount);
+        sendNotification.put(NotificationKeywords.USER_ID, userId);
+        try {
+            Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
     }
 
     /**
@@ -496,7 +512,7 @@ public class MailController extends BaseController {
      * receiver - qube
      */
     // Final Cashless Credit Request flow db calls
-    private void handleFinalCashlessCreditRequest(Map<String, String> response) {
+    private void handleFinalCashlessCreditRequest(Map<String, String> response, String userId) {
         String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
         String claimNo = response.get(EmailKeywords.CLAIM_NO);
         String finalApprovedAmount = response.get(EmailKeywords.FINAL_CASHLESS_APPROVED_AMT);
@@ -590,11 +606,17 @@ public class MailController extends BaseController {
         ApiResponse<Object> updateFinalAmountsPrefundedData = this.loansService.updateFinalAmountsPrefunded(claimNo,
                 finalRequestAmount, finalApprovedAmount);
 
+        if (updateFinalAmountsPrefundedData.getStatus() == false) {
+            logger.error("Final amount update failed");
+        } else {
+            logger.info("Final amount Successfully updated");
+        }
+        
         Map<String, Object> sendNotification = new HashMap<>();
         sendNotification.put("claim_no", claimNo);
         sendNotification.put("approved_amount", finalApprovedAmount);
         sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.FINAL_AMOUNT_APPROVED);
-        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        sendNotification.put(NotificationKeywords.USER_ID, userId);
         try {
             Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
         } catch (IOException e) {
@@ -602,11 +624,7 @@ public class MailController extends BaseController {
             e.printStackTrace();
         }
         
-                        if (updateFinalAmountsPrefundedData.getStatus() == false) {
-                    logger.error("Final amount update failed");
-                } else {
-                    logger.info("Final amount Successfully updated");
-                }
+                
     }
 
     /**
@@ -615,7 +633,7 @@ public class MailController extends BaseController {
      * receiver - qube
      */
     // Final Bill And Discharge Summary flow db calls
-    private void handleFinalBillAndDischargeSummary(Map<String, String> response) {
+    private void handleFinalBillAndDischargeSummary(Map<String, String> response, String userId) {
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
         String claimNo = response.get(EmailKeywords.CLAIM_NO);
         String khId = response.get(EmailKeywords.TPA_DESK_ID);
@@ -698,21 +716,23 @@ public class MailController extends BaseController {
         ApiResponse<Object> updateStatusAdjudicationData = this.loansService.updateStatusAdjudicationData(claimNo,
                 status);
 
+        if (updateStatusAdjudicationData.getStatus() == false) {
+            logger.error("Status not updated as PENDING");
+        } else {
+            logger.info("Status updated as PENDING");
+        }
+
         Map<String, Object> sendNotification = new HashMap<>();
         sendNotification.put("claim_no", claimNo);
         sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.FINAL_DOCUMENT_SENT);
-        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        sendNotification.put(NotificationKeywords.USER_ID, userId);
         try {
             Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-                if (updateStatusAdjudicationData.getStatus() == false) {
-                    logger.error("Status not updated as PENDING");
-                } else {
-                    logger.info("Status updated as PENDING");
-                }
+                
     }
 
     /**
@@ -721,7 +741,7 @@ public class MailController extends BaseController {
      * receiver - qube
      */
     // Additional Information flow db calls
-    private void handleAdditionalInformation(Map<String, String> response) {
+    private void handleAdditionalInformation(Map<String, String> response, String userId) {
 
         String employeeCode = response.get(EmailKeywords.EMPLOYEE_CODE);
         String claimNo = response.get(EmailKeywords.CLAIM_NO);
@@ -807,7 +827,7 @@ public class MailController extends BaseController {
         sendNotification.put("claim_no", claimNo);
         sendNotification.put("document_required", documentRequired);
         sendNotification.put(NotificationKeywords.TYPE, NotificationKeywords.RAISE_QUERY);
-        sendNotification.put(NotificationKeywords.USER_ID, NotificationKeywords.USER_ID_VALUE);
+        sendNotification.put(NotificationKeywords.USER_ID, userId);
         try {
             Producer.addInQueue(QueueConstants.LINKAGE.exchange, ExecutionsConstants.PREFUNDED_NOTIFICATON.key,Helper.convertMapToJsonString(sendNotification));
         } catch (IOException e) {
