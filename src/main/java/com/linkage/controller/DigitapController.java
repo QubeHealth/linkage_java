@@ -1,12 +1,12 @@
 package com.linkage.controller;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.DigitapService;
-import com.linkage.core.validations.DigitapCreditSchema;
-import com.linkage.core.validations.RefereeInviteMsgSchema;
+import com.linkage.core.validations.DigitapSchema.GetCreditBureau;
 import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,8 +37,8 @@ public class DigitapController extends BaseController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public ApiResponse<Object> referreeInviteMessage(@Context HttpServletRequest request,
-            DigitapCreditSchema body) {
-        Set<ConstraintViolation<DigitapCreditSchema>> violations = validator.validate(body);
+            GetCreditBureau body) {
+        Set<ConstraintViolation<GetCreditBureau>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
             // Construct error message from violations
             String errorMessage = violations.stream()
@@ -46,13 +46,26 @@ public class DigitapController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
+
         ApiResponse<Object> digitapResponse = this.digitapService.getCreditReport(body);
 
-        System.out.println("JSON REPORT => " + Helper.toJsonString(digitapResponse.getData()));
+        if (!digitapResponse.getStatus()) {
+            return digitapResponse;
+        }
 
-        System.out.println("\n\nXML REPORT => "+Helper.jsonToXML(Helper.toJsonString(digitapResponse.getData())));
+        Map<String, Object> creditResponse = (Map<String, Object>) digitapResponse.getData();
 
-        return digitapResponse;
+        if (creditResponse.get("result_code") != null && !creditResponse.get("result_code").equals(101)) {
+            return new ApiResponse<>(false, creditResponse.get("message").toString(), creditResponse);
+        }
+
+        Map<String, Object> report = (Map<String, Object>) creditResponse.get("result");
+
+        String xmlReport = Helper.jsonToXML(Helper.toJsonString(report.get("result_json")));
+
+        creditResponse.put("result", xmlReport);
+
+        return new ApiResponse<>(true, "Bureau fetch success", creditResponse);
 
     }
 }

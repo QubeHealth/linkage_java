@@ -2,14 +2,11 @@ package com.linkage.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.core.validations.DigitapCreditSchema;
+
+import com.linkage.core.validations.DigitapSchema.GetCreditBureau;
 import com.linkage.utility.Helper;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
@@ -22,8 +19,9 @@ public class DigitapService extends BaseServiceClient {
 
     private static final String CONSENT_MESSAGE = "I hereby authorize Experian to pull my credit report for the Credit History";
     private static final String DEVICE_TYPE = "mobile";
+    private static final String DEVICE_ID = "350123451234560";
 
-    public ApiResponse<Object> getCreditReport(DigitapCreditSchema body) {
+    public ApiResponse<Object> getCreditReport(GetCreditBureau body) {
 
         String timeStamp = Helper.getCurrentDate("ddMMyyyy-HH:mm:ss");
         body.setTimestamp(timeStamp);
@@ -32,6 +30,7 @@ public class DigitapService extends BaseServiceClient {
         body.setDeviceType(DEVICE_TYPE);
         body.setConsentAcceptance("yes");
         body.setNameLookup(0);
+        body.setDeviceId(DEVICE_ID);
 
         String authString = configuration.getDigitapClientId() + ":" + configuration.getDigitapClientSecret();
 
@@ -46,21 +45,7 @@ public class DigitapService extends BaseServiceClient {
 
         final String url = configuration.getDigitapUrl() + "credit_analytics/request";
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            Map<String, Object> report = objectMapper.readValue(configuration.getCreditReport(),
-                    new TypeReference<Map<String, Object>>() {
-                    });
-
-            return new ApiResponse<>(true, "success",
-                    report);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ApiResponse<>(false, "Experian pull failed", e);
-        }
-
-        // return this.networkCallExternalService(url, "POST", body, header);
+        return this.networkCallExternalService(url, "POST", body, header);
 
     }
 
