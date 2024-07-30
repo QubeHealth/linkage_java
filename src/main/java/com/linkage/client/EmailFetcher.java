@@ -31,31 +31,23 @@ import com.linkage.utility.GcpFileUpload;
 import com.linkage.utility.Helper;
 
 public abstract class EmailFetcher extends BaseServiceClient {
-    protected String host;
-    protected String port;
-    protected String user;
-    protected String password;
     protected Store store;
     protected Folder inbox;
 
-    protected EmailFetcher(String host, String port, String user, String password, LinkageConfiguration configuration) {
+    protected EmailFetcher(LinkageConfiguration configuration) {
         super(configuration);
-        this.host = host;
-        this.port = port;
-        this.user = user;
-        this.password = password;
     }
 
     protected void connect() throws MessagingException {
         Properties properties = new Properties();
         properties.put("mail.store.protocol", "imaps");
-        properties.put("mail.imap.host", host);
-        properties.put("mail.imap.port", port);
+        properties.put("mail.imap.host", configuration.getMailHost());
+        properties.put("mail.imap.port", configuration.getMailPort());
         properties.put("mail.imap.ssl.enable", "true");
 
         Session emailSession = Session.getDefaultInstance(properties);
         store = emailSession.getStore("imaps");
-        store.connect(host, user, password);
+        store.connect(configuration.getMailHost(), configuration.getMailId(), configuration.getPasskey());
         inbox = store.getFolder("INBOX");
         inbox.open(Folder.READ_WRITE);
     }

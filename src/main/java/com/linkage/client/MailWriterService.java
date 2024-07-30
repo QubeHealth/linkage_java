@@ -17,11 +17,12 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.search.SubjectTerm;
 
 import com.linkage.LinkageConfiguration;
+import com.linkage.core.constants.Constants.EmailKeywords;
 
 public class MailWriterService extends EmailFetcher {
 
     public MailWriterService(LinkageConfiguration configuration) {
-        super("imap.gmail.com", "993", "qubetestemailssend@gmail.com", "obflrwzjtuidmyae", configuration);
+        super(configuration);
     }
 
     public void mailSender(Message sendMessage) throws MessagingException {
@@ -35,26 +36,24 @@ public class MailWriterService extends EmailFetcher {
 
             String recipient = null;
 
-            if ("supporting document".equalsIgnoreCase(keyword) || "query reply".equalsIgnoreCase(keyword)
-                    || "addtional information".equalsIgnoreCase(keyword)) {
-                recipient = "tmt.9@qubehealth.com";
-            } else if ("pre auth".equalsIgnoreCase(keyword) || "cashless credit request".equalsIgnoreCase(keyword)
-                    || "final bill and discharge summary".equalsIgnoreCase(keyword)) {
-                recipient = "tmt.9@qubehealth.com";
+            if (EmailKeywords.adjudicatorKeywords.contains(keyword.toLowerCase())) {
+                recipient = configuration.getAdjudicatorMail();
+            } else if (EmailKeywords.tpaKeywords.contains(keyword.toLowerCase())) {
+                recipient = configuration.getTpaMail();
             }
 
             // Sender's email ID
-            String from = "qubetestemailssend@gmail.com";
+            String from = configuration.getMailId();
 
             // Assuming you are sending email from a SMTP server
-            String host = "smtp.gmail.com";
+            String host = configuration.getMailHost();
 
             // Get system properties
             Properties properties = System.getProperties();
 
             // Setup mail server
             properties.setProperty("mail.smtp.host", host);
-            properties.setProperty("mail.smtp.port", "587"); // Change port if needed
+            properties.setProperty("mail.smtp.port", configuration.getMailWriterPort()); // Change port if needed
             properties.setProperty("mail.smtp.auth", "true");
             properties.setProperty("mail.smtp.starttls.enable", "true");
 
@@ -62,7 +61,7 @@ public class MailWriterService extends EmailFetcher {
             Session session = Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication("qubetestemailssend@gmail.com", "obflrwzjtuidmyae");
+                    return new PasswordAuthentication(configuration.getMailId(), configuration.getPasskey());
                 }
             });
 
@@ -83,19 +82,16 @@ public class MailWriterService extends EmailFetcher {
 
             // Send message
             Transport.send(message);
-            System.out.println("Sent message successfully...");
-            //return "Mail delivered successfully";
+            logger.info("Sent message successfully...");
         } catch (MessagingException | IOException e) {
             e.printStackTrace();
-            //return "failure";
         } finally {
             close(); // Ensure close is called in all cases
         }
     }
 
     private String parseSubjectForKeyword(String subject) {
-        String[] keywords = { "supporting document", "query reply", "final bill and discharge summary", "pre auth",
-                "cashless credit request", "addtional information" };
+        String[] keywords = EmailKeywords.keywordsArray;
         String lowerCaseSubject = subject.toLowerCase();
 
         for (String keyword : keywords) {

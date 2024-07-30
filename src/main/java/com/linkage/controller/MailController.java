@@ -41,7 +41,7 @@ public class MailController extends BaseController {
 
     public MailController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
-        this.mailReaderService = new MailReaderService(null, null, null, null, configuration);
+        this.mailReaderService = new MailReaderService(configuration);
         this.masterService = new MasterService(configuration);
         this.loansService = new LoansService(configuration);
         this.mailWriterService = new MailWriterService(configuration);
@@ -135,8 +135,8 @@ public class MailController extends BaseController {
         preFundedReqMap.put("hsp_id", "123");
         preFundedReqMap.put("partnered_user_id", partneredUserId);
         preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, khId);
-        preFundedReqMap.put(EmailKeywords.STATUS, "PENDING");
-        preFundedReqMap.put(EmailKeywords.TYPE, "TPA");
+        preFundedReqMap.put(EmailKeywords.STATUS, EmailKeywords.PENDING);
+        preFundedReqMap.put(EmailKeywords.TYPE, EmailKeywords.TPA);
         preFundedReqMap.put(EmailKeywords.IS_ACTIVE, true);
 
         ApiResponse<Object> preFundedRequest = this.loansService.preFundedrequestStore(preFundedReqMap);
@@ -163,7 +163,7 @@ public class MailController extends BaseController {
             logger.info("prefundedEmailer Data Successfully updated");
         }
         Map<String, Object> prefundedEmailResponseData = (Map<String, Object>) prefundedEmailRequest.getData();
-        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data")); // "225";
+        String prefundedEmailId = String.valueOf(prefundedEmailResponseData.get("data"));
         
 
         Map<String, Object> emailerItems = new HashMap<>();
@@ -189,9 +189,9 @@ public class MailController extends BaseController {
         adjudicationDataMap.put(EmailKeywords.FILE_NAME, gcpFileName);
         adjudicationDataMap.put(EmailKeywords.USER_ID, partneredUserId);
         adjudicationDataMap.put(EmailKeywords.HSP_ID, 123);
-        adjudicationDataMap.put(EmailKeywords.STATUS, "PENDING");
-        adjudicationDataMap.put("created_by", "TPA DESK");
-        adjudicationDataMap.put("updated_by", "ADJUDICATOR");
+        adjudicationDataMap.put(EmailKeywords.STATUS, EmailKeywords.PENDING);
+        adjudicationDataMap.put(EmailKeywords.CREATED_BY, "TPA DESK");
+        adjudicationDataMap.put(EmailKeywords.UPDATED_BY, "ADJUDICATOR");
 
         ApiResponse<Object> adjudicationData = this.loansService.adjudicationDataStore(adjudicationDataMap);
         if (!adjudicationData.getStatus()) {
@@ -250,7 +250,6 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.TYPE, "QUERY_REPLY");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
-        //preFundedEmailerMap.put("partnered_claim_no", claimNo);
         preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, prefundedRequestId);
 
         ApiResponse<Object> prefundedEmailRequest = this.masterService.prefundedEmail(preFundedEmailerMap);
@@ -434,7 +433,7 @@ public class MailController extends BaseController {
         String body = response.get(EmailKeywords.BODY);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
-        String status = "APPROVED";
+        String status = EmailKeywords.APPROVED;
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
 
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
@@ -451,8 +450,8 @@ public class MailController extends BaseController {
         preFundedEmailerMap.put(EmailKeywords.TYPE, "FINAL_CASHLESS_CREDIT_REQUEST");
         preFundedEmailerMap.put(EmailKeywords.SUBJECT, subject);
         preFundedEmailerMap.put(EmailKeywords.IS_ACTIVE, true);
-        preFundedEmailerMap.put("partnered_claim_no", "22");
-        preFundedEmailerMap.put("pf_request_id", prefundedRequestId);
+        //preFundedEmailerMap.put("partnered_claim_no", "22");
+        preFundedEmailerMap.put(EmailKeywords.PF_REQUEST_ID, prefundedRequestId);
         preFundedEmailerMap.put(EmailKeywords.POLICY_NO, employeeCode);
         preFundedEmailerMap.put(EmailKeywords.CLAIM_NO, claimNo);
 
@@ -539,7 +538,7 @@ public class MailController extends BaseController {
         String body = response.get(EmailKeywords.BODY);
         String gcpPath = response.get(EmailKeywords.GCP_PATH);
         String gcpFileName = response.get(EmailKeywords.GCP_FILE_NAME);
-        String status = "PENDING";
+        String status = EmailKeywords.PENDING;
 
         ApiResponse<Object> getPrefundedRequestIdRequest = this.loansService.getPrefundedRequestId(claimNo);
         if (!getPrefundedRequestIdRequest.getStatus()) {
@@ -695,7 +694,7 @@ public class MailController extends BaseController {
         adjudicationQuery.put(EmailKeywords.IS_ACTIVE, 1);
         adjudicationQuery.put("responded_at", null);
         adjudicationQuery.put("resolved_at", null);
-        adjudicationQuery.put(EmailKeywords.STATUS, "PENDING");
+        adjudicationQuery.put(EmailKeywords.STATUS, EmailKeywords.PENDING);
 
         ApiResponse<Object> adjudicationQueryData = this.loansService.adjudicationQueryStore(adjudicationQuery);
         if (!adjudicationQueryData.getStatus()) {

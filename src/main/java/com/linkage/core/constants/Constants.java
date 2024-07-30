@@ -1,5 +1,8 @@
 package com.linkage.core.constants;
 
+import java.util.Arrays;
+import java.util.List;
+
 public final class Constants {
 
     public static final class EmailKeywords {
@@ -45,14 +48,23 @@ public final class Constants {
         public static final String ADJUDICATION_DATA_ID = "adjudication_data_id";
         public static final String PF_DOCUMENT_ID = "pf_document_id";
         public static final String DOCUMENT_URL = "document_url";
+        public static final String TPA = "TPA";
+        public static final String CREATED_BY = "created_by";
+        public static final String UPDATED_BY = "updated_by";
 
         public static final String PENDING = "PENDING";
         public static final String APPROVED = "APPROVED";
 
 
-        public static final String[] keywordsList = { SUPPORTING_DOCUMENT, QUERY_REPLY,
-            FINAL_BILL_AND_DISCHARGE_SUMMARY, PRE_AUTH,
-            CASHLESS_CREDIT_REQUEST, ADDITIONAL_INFORMATION };
+        public static final String[] keywordsArray = { SUPPORTING_DOCUMENT, QUERY_REPLY,
+                FINAL_BILL_AND_DISCHARGE_SUMMARY, PRE_AUTH,
+                CASHLESS_CREDIT_REQUEST, ADDITIONAL_INFORMATION };
+
+        public static final List<String> adjudicatorKeywords = Arrays.asList(
+                "addtional information", "cashless credit request");
+
+        public static final List<String> tpaKeywords = Arrays.asList(
+                "pre auth", "final bill and discharge summary", "query reply");
     }
 
 }

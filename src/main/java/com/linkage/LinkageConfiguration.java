@@ -32,6 +32,12 @@ public class LinkageConfiguration extends Configuration {
     private String mailId;
     @NotEmpty
     private String passkey;
+    @NotEmpty
+    private String adjudicatorMail;
+    @NotEmpty
+    private String tpaMail;
+    @NotEmpty
+    private String mailWriterPort;
 
     public String getxApiKey() {
         return xApiKey;
@@ -131,5 +137,26 @@ public class LinkageConfiguration extends Configuration {
     }
     public void setPasskey(String passkey) {
         this.passkey = passkey;
+    }
+
+    public String getTpaMail() {
+        return tpaMail;
+    }
+    public void setTpaMail(String tpaMail) {
+        this.tpaMail = tpaMail;
+    }
+
+    public String getAdjudicatorMail() {
+        return adjudicatorMail;
+    }
+    public void setAdjudicatorMail(String adjudicatorMail) {
+        this.adjudicatorMail = adjudicatorMail;
+    }
+
+    public String getMailWriterPort() {
+        return mailWriterPort;
+    }
+    public void setMailWriterPort(String mailWriterPort) {
+        this.mailWriterPort = mailWriterPort;
     }
 }

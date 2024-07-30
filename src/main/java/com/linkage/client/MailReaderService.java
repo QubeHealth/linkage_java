@@ -28,9 +28,8 @@ public class MailReaderService extends EmailFetcher {
 
     private MasterService masterService;
 
-    public MailReaderService(String host, String port, String user, String password,
-            LinkageConfiguration configuration) {
-        super("imap.gmail.com", "993", "qubetestemailssend@gmail.com", "obflrwzjtuidmyae", configuration);
+    public MailReaderService(LinkageConfiguration configuration) {
+        super(configuration);
         this.masterService = new MasterService(configuration);
     }
 
@@ -49,7 +48,7 @@ public class MailReaderService extends EmailFetcher {
             String subject = fetchSubject(message);
             String body = fetchBody(message);
             String keyword = parseSubjectForKeyword(subject);
-            logger.info("Email Parsed Successfully: Subject = {}, Body = {}, Keyword = {}", subject, body, keyword);
+            logger.info("Email Parsed Successfully: Subject = {},Keyword = {}", subject, keyword);
 
             responseMap.put(EmailKeywords.SUBJECT, subject);
             responseMap.put(EmailKeywords.BODY, body);
@@ -127,7 +126,7 @@ public class MailReaderService extends EmailFetcher {
     
 
     private String parseSubjectForKeyword(String subject) {
-        String[] keywords = EmailKeywords.keywordsList;
+        String[] keywords = EmailKeywords.keywordsArray;
 
         String lowerCaseSubject = subject.toLowerCase();
 
