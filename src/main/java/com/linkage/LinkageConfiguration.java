@@ -18,6 +18,26 @@ public class LinkageConfiguration extends Configuration {
     private String watiToken;
     @NotEmpty
     private String befiscAuthKey;
+    @NotEmpty
+    private String loansUrl;
+    @NotEmpty
+    private String masterUrl;
+    @NotEmpty
+    private String userJavaUrl;
+    @NotEmpty
+    private String mailHost;
+    @NotEmpty
+    private String mailPort;
+    @NotEmpty
+    private String mailId;
+    @NotEmpty
+    private String passkey;
+    @NotEmpty
+    private String adjudicatorMail;
+    @NotEmpty
+    private String tpaMail;
+    @NotEmpty
+    private String mailWriterPort;
 
     public String getxApiKey() {
         return xApiKey;
@@ -70,5 +90,73 @@ public class LinkageConfiguration extends Configuration {
     public void setWatiToken(String watiToken) {
         this.watiToken = watiToken;
     }
-   
+    public String getMasterurl() {
+        return masterUrl;
+    }
+    public void setMasterUrl(String masterUrl) {
+        this.masterUrl = masterUrl;
+    }
+
+    public String getLoansUrl() {
+        return loansUrl;
+    }
+    public void setLoansurl(String loansUrl) {
+        this.loansUrl = loansUrl;
+    }
+
+    public String getUserJavaUrl(){
+        return userJavaUrl;
+    }
+    public void SetUserJavaUrl(String userJavaUrl) {
+        this.userJavaUrl = userJavaUrl;
+    }
+    
+    public String getMailHost(){
+        return mailHost;
+    }
+    public void setMailHost(String mailHost){
+        this.mailHost = mailHost;
+    }
+
+    public String getMailPort() {
+        return mailPort;
+    }
+    public void setMailPort(String mailPort) {
+        this.mailPort = mailPort;
+    }
+
+    public String getMailId() {
+        return mailId;
+    }
+    public void setMailId(String mailId) {
+        this.mailId = mailId;
+    }
+
+    public String getPasskey() {
+        return passkey;
+    }
+    public void setPasskey(String passkey) {
+        this.passkey = passkey;
+    }
+
+    public String getTpaMail() {
+        return tpaMail;
+    }
+    public void setTpaMail(String tpaMail) {
+        this.tpaMail = tpaMail;
+    }
+
+    public String getAdjudicatorMail() {
+        return adjudicatorMail;
+    }
+    public void setAdjudicatorMail(String adjudicatorMail) {
+        this.adjudicatorMail = adjudicatorMail;
+    }
+
+    public String getMailWriterPort() {
+        return mailWriterPort;
+    }
+    public void setMailWriterPort(String mailWriterPort) {
+        this.mailWriterPort = mailWriterPort;
+    }
 }
