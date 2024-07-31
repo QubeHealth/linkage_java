@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -211,11 +213,22 @@ public final class Helper {
     public static String jsonToXML(String json) {
 
         ObjectMapper jsonMapper = new ObjectMapper();
-      XmlMapper xmlMapper = new XmlMapper();
+        XmlMapper xmlMapper = new XmlMapper();
 
         try {
             JsonNode jsonNode = jsonMapper.readTree(json);
-            return xmlMapper.writeValueAsString(jsonNode);
+
+            String xml = xmlMapper.writeValueAsString(jsonNode);
+
+            String regex = "<ObjectNode>(.*?)</ObjectNode>";
+            Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(xml);
+
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+
+            return xml;
 
         } catch (Exception e) {
             e.printStackTrace();

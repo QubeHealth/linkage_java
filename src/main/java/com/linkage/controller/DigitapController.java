@@ -1,5 +1,6 @@
 package com.linkage.controller;
 
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("/api/digitap")
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,40 +34,59 @@ public class DigitapController extends BaseController {
         this.digitapService = new DigitapService(configuration);
     }
 
+    private Response response(Response.Status status, Object data) {
+        return Response.status(status).entity(data).build();
+    }
+
     @POST
     @Path("/getCreditBureau")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ApiResponse<Object> referreeInviteMessage(@Context HttpServletRequest request,
+    public Response referreeInviteMessage(@Context HttpServletRequest request,
             GetCreditBureau body) {
+
         Set<ConstraintViolation<GetCreditBureau>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
             // Construct error message from violations
             String errorMessage = violations.stream()
                     .map(ConstraintViolation::getMessage)
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
-            return new ApiResponse<>(false, errorMessage, null);
+            return response(Response.Status.BAD_REQUEST, new ApiResponse<>(false, errorMessage, null));
         }
 
-        ApiResponse<Object> digitapResponse = this.digitapService.getCreditReport(body);
+        try {
 
-        if (!digitapResponse.getStatus()) {
-            return digitapResponse;
+            InetAddress myIP = InetAddress.getLocalHost();
+            String ipv4Address = myIP.getHostAddress();
+            body.setDeviceIp(ipv4Address);
+
+            ApiResponse<Object> digitapResponse = this.digitapService.getCreditReport(body);
+
+            if (!digitapResponse.getStatus()) {
+                return response(Response.Status.FORBIDDEN, digitapResponse);
+            }
+
+            Map<String, Object> creditResponse = (Map<String, Object>) digitapResponse.getData();
+
+            if (creditResponse.get("result_code") != null && !creditResponse.get("result_code").equals(101)) {
+                return response(Response.Status.FORBIDDEN,
+                        new ApiResponse<>(false, creditResponse.get("message").toString(), creditResponse));
+
+            }
+
+            Map<String, Object> report = (Map<String, Object>) creditResponse.get("result");
+
+            String xmlReport = Helper.jsonToXML(Helper.toJsonString(report.get("result_json")));
+
+            creditResponse.put("result", xmlReport);
+
+            return response(Response.Status.OK,
+                    new ApiResponse<>(true, "Bureau fetch success", creditResponse));
+
+        } catch (Exception e) {
+            return response(Response.Status.INTERNAL_SERVER_ERROR,
+                    new ApiResponse<>(false, e.getMessage(), e));
         }
-
-        Map<String, Object> creditResponse = (Map<String, Object>) digitapResponse.getData();
-
-        if (creditResponse.get("result_code") != null && !creditResponse.get("result_code").equals(101)) {
-            return new ApiResponse<>(false, creditResponse.get("message").toString(), creditResponse);
-        }
-
-        Map<String, Object> report = (Map<String, Object>) creditResponse.get("result");
-
-        String xmlReport = Helper.jsonToXML(Helper.toJsonString(report.get("result_json")));
-
-        creditResponse.put("result", xmlReport);
-
-        return new ApiResponse<>(true, "Bureau fetch success", creditResponse);
 
     }
 }

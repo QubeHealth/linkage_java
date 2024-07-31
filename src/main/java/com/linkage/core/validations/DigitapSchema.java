@@ -66,7 +66,6 @@ public class DigitapSchema {
         @JsonProperty("timestamp")
         private String timestamp;
 
-        @NotBlank(message = "Device IP is mandatory")
         @JsonProperty("device_ip")
         private String deviceIp;
 
