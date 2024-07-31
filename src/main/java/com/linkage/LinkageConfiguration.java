@@ -18,14 +18,13 @@ public class LinkageConfiguration extends Configuration {
     private String watiToken;
     @NotEmpty
     private String befiscAuthKey;
+
     @NotEmpty
     private String digitapUrl;
     @NotEmpty
     private String digitapClientId;
     @NotEmpty
     private String digitapClientSecret;
-
-    private String creditReport;
 
     public String getxApiKey() {
         return xApiKey;
@@ -105,14 +104,6 @@ public class LinkageConfiguration extends Configuration {
 
     public void setDigitapUrl(String digitapUrl) {
         this.digitapUrl = digitapUrl;
-    }
-
-    public String getCreditReport() {
-        return creditReport;
-    }
-
-    public void setCreditReport(String creditReport) {
-        this.creditReport = creditReport;
     }
 
 }

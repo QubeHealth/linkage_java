@@ -71,7 +71,7 @@ public class DigitapController extends BaseController {
                 clientIp = request.getRemoteAddr();
             }
 
-            System.out.println("\n\n IP ADDDRESS => " + clientIp);
+            System.out.println("\n\nIP ADDDRESS => " + clientIp);
 
             InetAddress myIP = InetAddress.getLocalHost();
             String ipv4Address = myIP.getHostAddress();
