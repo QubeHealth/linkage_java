@@ -120,7 +120,7 @@ public class MailController extends BaseController {
     // Pre-Auth flow db calls
     private void handlePreAuth(Map<String, String> response) {
 
-        String partneredEmpId = response.get("partnered_emp_id");
+        String partneredEmpId = response.get(EmailKeywords.PARTNERED_EMP_ID);
         String khId = response.get(EmailKeywords.TPA_DESK_ID);
         String subject = response.get(EmailKeywords.SUBJECT);
         String patientName = response.get(EmailKeywords.PATIENT_NAME);
@@ -134,7 +134,7 @@ public class MailController extends BaseController {
         Map<String, Object> preFundedReqMap = new HashMap<>();
         preFundedReqMap.put(EmailKeywords.USER_ID, userId);
         preFundedReqMap.put("hsp_id", "123");
-        preFundedReqMap.put("partnered_emp_id", partneredEmpId);
+        preFundedReqMap.put(EmailKeywords.PARTNERED_EMP_ID, partneredEmpId);
         preFundedReqMap.put(EmailKeywords.TPA_DESK_ID, khId);
         preFundedReqMap.put(EmailKeywords.STATUS, EmailKeywords.PENDING);
         preFundedReqMap.put(EmailKeywords.TYPE, EmailKeywords.TPA);
@@ -192,7 +192,7 @@ public class MailController extends BaseController {
 
         Map<String, Object> adjudicationDataMap = new HashMap<>();
         adjudicationDataMap.put(EmailKeywords.TPA_DESK_ID, khId);
-        adjudicationDataMap.put(EmailKeywords.PF_REQUEST_ID, preFundedRequestId);
+        adjudicationDataMap.put(EmailKeywords.PF_REQ_ID, preFundedRequestId);
         adjudicationDataMap.put(EmailKeywords.FILE_PATH, gcpPath);
         adjudicationDataMap.put(EmailKeywords.FILE_NAME, gcpFileName);
         adjudicationDataMap.put(EmailKeywords.USER_ID, partneredEmpId);
@@ -682,9 +682,9 @@ public class MailController extends BaseController {
 
         ApiResponse<Object> adjudicationDataRequest = this.loansService.updateStatusAdjudicationData(claimNo, "QUERY");
         if (!adjudicationDataRequest.getStatus()) {
-            logger.error("adjudicationDataId data not found");
+            logger.error("adjudicationData data not updated");
         } else {
-            logger.info("adjudicationDataId fetched successfully");
+            logger.info("adjudicationData updated successfully");
         }
         Map<String, Object> adjudicationDataResponseData = (Map<String, Object>) adjudicationDataRequest.getData();
         String adjudicationDataId = String.valueOf(adjudicationDataResponseData.get("data"));

@@ -52,6 +52,7 @@ public final class Constants {
         public static final String CREATED_BY = "created_by";
         public static final String UPDATED_BY = "updated_by";
         public static final String PF_EMAILER_ID = "pf_emailer_id";
+        public static final String PF_REQ_ID = "pf_req_id";
 
         public static final String PENDING = "PENDING";
         public static final String APPROVED = "APPROVED";
