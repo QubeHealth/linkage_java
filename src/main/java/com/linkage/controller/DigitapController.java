@@ -56,6 +56,23 @@ public class DigitapController extends BaseController {
 
         try {
 
+            // Retrieve the client IP address
+            String clientIp = request.getHeader("X-Forwarded-For");
+
+            if (clientIp != null) {
+                // X-Forwarded-For may contain a comma-separated list of IPs
+                clientIp = clientIp.split(",")[0];
+            }
+
+            if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
+                clientIp = request.getHeader("X-Real-IP");
+            }
+            if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
+                clientIp = request.getRemoteAddr();
+            }
+
+            System.out.println("\n\n IP ADDDRESS => " + clientIp);
+
             InetAddress myIP = InetAddress.getLocalHost();
             String ipv4Address = myIP.getHostAddress();
             body.setDeviceIp(ipv4Address);
