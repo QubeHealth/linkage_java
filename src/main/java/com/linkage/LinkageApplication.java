@@ -1,6 +1,7 @@
 package com.linkage;
 
 import com.linkage.controller.BefiscController;
+import com.linkage.controller.DigitapController;
 import com.linkage.controller.FirebaseController;
 import com.linkage.controller.WatiController;
 import com.linkage.controller.WebhookController;
@@ -37,10 +38,13 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         WebhookController webhookController = new WebhookController(configuration, validator);
         FirebaseController firebaseController = new FirebaseController(configuration, validator);
         WatiController watiController = new WatiController(configuration, validator);
+        DigitapController digitapController = new DigitapController(configuration, validator);
+
         environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
         environment.jersey().register(watiController);
+        environment.jersey().register(digitapController);
 
     }
 }

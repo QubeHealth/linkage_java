@@ -43,11 +43,11 @@ public final class ThirdPartyAPICall {
             response = builder.post(Entity.json(request.getBody()));
         }
 
-        logger.info("\nThird party api request => {}", Helper.toJsonString(request));
+        logger.info("\n\nThird party api request => {}", Helper.toJsonString(request));
         // Use GenericType to specify the type parameter for readEntity method
         Map<String, Object> responseBody = response.readEntity(new GenericType<Map<String, Object>>() {
         });
-        logger.info("\nThird party api response => {}", Helper.toJsonString(responseBody));
+        logger.info("\n\nThird party api response => {}", Helper.toJsonString(responseBody));
         boolean status = false;
         if (Response.Status.OK.getStatusCode() <= response.getStatus() && response.getStatus() < 300) {
             status = true;
