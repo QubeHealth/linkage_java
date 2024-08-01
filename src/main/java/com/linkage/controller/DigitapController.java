@@ -1,6 +1,7 @@
 package com.linkage.controller;
 
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,26 +57,12 @@ public class DigitapController extends BaseController {
 
         try {
 
-            // Retrieve the client IP address
-            String clientIp = request.getHeader("X-Forwarded-For");
-
-            if (clientIp != null) {
-                // X-Forwarded-For may contain a comma-separated list of IPs
-                clientIp = clientIp.split(",")[0];
+            if (body.getDeviceIp() == null || body.getDeviceIp().isBlank() || body.getDeviceIp().contains("0.0.0.0")
+                    || Arrays.asList("127.0.0.0", "127.0.0.1", "127.0.1.1").contains(body.getDeviceIp())) {
+                InetAddress myIP = InetAddress.getLocalHost();
+                String ipv4Address = myIP.getHostAddress();
+                body.setDeviceIp(ipv4Address);
             }
-
-            if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
-                clientIp = request.getHeader("X-Real-IP");
-            }
-            if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
-                clientIp = request.getRemoteAddr();
-            }
-
-            System.out.println("\n\nIP ADDDRESS => " + clientIp);
-
-            InetAddress myIP = InetAddress.getLocalHost();
-            String ipv4Address = myIP.getHostAddress();
-            body.setDeviceIp(ipv4Address);
 
             ApiResponse<Object> digitapResponse = this.digitapService.getCreditReport(body);
 
