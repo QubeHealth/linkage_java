@@ -3,6 +3,7 @@ package com.linkage.utility;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.crypto.Cipher;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -24,7 +27,9 @@ import org.json.JSONObject;
 import org.json.XML;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 public final class Helper {
     private Helper() {
@@ -163,10 +168,16 @@ public final class Helper {
         return localDate.format(DateTimeFormatter.ofPattern(convertToFormat));
     }
 
-    public static String getCurrentDate() {
-        LocalDate currentDate = LocalDate.now();
+    public static String getCurrentDate(String format) {
+        LocalDateTime currentDate = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        if (format != null && !format.isBlank()) {
+            formatter = DateTimeFormatter.ofPattern(format);
+        }
+
         return currentDate.format(formatter);
+
     }
 
     public static String toJsonString(Object obj) {
@@ -196,6 +207,32 @@ public final class Helper {
             return true; // If no exception is thrown, URL is valid
         } catch (Exception e) {
             return false; // If an exception is caught, URL is not valid
+        }
+    }
+
+    public static String jsonToXML(String json) {
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+        XmlMapper xmlMapper = new XmlMapper();
+
+        try {
+            JsonNode jsonNode = jsonMapper.readTree(json);
+
+            String xml = xmlMapper.writeValueAsString(jsonNode);
+
+            String regex = "<ObjectNode>(.*?)</ObjectNode>";
+            Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(xml);
+
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+
+            return xml;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
         }
     }
 

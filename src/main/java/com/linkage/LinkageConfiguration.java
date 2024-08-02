@@ -18,6 +18,13 @@ public class LinkageConfiguration extends Configuration {
     private String watiToken;
     @NotEmpty
     private String befiscAuthKey;
+
+    @NotEmpty
+    private String digitapUrl;
+    @NotEmpty
+    private String digitapClientId;
+    @NotEmpty
+    private String digitapClientSecret;
     @NotEmpty
     private String loansUrl;
     @NotEmpty
@@ -78,18 +85,47 @@ public class LinkageConfiguration extends Configuration {
     public void setBefiscAuthKey(String befiscAuthKey) {
         this.befiscAuthKey = befiscAuthKey;
     }
+
     public String getWatiUrl() {
         return watiUrl;
     }
+
     public void setWatiUrl(String watiUrl) {
         this.watiUrl = watiUrl;
     }
+
     public String getWatiToken() {
         return watiToken;
     }
+
     public void setWatiToken(String watiToken) {
         this.watiToken = watiToken;
     }
+
+    public String getDigitapClientId() {
+        return digitapClientId;
+    }
+
+    public void setDigitapClientId(String digitapClientId) {
+        this.digitapClientId = digitapClientId;
+    }
+
+    public String getDigitapClientSecret() {
+        return digitapClientSecret;
+    }
+
+    public void setDigitapClientSecret(String digitapClientSecret) {
+        this.digitapClientSecret = digitapClientSecret;
+    }
+
+    public String getDigitapUrl() {
+        return digitapUrl;
+    }
+
+    public void setDigitapUrl(String digitapUrl) {
+        this.digitapUrl = digitapUrl;
+    }
+
     public String getMasterurl() {
         return masterUrl;
     }
