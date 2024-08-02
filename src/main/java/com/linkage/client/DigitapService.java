@@ -30,8 +30,10 @@ public class DigitapService extends BaseServiceClient {
         body.setDeviceType(DEVICE_TYPE);
         body.setConsentAcceptance("yes");
         body.setNameLookup(0);
-        body.setDeviceId(DEVICE_ID);
-
+        // if device id is not passed the set the static device id given by digitap doc
+        if (body.getDeviceId() == null || body.getDeviceId().length() != 15) {
+            body.setDeviceId(DEVICE_ID);
+        }
         String authString = configuration.getDigitapClientId() + ":" + configuration.getDigitapClientSecret();
 
         // Encode the string in Base64
