@@ -132,11 +132,13 @@ public class BefiscController extends BaseController {
         List<Object> vpa = Helper.getDataFromMap(result.getData(), Arrays.asList("vpa"));
         List<Object> name = Helper.getDataFromMap(result.getData(), Arrays.asList("name"));
         List<Object> accountName = Helper.getDataFromMap(result.getData(), Arrays.asList("account_holder_name"));
+        List<Object> entityType = Helper.getDataFromMap(result.getData(), Arrays.asList("entity_type"));
 
         Map<String, Object> data = new HashMap<>();
         data.put("vpa", vpa.isEmpty() ? null : vpa.get(0));
         data.put("merchant_name", name.isEmpty() ? null : name.get(0));
         data.put("bank_account_name", accountName.isEmpty() ? null : accountName.get(0));
+        data.put("account_type", entityType.isEmpty() ? null : entityType.get(0));
 
         Map<String, Object> validation = hspValidationCheck(data.get("merchant_name").toString());
         if (Boolean.FALSE.equals(validation.get("valid_hsp"))) {
