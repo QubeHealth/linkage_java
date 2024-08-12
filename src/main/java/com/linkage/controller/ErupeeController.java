@@ -6,6 +6,7 @@ import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.ErupeeService;
 import com.linkage.core.validations.ErupeeSchema.VoucherRequest;
+import com.linkage.core.validations.ErupeeSchema.VoucherStatus;
 import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,6 +51,28 @@ public class ErupeeController extends BaseController {
 
         return res;
 
+    }
+
+    // e-rupi voucher status api 
+
+    @POST
+    @Path("/voucherStatus")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> voucherStatus(@Context HttpServletRequest request,VoucherStatus body) {
+        Set<ConstraintViolation<VoucherStatus>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+
+        ApiResponse<Object> res = this.erupeeService.voucherStatus(body);
+        System.out.println("RES ==>\n" + Helper.toJsonString(res));
+
+        return res;
     }
 
 }

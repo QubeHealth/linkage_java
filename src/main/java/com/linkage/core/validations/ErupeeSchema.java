@@ -58,4 +58,15 @@ public class ErupeeSchema {
         private String txnCompletionDate;
         private String umn;
     }
+
+    @Data
+    public static class VoucherStatus {
+        private String merchantId;
+        private String subMerchantId;
+        private String merchantTranId;
+        private String transactionType;
+        private String terminalId;
+        @JsonProperty("UMN")
+        private String UMN;
+    }
 }
