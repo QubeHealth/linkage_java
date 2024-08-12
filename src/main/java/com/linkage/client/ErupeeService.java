@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.ErupeeSchema.VoucherRequest;
+import com.linkage.core.validations.ErupeeSchema.VoucherStatus;
 import com.linkage.utility.Helper;
 
 import java.io.FileInputStream;
@@ -176,5 +177,39 @@ public class ErupeeService extends BaseServiceClient {
         }
         String alias = keyStore.aliases().nextElement();
         return (PrivateKey) keyStore.getKey(alias, password.toCharArray());
+    }
+
+    public ApiResponse<Object> voucherStatus(VoucherStatus request) {
+        MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
+
+        header.putSingle("apiKey", "ZceJ7Ggva6Sy3h7D8PSxdWSeIvgE4ICg");
+        String url = "https://apibankingonesandbox.icicibank.com/api/MerchantAPI/UPI2/v1/TransactionStatusByCriteria";
+
+        try {
+
+            String body = Helper.toJsonString(request);
+            System.out.println(body);
+
+            body = encryptRequest(body);
+
+            ApiResponse<Object> res = this.networkCallExternalService(url, "POST", body, header);
+
+            Map<String, Object> data = (Map<String, Object>) res.getData();
+
+            String encryptedKey = data.get("encryptedKey").toString();
+
+            String decrptedRes = decrypt(data.get("encryptedData").toString(), encryptedKey);
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            HashMap<String, Object> map = objectMapper.readValue(decrptedRes,
+                    new TypeReference<HashMap<String, Object>>() {
+                    });
+
+            return new ApiResponse<>(true, "success", map);
+
+        } catch (Exception e) {
+            return new ApiResponse<>(false, e.getMessage(), null);
+        }
+
     }
 }
