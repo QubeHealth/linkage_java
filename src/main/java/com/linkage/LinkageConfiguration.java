@@ -106,4 +106,13 @@ public class LinkageConfiguration extends Configuration {
         this.digitapUrl = digitapUrl;
     }
 
+    private String imsUrl;
+
+    public String getImsUrl() {
+        return imsUrl;
+    }
+
+    public void setImsUrl(String imsUrl) {
+        this.imsUrl = imsUrl;
+    }
 }
