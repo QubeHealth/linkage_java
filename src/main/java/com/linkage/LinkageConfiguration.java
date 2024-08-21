@@ -13,9 +13,13 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String firebaseWebApiKey;
     @NotEmpty
-    private String watiUrl;
+    private String messageProviderUrl;
     @NotEmpty
-    private String watiToken;
+    private String messageProviderToken;
+    @NotEmpty
+    private String messageProviderSource;
+    @NotEmpty
+    private String messageProviderChannel;
     @NotEmpty
     private String befiscAuthKey;
 
@@ -66,20 +70,36 @@ public class LinkageConfiguration extends Configuration {
         this.befiscAuthKey = befiscAuthKey;
     }
 
-    public String getWatiUrl() {
-        return watiUrl;
+    public String getMessageProviderUrl() {
+        return messageProviderUrl;
     }
 
-    public void setWatiUrl(String watiUrl) {
-        this.watiUrl = watiUrl;
+    public void setMessageProviderUrl(String messageProviderUrl) {
+        this.messageProviderUrl = messageProviderUrl;
     }
 
-    public String getWatiToken() {
-        return watiToken;
+    public String getMessageProviderToken() {
+        return messageProviderToken;
     }
 
-    public void setWatiToken(String watiToken) {
-        this.watiToken = watiToken;
+    public void setMessageProviderToken(String messageProviderToken) {
+        this.messageProviderToken = messageProviderToken;
+    }
+
+    public String getMessageProviderSource() {
+        return messageProviderSource;
+    }
+
+    public void setMessageProviderSource(String messageProviderSource) {
+        this.messageProviderSource = messageProviderSource;
+    }
+
+    public String getMessageProviderChannel() {
+        return messageProviderChannel;
+    }
+
+    public void setMessageProviderChannel(String messageProviderChannel) {
+        this.messageProviderChannel = messageProviderChannel;
     }
 
     public String getDigitapClientId() {

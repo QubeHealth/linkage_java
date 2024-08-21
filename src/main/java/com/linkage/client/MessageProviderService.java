@@ -15,7 +15,7 @@ import com.linkage.core.validations.RefereeInviteMsgSchema;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
-public class WatiService extends BaseServiceClient {
+public class MessageProviderService extends BaseServiceClient {
     private static final String REFEREE_INVITE_TEMPLATE = "qp_cashback_referal_invite24may2024";
     private static final String REFERER_CASHBACK_TEMPLATE = "qp_cashback_referrer_24may2024";
     private static final String REFEREE_CASHBACK_TEMPLATE = "qp_cashback_referree_24may2024";
@@ -24,7 +24,7 @@ public class WatiService extends BaseServiceClient {
     private static final String BILL_REJECTED_TEMPLATE = "qp_ubr_new24may2024";
     private static final String APP_REVIEWER_TEMPLATE = "cashback_appreviews_05june2024";
 
-    public WatiService(LinkageConfiguration configuration) {
+    public MessageProviderService(LinkageConfiguration configuration) {
         super(configuration);
     }
 
@@ -117,13 +117,26 @@ public class WatiService extends BaseServiceClient {
             List<Map<String, String>> paramList) {
         MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
 
-        header.putSingle("Authorization", configuration.getWatiToken());
-        String url = configuration.getWatiUrl() + mobile;
+        header.putSingle("Authorization", configuration.getMessageProviderToken());
+        String url = configuration.getMessageProviderUrl();
 
         Map<String, Object> mainMap = new HashMap<>();
-        mainMap.put("template_name", templateName);
-        mainMap.put("broadcast_name", broadCastName);
+        mainMap.put("source", "91" + configuration.getMessageProviderSource());
+        mainMap.put("channel", configuration.getMessageProviderChannel());
+        mainMap.put("destination", "91" + mobile);
+
+        Map<String, String> messageMap = new HashMap<>();
+        messageMap.put("type", "text");
+        messageMap.put("text", "text");
+        mainMap.put("message",messageMap);
         mainMap.put("parameters", paramList);
+
+        header.putSingle("apikey", "null");
+
+
+
+
+
 
         return this.networkCallExternalService(url, "POST", mainMap, header);
     }

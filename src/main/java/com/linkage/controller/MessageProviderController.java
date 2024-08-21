@@ -4,7 +4,7 @@ import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.client.WatiService;
+import com.linkage.client.MessageProviderService;
 import com.linkage.core.validations.BillRejectedSchema;
 import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.CashbackTypeMessageSchema;
@@ -21,16 +21,16 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
-@Path("/api/wati")
+@Path("/api/messenger")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 
-public class WatiController extends BaseController {
-    private WatiService watiService;
+public class MessageProviderController extends BaseController {
+    private MessageProviderService messageProviderService;
 
-    public WatiController(LinkageConfiguration configuration, Validator validator) {
+    public MessageProviderController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
-        watiService = new WatiService(configuration);
+        messageProviderService = new MessageProviderService(configuration);
     }
 
     @POST
@@ -47,14 +47,14 @@ public class WatiController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
-        ApiResponse<Object> watiResponse = this.watiService.referreeInviteMessage(body);
-        if (!watiResponse.getStatus()) {
-            watiResponse.setMessage("Message failed to deliver");
-            return watiResponse;
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.referreeInviteMessage(body);
+        if (!messageProviderResponse.getStatus()) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
         }
-        watiResponse.setMessage("Message delivered successfully");
-        watiResponse.setData(null);
-        return watiResponse;
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
 
     }
 
@@ -72,14 +72,14 @@ public class WatiController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
-        ApiResponse<Object> watiResponse = this.watiService.referrerCashbackMessage(body);
-        if (!watiResponse.getStatus()) {
-            watiResponse.setMessage("Message failed to deliver");
-            return watiResponse;
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.referrerCashbackMessage(body);
+        if (!messageProviderResponse.getStatus()) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
         }
-        watiResponse.setMessage("Message delivered successfully");
-        watiResponse.setData(null);
-        return watiResponse;
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
     }
 
     @POST
@@ -96,14 +96,14 @@ public class WatiController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
-        ApiResponse<Object> watiResponse = this.watiService.refereeCashbackMessage(body);
-        if (!watiResponse.getStatus()) {
-            watiResponse.setMessage("Message failed to deliver");
-            return watiResponse;
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.refereeCashbackMessage(body);
+        if (!messageProviderResponse.getStatus()) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
         }
-        watiResponse.setMessage("Message delivered successfully");
-        watiResponse.setData(null);
-        return watiResponse;
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
     }
 
     @POST
@@ -120,14 +120,14 @@ public class WatiController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
-        ApiResponse<Object> watiResponse = this.watiService.billVerifiedMessage(body);
-        if (!watiResponse.getStatus()) {
-            watiResponse.setMessage("Message failed to deliver");
-            return watiResponse;
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.billVerifiedMessage(body);
+        if (!messageProviderResponse.getStatus()) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
         }
-        watiResponse.setMessage("Message delivered successfully");
-        watiResponse.setData(null);
-        return watiResponse;
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
     }
 
     @POST
@@ -144,14 +144,14 @@ public class WatiController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
-        ApiResponse<Object> watiResponse = this.watiService.billRejected(body);
-        if (!watiResponse.getStatus()) {
-            watiResponse.setMessage("Message failed to deliver");
-            return watiResponse;
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.billRejected(body);
+        if (!messageProviderResponse.getStatus()) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
         }
-        watiResponse.setMessage("Message delivered successfully");
-        watiResponse.setData(null);
-        return watiResponse;
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
     }
 
     @POST
@@ -168,14 +168,14 @@ public class WatiController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
-        ApiResponse<Object> watiResponse = this.watiService.cashbackTypeMessage(body);
-        if (!watiResponse.getStatus()) {
-            watiResponse.setMessage("Message failed to deliver");
-            return watiResponse;
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.cashbackTypeMessage(body);
+        if (!messageProviderResponse.getStatus()) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
         }
-        watiResponse.setMessage("Message delivered successfully");
-        watiResponse.setData(null);
-        return watiResponse;
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
     }
 
     @POST
@@ -200,21 +200,21 @@ public class WatiController extends BaseController {
         refererBody.setCashbackAmt(body.getCashbackAmtReferer());
         refererBody.setMobile(body.getMobileReferer());
 
-        ApiResponse<Object> watiResponse = this.watiService.refereeCashbackMessage(refereeBody);
-        if (!watiResponse.getStatus()) {
-            watiResponse.setMessage("Message failed to deliver to referee");
-            return watiResponse;
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.refereeCashbackMessage(refereeBody);
+        if (!messageProviderResponse.getStatus()) {
+            messageProviderResponse.setMessage("Message failed to deliver to referee");
+            return messageProviderResponse;
         }
 
-        watiResponse = this.watiService.referrerCashbackMessage(refererBody);
-        if (!watiResponse.getStatus()) {
-            watiResponse.setMessage("Message failed to deliver to rerferer");
-            return watiResponse;
+        messageProviderResponse = this.messageProviderService.referrerCashbackMessage(refererBody);
+        if (!messageProviderResponse.getStatus()) {
+            messageProviderResponse.setMessage("Message failed to deliver to rerferer");
+            return messageProviderResponse;
         }
 
-        watiResponse.setMessage("Message delivered successfully to referer and referee");
-        watiResponse.setData(null);
+        messageProviderResponse.setMessage("Message delivered successfully to referer and referee");
+        messageProviderResponse.setData(null);
 
-        return watiResponse;
+        return messageProviderResponse;
     }
 }
