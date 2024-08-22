@@ -9,6 +9,14 @@ import java.time.format.DateTimeFormatter;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -17,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -236,4 +245,42 @@ public final class Helper {
         }
     }
 
+    public static void sendEmail(String to, String from, String subject, String body) throws MessagingException {
+        // SMTP server information
+        String host = "smtp.yourdomain.com"; // Replace with your SMTP server
+        final String username = "your-smtp-username"; // Replace with your SMTP username
+        final String password = "your-smtp-password"; // Replace with your SMTP password
+
+        // Set properties
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587"); // Replace with your SMTP port
+
+        // Get the Session object
+        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        // Create a default MimeMessage object
+        Message message = new MimeMessage(session);
+
+        // Set From: header field
+        message.setFrom(new InternetAddress(from));
+
+        // Set To: header field
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+
+        // Set Subject: header field
+        message.setSubject(subject);
+
+        // Set the actual message
+        message.setText(body);
+
+        // Send the message
+        Transport.send(message);
+    }
 }

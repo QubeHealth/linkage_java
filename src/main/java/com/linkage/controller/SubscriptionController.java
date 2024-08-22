@@ -8,6 +8,7 @@ import com.linkage.core.validations.SubscriptionSchema;
 import com.linkage.service.SubscriptionService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -34,7 +35,9 @@ public class SubscriptionController extends BaseController  {
     @Path("/sendSubscriptionExpiryEmail")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response sendEmailSubscription(SubscriptionSchema request) {
+    public Response sendEmailSubscription(@Valid SubscriptionSchema request) {
+
+        
 
         
         return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Email Sent Successfully", null)).build();
