@@ -15,6 +15,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+@Path("/api/subscription")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class SubscriptionController extends BaseController  {
     
     private SubscriptionService subscriptionService;
@@ -26,7 +29,7 @@ public class SubscriptionController extends BaseController  {
     }
 
     @POST
-    @Path("/sendEmailSubscription")
+    @Path("/sendSubscriptionExpiryEmail")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendEmailSubscription(@Context HttpServletRequest request) {
