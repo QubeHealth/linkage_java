@@ -2,7 +2,11 @@
 config.yml
 
 logs
-target/*
+target
+myenv
 .history
 
 sslPrivateKey.p12
+
+.DS_Store
+
