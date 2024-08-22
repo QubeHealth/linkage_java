@@ -9,4 +9,5 @@ myenv
 sslPrivateKey.p12
 
 .DS_Store
+fab_config.json
 

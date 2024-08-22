@@ -2,6 +2,7 @@ package com.linkage;
 
 import com.linkage.controller.BefiscController;
 import com.linkage.controller.DigitapController;
+import com.linkage.controller.ErupeeController;
 import com.linkage.controller.FirebaseController;
 import com.linkage.controller.HereController;
 import com.linkage.controller.WatiController;
@@ -40,13 +41,16 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         FirebaseController firebaseController = new FirebaseController(configuration, validator);
         WatiController watiController = new WatiController(configuration, validator);
         DigitapController digitapController = new DigitapController(configuration, validator);
-        HereController hereController= new HereController(configuration, validator);
+
+        ErupeeController erupeeController = new ErupeeController(configuration, validator);
+                HereController hereController= new HereController(configuration, validator);
 
         environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
         environment.jersey().register(watiController);
         environment.jersey().register(digitapController);
+        environment.jersey().register(erupeeController);
         environment.jersey().register(hereController);
 
     }
