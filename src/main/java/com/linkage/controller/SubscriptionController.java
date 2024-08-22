@@ -1,11 +1,14 @@
 package com.linkage.controller;
 
+import javax.mail.MessagingException;
+
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.FirebaseService;
 import com.linkage.core.validations.GetReferalUrl;
 import com.linkage.core.validations.SubscriptionSchema;
 import com.linkage.service.SubscriptionService;
+import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -37,9 +40,13 @@ public class SubscriptionController extends BaseController  {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendEmailSubscription(@Valid SubscriptionSchema request) {
 
-        
+        try {
+            Helper.sendEmail(configuration, request.getEmail(), "Hi", "Subscription Expired");
 
-        
-        return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Email Sent Successfully", null)).build();
+            return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Email Sent Successfully", null)).build();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, e.getMessage(), e)).build();
+        }    
     }
 }

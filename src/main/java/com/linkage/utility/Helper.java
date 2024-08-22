@@ -39,6 +39,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.linkage.LinkageConfiguration;
 
 public final class Helper {
     private Helper() {
@@ -245,11 +246,11 @@ public final class Helper {
         }
     }
 
-    public static void sendEmail(String to, String from, String subject, String body) throws MessagingException {
+    public static void sendEmail(LinkageConfiguration configuration, String to, String subject, String body) throws MessagingException {
         // SMTP server information
-        String host = "smtp.yourdomain.com"; // Replace with your SMTP server
-        final String username = "your-smtp-username"; // Replace with your SMTP username
-        final String password = "your-smtp-password"; // Replace with your SMTP password
+        String host = configuration.getEmailHost();
+        final String username = configuration.getEmailSmtp();
+        final String password = configuration.getEmailPassword();
 
         // Set properties
         Properties props = new Properties();
@@ -269,7 +270,7 @@ public final class Helper {
         Message message = new MimeMessage(session);
 
         // Set From: header field
-        message.setFrom(new InternetAddress(from));
+        message.setFrom(new InternetAddress(configuration.getEmailSmtp()));
 
         // Set To: header field
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
