@@ -2,8 +2,10 @@ package com.linkage;
 
 import com.linkage.controller.BefiscController;
 import com.linkage.controller.DigitapController;
+import com.linkage.controller.ErupeeController;
 import com.linkage.controller.FirebaseController;
 import com.linkage.controller.SubscriptionController;
+import com.linkage.controller.HereController;
 import com.linkage.controller.WatiController;
 import com.linkage.controller.WebhookController;
 import com.linkage.utility.AuthFilter;
@@ -42,12 +44,17 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         DigitapController digitapController = new DigitapController(configuration, validator);
         SubscriptionController subscriptionController = new SubscriptionController(configuration, validator);
 
+        ErupeeController erupeeController = new ErupeeController(configuration, validator);
+                HereController hereController= new HereController(configuration, validator);
+
         environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
         environment.jersey().register(watiController);
         environment.jersey().register(digitapController);
         environment.jersey().register(subscriptionController);
+        environment.jersey().register(erupeeController);
+        environment.jersey().register(hereController);
 
     }
 }

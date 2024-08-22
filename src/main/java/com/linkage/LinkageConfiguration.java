@@ -25,6 +25,8 @@ public class LinkageConfiguration extends Configuration {
     private String digitapClientId;
     @NotEmpty
     private String digitapClientSecret;
+    @NotEmpty
+    private String hereApiKey;
 
     @NotEmpty
     private String emailSmtp;
@@ -135,5 +137,14 @@ public class LinkageConfiguration extends Configuration {
 
     public void setEmailHost(String emailHost) {
         this.emailHost = emailHost;
+    }
+
+    public String getHereApiKey() {
+        return hereApiKey;
+
+    }
+
+    public void setHereApiKey(String hereApiKey) {
+        this.hereApiKey=hereApiKey;
     }
 }

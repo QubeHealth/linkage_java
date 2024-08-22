@@ -295,4 +295,14 @@ public final class Helper {
             return false;
         }
     }
+    public static String convertJsonToString(Object jsonNode) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(jsonNode);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
 }
