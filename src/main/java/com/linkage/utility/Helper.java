@@ -246,42 +246,53 @@ public final class Helper {
         }
     }
 
-    public static void sendEmail(LinkageConfiguration configuration, String to, String subject, String body) throws MessagingException {
-        // SMTP server information
-        String host = configuration.getEmailHost();
-        final String username = configuration.getEmailSmtp();
-        final String password = configuration.getEmailPassword();
-
-        // Set properties
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", "587"); // Replace with your SMTP port
-
-        // Get the Session object
-        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
-            }
-        });
-
-        // Create a default MimeMessage object
-        Message message = new MimeMessage(session);
-
-        // Set From: header field
-        message.setFrom(new InternetAddress(configuration.getEmailSmtp()));
-
-        // Set To: header field
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-
-        // Set Subject: header field
-        message.setSubject(subject);
-
-        // Set the actual message
-        message.setText(body);
-
-        // Send the message
-        Transport.send(message);
+    public static boolean sendEmail(LinkageConfiguration configuration, String to, String subject, String body) {
+        try {
+            // SMTP server information
+            String host = configuration.getEmailHost();
+            final String username = configuration.getEmailSmtp();
+            final String password = configuration.getEmailPassword();
+    
+            // Set properties
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", host);
+            props.put("mail.smtp.port", "587"); // Replace with your SMTP port
+    
+            // Get the Session object
+            Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(username, password);
+                }
+            });
+    
+            // Create a default MimeMessage object
+            Message message = new MimeMessage(session);
+    
+            // Set From: header field
+            message.setFrom(new InternetAddress(configuration.getEmailSmtp()));
+    
+            // Set To: header field
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+    
+            // Set Subject: header field
+            message.setSubject(subject);
+    
+            // Set the actual message
+            message.setText(body);
+    
+            // Send the message
+            Transport.send(message);
+    
+            // If everything went well, return true
+            return true;
+        } catch (MessagingException e) {
+            // Log the exception (optional)
+            e.printStackTrace();
+    
+            // If there was an error, return false
+            return false;
+        }
     }
 }
