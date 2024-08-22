@@ -1,8 +1,10 @@
 package com.linkage.controller;
 
 import com.linkage.LinkageConfiguration;
+import com.linkage.api.ApiResponse;
 import com.linkage.client.FirebaseService;
 import com.linkage.core.validations.GetReferalUrl;
+import com.linkage.core.validations.SubscriptionSchema;
 import com.linkage.service.SubscriptionService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,9 +34,9 @@ public class SubscriptionController extends BaseController  {
     @Path("/sendSubscriptionExpiryEmail")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response sendEmailSubscription(@Context HttpServletRequest request) {
+    public Response sendEmailSubscription(SubscriptionSchema request) {
 
         
-        return null;
+        return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Email Sent Successfully", null)).build();
     }
 }
