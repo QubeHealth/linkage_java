@@ -36,7 +36,7 @@ public class SubscriptionController extends BaseController {
                     .entity(new ApiResponse<>(false, "Failed to send email", null)).build();
         }
 
-        return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Email Sent Successfully", null))
+        return Response.status(Response.Status.NO_CONTENT).entity(new ApiResponse<>(true, "Email Sent Successfully", null))
                 .build();
     }
 }
