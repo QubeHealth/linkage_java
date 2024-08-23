@@ -1,5 +1,7 @@
 package com.linkage.core.validations;
 
+import java.util.ArrayList;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -14,5 +16,5 @@ public class SubscriptionSchema {
     
     @JsonProperty("email")
     @NotEmpty(message = "Email is required")
-    private String email;
+    private ArrayList<String> email;
 }

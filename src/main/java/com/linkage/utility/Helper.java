@@ -295,6 +295,7 @@ public final class Helper {
             return false;
         }
     }
+
     public static String convertJsonToString(Object jsonNode) {
         try {
             ObjectMapper mapper = new ObjectMapper();

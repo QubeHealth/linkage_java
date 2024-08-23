@@ -1,5 +1,8 @@
 package com.linkage.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.SubscriptionSchema;
@@ -29,14 +32,28 @@ public class SubscriptionController extends BaseController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendEmailSubscription(@Valid SubscriptionSchema request) {
-        Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, request.getEmail(), "Hi",
-                "Subscription Expired");
-        if (!sendSubscriptionEmailRes) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ApiResponse<>(false, "Failed to send email", null)).build();
+
+        List<ApiResponse<Object>> responses = new ArrayList<ApiResponse<Object>>();
+
+        Boolean success = false;
+
+        for (String email : request.getEmail()) {
+            Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, email, "Hi",
+            "Subscription Expired");
+            if(!sendSubscriptionEmailRes) {
+                responses.add(new ApiResponse<Object>(false, "Failed to send subscription expiry email", null));
+            } else {
+                responses.add(new ApiResponse<Object>(true, "Subscription expiry email sent to " + email, null));
+                success = true;
+            }
         }
 
-        return Response.status(Response.Status.NO_CONTENT).entity(new ApiResponse<>(true, "Email Sent Successfully", null))
+        if(!success) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Failed to send subscription expiry emails", responses))
+                   .build();
+        }
+
+        return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Email sent successfully", responses))
                 .build();
     }
 }
