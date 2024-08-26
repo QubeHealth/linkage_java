@@ -24,9 +24,14 @@ public class MessageProviderService extends BaseServiceClient {
     private static final String BILL_REJECTED_TEMPLATE = "qp_ubr_new24may2024";
     private static final String APP_REVIEWER_TEMPLATE = "cashback_appreviews_05june2024";
 
+
+
     public MessageProviderService(LinkageConfiguration configuration) {
         super(configuration);
+
+    
     }
+
 
     // referee Invite message
     public ApiResponse<Object> referreeInviteMessage(RefereeInviteMsgSchema body) {
@@ -139,6 +144,27 @@ public class MessageProviderService extends BaseServiceClient {
 
 
         return this.networkCallExternalService(url, "POST", mainMap, header);
+    }
+
+    public ApiResponse<Object>  getTemplates() {
+        MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
+        header.putSingle("apikey", "mmvjw44hmoihd5v3pilrubbhdtjinfm5");
+        String url = "https://api.gupshup.io/sm/api/v1/template/list/X4YjYkuCjDy6rd9z3l3lb0rV";
+        
+        return this.networkCallExternalService(url, "get", null, header);
+
+    }
+
+    
+    public ApiResponse<Object> sendMessage(String urlEncodedString) {
+
+        MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
+        header.putSingle("apikey", "mmvjw44hmoihd5v3pilrubbhdtjinfm5");
+        header.putSingle("Content-Type", "application/x-www-form-urlencoded");
+
+        String url = "https://api.gupshup.io/wa/api/v1/msg";
+        
+        return this.networkCallExternalService(url, "post", urlEncodedString, header);
     }
 
 }
