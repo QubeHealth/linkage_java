@@ -1,7 +1,6 @@
 package com.linkage.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +13,6 @@ import com.linkage.core.validations.CashbackTypeMessageSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
 import com.linkage.core.validations.SendCashbackMsgSchema;
-import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -56,7 +54,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.referreeInviteMessage(body);
-        if (!messageProviderResponse.getStatus()) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -81,7 +81,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.referrerCashbackMessage(body);
-        if (!messageProviderResponse.getStatus()) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -105,7 +107,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.refereeCashbackMessage(body);
-        if (!messageProviderResponse.getStatus()) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -129,7 +133,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.billVerifiedMessage(body);
-        if (!messageProviderResponse.getStatus()) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -153,7 +159,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.billRejected(body);
-        if (!messageProviderResponse.getStatus()) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -177,7 +185,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.cashbackTypeMessage(body);
-        if (!messageProviderResponse.getStatus()) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -209,20 +219,23 @@ public class MessageProviderController extends BaseController {
         refererBody.setMobile(body.getMobileReferer());
 
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.refereeCashbackMessage(refereeBody);
-        if (!messageProviderResponse.getStatus()) {
-            messageProviderResponse.setMessage("Message failed to deliver to referee");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
 
         messageProviderResponse = this.messageProviderService.referrerCashbackMessage(refererBody);
-        if (!messageProviderResponse.getStatus()) {
-            messageProviderResponse.setMessage("Message failed to deliver to rerferer");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> res = (Map<String, Object>) messageProviderResponse.getData();
+        if (res.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
 
-        messageProviderResponse.setMessage("Message delivered successfully to referer and referee");
+        messageProviderResponse.setMessage("Message delivered successfully");
         messageProviderResponse.setData(null);
-
         return messageProviderResponse;
     }
 
@@ -248,31 +261,5 @@ public class MessageProviderController extends BaseController {
 
     }
 
-    @POST
-    @Path("/sendMessage")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public ApiResponse<Object> sendMessage(@Context HttpServletRequest request){
 
-        logger.info("TEamplate ata => {} ",templatesData);
-
-        Map<String, String> params = new HashMap<>();
-        params.put("channel", "whatsapp");
-        params.put("source", "917208024110");
-        params.put("destination", "919594952952");
-        params.put("message", "{\"type\":\"text\",\"image\":{\"link\":\"\"}}");
-        params.put("src.name", "X4YjYkuCjDy6rd9z3l3lb0rV");
-        params.put("template", "{ \"id\" :  \"3bc02264-d39e-4b9a-9520-6cfd6a66d0b4\" , \"params\" : [\"Tejas\"]}");
-
-        String urlEncodedString = Helper.convertToUrlEncoded(params);
-
-        ApiResponse<Object>  result = this.messageProviderService.sendMessage(urlEncodedString);
-        if (!result.getStatus()) {
-            result.setMessage("Failed to send the message");
-            return result;
-        }
-
-        return templatesData;
-
-    }
 }
