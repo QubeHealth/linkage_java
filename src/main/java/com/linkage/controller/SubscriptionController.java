@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
+import com.linkage.core.constants.Constants;
 import com.linkage.core.validations.SubscriptionSchema;
 import com.linkage.utility.Helper;
 
@@ -38,8 +39,8 @@ public class SubscriptionController extends BaseController {
         Boolean success = false;
 
         for (String email : request.getEmail()) {
-            Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, email, "Hi",
-            "Subscription Expired");
+            Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, "noelpinto47@gmail.com", Constants.SUBSCRIPTION_EXPIRED_EMAIL.get("SUBJECT"),
+            Constants.SUBSCRIPTION_EXPIRED_EMAIL.get("BODY"));
             if(!sendSubscriptionEmailRes) {
                 responses.add(new ApiResponse<Object>(false, "Failed to send subscription expiry email", null));
             } else {
