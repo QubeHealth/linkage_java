@@ -13,8 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubscriptionSchema {
-    
-    @JsonProperty("email")
+
+    @JsonProperty("hr_name")
+    @NotEmpty(message = "HR name is required")
+    private String hrName;
+
+    @JsonProperty("employee_name")
+    @NotEmpty(message = "Employee name is required")
+    private String employeeName;
+
+    @JsonProperty("hr_email")
     @NotEmpty(message = "Email is required")
-    private ArrayList<String> email;
+    private String hrEmail;
 }

@@ -2,14 +2,14 @@ package com.linkage.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.core.constants.Constants;
 import com.linkage.core.validations.SubscriptionSchema;
 import com.linkage.utility.Helper;
 
-import jakarta.validation.Valid;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -32,19 +32,37 @@ public class SubscriptionController extends BaseController {
     @Path("/sendSubscriptionExpiryEmail")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response sendEmailSubscription(@Valid SubscriptionSchema request) {
+    public Response sendEmailSubscription(List<SubscriptionSchema> request) {
+        Set<ConstraintViolation<List<SubscriptionSchema>>> violations = validator.validate(request);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return Response.status(Response.Status.OK)
+                    .entity(new ApiResponse<>(false, errorMessage, null))
+                    .build();
+        }
 
         List<ApiResponse<Object>> responses = new ArrayList<ApiResponse<Object>>();
 
         Boolean success = false;
 
-        for (String email : request.getEmail()) {
-            Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, "noelpinto47@gmail.com", Constants.SUBSCRIPTION_EXPIRED_EMAIL.get("SUBJECT"),
-            Constants.SUBSCRIPTION_EXPIRED_EMAIL.get("BODY"));
+        for (SubscriptionSchema email : request) {
+
+            String emailSubject = email.getEmployeeName() + " is requesting Qube Renewal!";
+            String emailBody = "Dear " + email.getHrName() + ", \n\n"+
+            email.getEmployeeName() + " from your team, just requested you to RENEW their Qube Subscription. \nThere might be many others who are worried about their subscription expiry - Please reach out to your contact at QubeHealth to get this done soon.\n\n" +
+            "Thanks\n"+
+            "QubeHealth Subscription Team";
+
+
+            Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, email.getHrEmail(), emailSubject,
+            emailBody);
             if(!sendSubscriptionEmailRes) {
                 responses.add(new ApiResponse<Object>(false, "Failed to send subscription expiry email", null));
             } else {
-                responses.add(new ApiResponse<Object>(true, "Subscription expiry email sent to " + email, null));
+                responses.add(new ApiResponse<Object>(true, "Subscription expiry email sent to " + email.getHrEmail(), null));
                 success = true;
             }
         }
