@@ -13,13 +13,17 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String firebaseWebApiKey;
     @NotEmpty
-    private String messageProviderUrl;
+    private String messageProviderTemplateUrl;
+    @NotEmpty
+    private String messageProviderSendMessageUrl;
     @NotEmpty
     private String messageProviderToken;
     @NotEmpty
     private String messageProviderSource;
     @NotEmpty
     private String messageProviderChannel;
+    @NotEmpty
+    private String messageProviderSrcName;
     @NotEmpty
     private String befiscAuthKey;
 
@@ -70,14 +74,21 @@ public class LinkageConfiguration extends Configuration {
         this.befiscAuthKey = befiscAuthKey;
     }
 
-    public String getMessageProviderUrl() {
-        return messageProviderUrl;
+    public String getMessageProviderTemplateUrl() {
+        return messageProviderTemplateUrl;
     }
 
-    public void setMessageProviderUrl(String messageProviderUrl) {
-        this.messageProviderUrl = messageProviderUrl;
+    public void setMessageProviderTemplateUrl(String messageProviderTemplateUrl) {
+        this.messageProviderTemplateUrl = messageProviderTemplateUrl;
     }
 
+    public String getMessageProviderSendMessageUrl() {
+        return messageProviderSendMessageUrl;
+    }
+
+    public void setMessageProviderSendMessageUrl(String messageProviderSendMessageUrl) {
+        this.messageProviderSendMessageUrl = messageProviderSendMessageUrl;
+    }
     public String getMessageProviderToken() {
         return messageProviderToken;
     }
@@ -101,6 +112,16 @@ public class LinkageConfiguration extends Configuration {
     public void setMessageProviderChannel(String messageProviderChannel) {
         this.messageProviderChannel = messageProviderChannel;
     }
+
+
+    public String getMessageProviderSrcName() {
+        return messageProviderSrcName;
+    }
+
+    public void setMessageProviderSrcName(String messageProviderSrcName) {
+        this.messageProviderSrcName = messageProviderSrcName;
+    }
+
 
     public String getDigitapClientId() {
         return digitapClientId;

@@ -31,12 +31,9 @@ import jakarta.ws.rs.core.MediaType;
 public class MessageProviderController extends BaseController {
     private MessageProviderService messageProviderService;
 
-    public ApiResponse<Object> templatesData;
-
     public MessageProviderController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
         messageProviderService = new MessageProviderService(configuration);
-        templatesData =  messageProviderService.getTemplates();
     }
 
     @POST
@@ -56,13 +53,7 @@ public class MessageProviderController extends BaseController {
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.referreeInviteMessage(body);
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
-        if (response.get("status").equals("submitted")) {
-            messageProviderResponse.setMessage("Message failed to deliver");
-            return messageProviderResponse;
-        }
-        messageProviderResponse.setMessage("Message delivered successfully");
-        messageProviderResponse.setData(null);
-        return messageProviderResponse;
+        return new ApiResponse<Object>(true, null, response);
 
     }
 
@@ -185,7 +176,6 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.cashbackTypeMessage(body);
-        @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
@@ -221,7 +211,7 @@ public class MessageProviderController extends BaseController {
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.refereeCashbackMessage(refereeBody);
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
-        if (response.get("status").equals("submitted")) {
+        if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -229,13 +219,12 @@ public class MessageProviderController extends BaseController {
         messageProviderResponse = this.messageProviderService.referrerCashbackMessage(refererBody);
         @SuppressWarnings("unchecked")
         Map<String, Object> res = (Map<String, Object>) messageProviderResponse.getData();
-        if (res.get("status").equals("submitted")) {
+        if (!res.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
 
         messageProviderResponse.setMessage("Message delivered successfully");
-        messageProviderResponse.setData(null);
         return messageProviderResponse;
     }
 
