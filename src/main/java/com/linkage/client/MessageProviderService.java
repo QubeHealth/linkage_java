@@ -1,6 +1,7 @@
 package com.linkage.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +10,14 @@ import org.json.JSONObject;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
+import com.linkage.core.validations.AdjudicationStatusMessageSchema;
+import com.linkage.core.validations.AhcAppointmentReportSchema;
+import com.linkage.core.validations.AhcBookConfirmSchema;
 import com.linkage.core.validations.BillRejectedSchema;
 import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.CashbackTypeMessageSchema;
+import com.linkage.core.validations.CreditAssignedSchema;
+import com.linkage.core.validations.DisbursedMessageSchema;
 import com.linkage.core.validations.MessageProviderSchema;
 import com.linkage.core.validations.MessageProviderSchema.SendMessageSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
@@ -29,6 +35,18 @@ public class MessageProviderService extends BaseServiceClient {
     private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024";
     private static final String BILL_PARTIAL_VERIFIED_TEMPLATE = "qp_ubr_new24may2024";
     private static final String BILL_REJECTED_TEMPLATE = "qp_ubr_new24may2024";
+
+    private static final String ADJUDICATION_APPROVED = "ncif_adjudication_2_22nov2023";
+    private static final String ADJUDICATION_INPROGRESS = "ncif_adjudication_1_22nov2023";
+    private static final String ADJUDICATION_REJECTED = "ncif_adjudication_3_22nov2023";
+
+    private static final String AHC_APPOINTMENT_REPORT = "ahc_appt_report_8_sept_2023";// "ahc_appointment_report_8_sept_2023";
+    private static final String AHC_APPOINTMENT_CONFIRM = "ahc_appointment_confirmation_7_sept_2023";
+
+    private static final String CREDIT_ASSIGNED = "qc_limit_assigned_22nov2023";
+    private static final String DISBURSEMENT_SUCCESS = "qc_disbursement_successful_22nov2023";
+    private static final String ALLOWED_TO_CREDIT_LIMIT = "qc_elign_29Mar2024";
+
     public ApiResponse<Object> templatesData;
 
     public MessageProviderService(LinkageConfiguration configuration) {
@@ -137,6 +155,113 @@ public class MessageProviderService extends BaseServiceClient {
 
     }
 
+    // Send Adjudication
+    public ApiResponse<Object> sendAdjudicationMessage(AdjudicationStatusMessageSchema body) {
+
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        
+        // Add values to the list
+        params.add(body.getFirstName());
+        params.add(body.getStatus().toString());
+        params.add(body.getMobile());
+        parameter.setParams(params);
+        if (body.getStatus().toLowerCase().equals("approved") ){
+            parameter.setElementName(ADJUDICATION_APPROVED);
+        } else if (body.getStatus().toLowerCase().equals("rejected") ){
+            parameter.setElementName(ADJUDICATION_REJECTED);
+        } else {
+            parameter.setElementName(ADJUDICATION_INPROGRESS);
+        }
+        return sendMessage(parameter);
+
+    }
+
+    // Appointment Confirmed
+    public ApiResponse<Object> appointmentConfirmed(AhcBookConfirmSchema body) {
+
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        
+        // Add values to the list
+        params.add(body.getFirstName().toString());
+        params.add(body.getDiagnosticsAddress());
+        params.add(body.getAppointmentDate());
+        params.add(body.getAppointmentTime());
+        parameter.setParams(params);
+        parameter.setElementName(AHC_APPOINTMENT_CONFIRM);
+        return sendMessage(parameter);
+
+    }
+
+    // Appointment Confirmed
+    public ApiResponse<Object> ahcReportMessage(AhcAppointmentReportSchema body) {
+
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        // Add values to the list
+        params.add(body.getFirstName().toString());
+        params.add(body.getAppointmentDate());
+        parameter.setParams(params);
+        parameter.setElementName(AHC_APPOINTMENT_REPORT);
+        return sendMessage(parameter);
+
+    }
+
+    // Credit Assigned
+    public ApiResponse<Object> creditAssigned(CreditAssignedSchema body) {
+
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        // Add values to the list
+        params.add(body.getFirstName().toString());
+        params.add("qubehealth");
+        params.add(body.getCreditAssigned());
+        parameter.setParams(params);
+        parameter.setElementName(CREDIT_ASSIGNED);
+        return sendMessage(parameter);
+
+    }
+
+    // Disbursement Succesful
+    public ApiResponse<Object> disbursementMessage(DisbursedMessageSchema body) {
+
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        // Add values to the list
+        params.add(body.getDisbursedAmount().toString());
+        params.add(body.getHspName());
+        params.add(body.getTransactionId());
+        params.add(new Date().toString());
+        parameter.setParams(params);
+        parameter.setElementName(DISBURSEMENT_SUCCESS);
+        return sendMessage(parameter);
+
+    }
+    
+    // Send Credit Limit Request
+    public ApiResponse<Object> allowedToRequestCredit(CreditAssignedSchema body) {
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        // Add values to the list
+        params.add(body.getFirstName().toString());
+        parameter.setParams(params);
+        parameter.setElementName(ALLOWED_TO_CREDIT_LIMIT);
+        return sendMessage(parameter);
+    }
+
     public ApiResponse<Object> getTemplates() {
         final String providerToken = configuration.getMessageProviderToken();
         final String providerBaseUrl = configuration.getMessageProviderTemplateUrl();
@@ -182,6 +307,9 @@ public class MessageProviderService extends BaseServiceClient {
         return this.networkCallExternalService(configuration.getMessageProviderSendMessageUrl(), "post", urlEncodedString, header);
     }
     
+
+
+
     private static Map<String, Object> extractAppIdForElementName(List<Map<String, Object>> data, String targetElementName) {
         try {
             // Use Java Streams to process the list of Maps

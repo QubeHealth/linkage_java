@@ -7,9 +7,14 @@ import java.util.Set;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.MessageProviderService;
+import com.linkage.core.validations.AdjudicationStatusMessageSchema;
+import com.linkage.core.validations.AhcAppointmentReportSchema;
+import com.linkage.core.validations.AhcBookConfirmSchema;
 import com.linkage.core.validations.BillRejectedSchema;
 import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.CashbackTypeMessageSchema;
+import com.linkage.core.validations.CreditAssignedSchema;
+import com.linkage.core.validations.DisbursedMessageSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
 import com.linkage.core.validations.SendCashbackMsgSchema;
@@ -74,7 +79,7 @@ public class MessageProviderController extends BaseController {
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.referrerCashbackMessage(body);
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
-        if (response.get("status").equals("submitted")) {
+        if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -100,7 +105,7 @@ public class MessageProviderController extends BaseController {
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.refereeCashbackMessage(body);
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
-        if (response.get("status").equals("submitted")) {
+        if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -126,7 +131,7 @@ public class MessageProviderController extends BaseController {
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.billVerifiedMessage(body);
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
-        if (response.get("status").equals("submitted")) {
+        if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -152,7 +157,7 @@ public class MessageProviderController extends BaseController {
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.billRejected(body);
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
-        if (response.get("status").equals("submitted")) {
+        if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -177,7 +182,7 @@ public class MessageProviderController extends BaseController {
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.cashbackTypeMessage(body);
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
-        if (response.get("status").equals("submitted")) {
+        if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
@@ -228,6 +233,151 @@ public class MessageProviderController extends BaseController {
         return messageProviderResponse;
     }
 
+    @POST
+    @Path("/userAdjudicationStatusMsg")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> userAdjudicationStatusMsg(AdjudicationStatusMessageSchema body) {
+        Set<ConstraintViolation<AdjudicationStatusMessageSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.sendAdjudicationMessage(body);
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
+
+    @POST
+    @Path("/userConfirmAhc")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> userConfirmAhc(AhcBookConfirmSchema body) {
+        Set<ConstraintViolation<AhcBookConfirmSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.appointmentConfirmed(body);
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
+    
+    @POST
+    @Path("/userAhcReport")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> userAhcReport(AhcAppointmentReportSchema body) {
+        Set<ConstraintViolation<AhcAppointmentReportSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.ahcReportMessage(body);
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
+    
+    
+    @POST
+    @Path("/sendCreditApprovedMsg")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> sendCreditApprovedMsg(CreditAssignedSchema body) {
+        Set<ConstraintViolation<CreditAssignedSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.creditAssigned(body);
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
+        
+    
+    @POST
+    @Path("/sendDisbursementMsg")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> sendDisbursementMsg(DisbursedMessageSchema body) {
+        Set<ConstraintViolation<DisbursedMessageSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.disbursementMessage(body);
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
+
+    @POST
+    @Path("/requestToCreditLimitMsg")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> requestToCreditLimitMsg(CreditAssignedSchema body) {
+        Set<ConstraintViolation<CreditAssignedSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.allowedToRequestCredit(body);
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
     
     @POST
     @Path("/getTemplates")
