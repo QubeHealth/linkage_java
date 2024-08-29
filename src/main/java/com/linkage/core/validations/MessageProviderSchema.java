@@ -21,5 +21,9 @@ public class MessageProviderSchema {
 
         @JsonProperty("params")
         private List<String> params;
+
+        @JsonProperty("link")
+        private String link;
+
     }
 }

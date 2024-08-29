@@ -210,6 +210,7 @@ public class MessageProviderService extends BaseServiceClient {
         params.add(body.getAppointmentDate());
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_REPORT);
+        parameter.setLink(body.getReportPath());
         return sendMessage(parameter);
 
     }
@@ -290,13 +291,15 @@ public class MessageProviderService extends BaseServiceClient {
         params.put("channel", configuration.getMessageProviderChannel());
         params.put("source", configuration.getMessageProviderSource());
         params.put("destination", parameter.getMobile());
+
         if (!extractedTemplateData.get("templateType").toString().equalsIgnoreCase("TEXT")) {
             final JSONObject selectedTemplateData = new JSONObject(extractedTemplateData.get("containerMeta").toString());
             final JSONObject imageObject = new JSONObject();
-            imageObject.put("id", selectedTemplateData.getString("mediaId").toString());
-            imageObject.put("type", "image");
+            imageObject.put("link", parameter.getLink());
             final JSONObject messagObject = new JSONObject();
-            messagObject.put("image", imageObject.toString());
+            messagObject.put("type", extractedTemplateData.get("templateType").toString().toLowerCase());
+            messagObject.put(extractedTemplateData.get("templateType").toString().toLowerCase(), imageObject);
+            params.put("message", messagObject.toString());
         }
         params.put("template", templateObject.toString());
         final String urlEncodedString = Helper.convertToUrlEncoded(params);
