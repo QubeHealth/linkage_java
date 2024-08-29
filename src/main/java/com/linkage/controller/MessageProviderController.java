@@ -55,7 +55,11 @@ public class MessageProviderController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
+
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.referreeInviteMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         return new ApiResponse<Object>(true, null, response);
@@ -77,6 +81,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.referrerCashbackMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
@@ -103,6 +110,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.refereeCashbackMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
@@ -129,6 +139,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.billVerifiedMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
@@ -155,6 +168,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.billRejected(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
@@ -181,6 +197,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.cashbackTypeMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
@@ -214,6 +233,9 @@ public class MessageProviderController extends BaseController {
         refererBody.setMobile(body.getMobileReferer());
 
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.refereeCashbackMessage(refereeBody);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
@@ -222,6 +244,9 @@ public class MessageProviderController extends BaseController {
         }
 
         messageProviderResponse = this.messageProviderService.referrerCashbackMessage(refererBody);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         @SuppressWarnings("unchecked")
         Map<String, Object> res = (Map<String, Object>) messageProviderResponse.getData();
         if (!res.get("status").equals("submitted")) {
@@ -247,6 +272,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.sendAdjudicationMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
@@ -271,6 +299,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.appointmentConfirmed(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
@@ -295,6 +326,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.ahcReportMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
@@ -320,6 +354,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.creditAssigned(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
@@ -345,6 +382,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.disbursementMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");
@@ -369,6 +409,9 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.allowedToRequestCredit(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted")) {
             messageProviderResponse.setMessage("Message failed to deliver");

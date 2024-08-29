@@ -279,6 +279,9 @@ public class MessageProviderService extends BaseServiceClient {
         final List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("templates");
     
         final Map<String, Object> extractedTemplateData = extractAppIdForElementName(data, parameter.getElementName());
+        if (extractedTemplateData == null) {
+            return new ApiResponse<Object>(false, "Template not found", null);
+        }
 
         // Get Template Object
         final Map<String, Object> templateParams = new HashMap<>();
@@ -293,7 +296,6 @@ public class MessageProviderService extends BaseServiceClient {
         params.put("destination", parameter.getMobile());
 
         if (!extractedTemplateData.get("templateType").toString().equalsIgnoreCase("TEXT")) {
-            final JSONObject selectedTemplateData = new JSONObject(extractedTemplateData.get("containerMeta").toString());
             final JSONObject imageObject = new JSONObject();
             imageObject.put("link", parameter.getLink());
             final JSONObject messagObject = new JSONObject();
