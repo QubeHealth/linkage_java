@@ -329,6 +329,9 @@ public class MessageProviderService extends BaseServiceClient {
         final List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("templates");
     
         final Map<String, Object> extractedTemplateData = extractAppIdForElementName(data, parameter.getElementName());
+        if (extractedTemplateData == null) {
+            return new ApiResponse<Object>(false, "Template Not Found",null);
+        }
 
         // Get Template Object
         final Map<String, Object> templateParams = new HashMap<>();
