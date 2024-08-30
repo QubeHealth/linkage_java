@@ -45,7 +45,7 @@ public class MessageProviderService extends BaseServiceClient {
 
     private static final String CREDIT_ASSIGNED = "qc_limit_assigned_22nov2023";
     private static final String DISBURSEMENT_SUCCESS = "qc_disbursement_successful_22nov2023";
-    private static final String ALLOWED_TO_CREDIT_LIMIT = "qc_elign_29Mar2024";
+    private static final String ALLOWED_TO_CREDIT_LIMIT = "qc_elign_29mar2024";
 
     public ApiResponse<Object> templatesData;
 
@@ -279,9 +279,6 @@ public class MessageProviderService extends BaseServiceClient {
         final List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("templates");
     
         final Map<String, Object> extractedTemplateData = extractAppIdForElementName(data, parameter.getElementName());
-        if (extractedTemplateData == null) {
-            return new ApiResponse<Object>(false, "Template not found", null);
-        }
 
         // Get Template Object
         final Map<String, Object> templateParams = new HashMap<>();
