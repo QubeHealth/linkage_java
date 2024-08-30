@@ -1,16 +1,27 @@
 import logging
+import json
 from fabric import Connection, task
 from invoke import run
 
+def load_config(env):
+   with open('fab_config.json') as config_file:
+       config = json.load(config_file)
+   return config.get(env, {})
+
+
+# Environment setup
+ENVIRONMENT = 'uat'  # You can change this to 'local' or 'production' as needed
+config = load_config(ENVIRONMENT)
+
 # Update these variables with your GCP instance details
-HOST = '34.93.59.36'  # Optional if using hostname
-USER = 'root'
-KEY_FILE_NAME = '/Users/muhammedafthad/.ssh/gcp_instance_key'
+HOST = config.get("host")
+USER = config.get("username")
+KEY_FILE_NAME = config.get('ssh_path')
 
 APP_NAME = 'linkage'
 JAR_FILE = 'target/' + APP_NAME + '-1.0-SNAPSHOT'+'.jar'  # Change this to your actual JAR file path
 CONFIG_FILE = 'config.yml'  # Path to your config.yml file
-OUTPUT_LOG = '/Users/muhammedafthad/MASTER_JAVA/server_log.txt'
+OUTPUT_LOG = '/server_log.log'
 PORT=5016
 
 # Remote paths

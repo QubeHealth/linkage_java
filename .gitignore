@@ -11,3 +11,4 @@ sslPrivateKey.p12
 .DS_Store
 
 serviceAccount.json
+fab_config.json
