@@ -33,6 +33,8 @@ public class LinkageConfiguration extends Configuration {
     private String digitapClientId;
     @NotEmpty
     private String digitapClientSecret;
+    @NotEmpty
+    private String hereApiKey;
 
     public String getxApiKey() {
         return xApiKey;
@@ -147,4 +149,12 @@ public class LinkageConfiguration extends Configuration {
         this.digitapUrl = digitapUrl;
     }
 
+    public String getHereApiKey() {
+        return hereApiKey;
+
+    }
+
+    public void setHereApiKey(String hereApiKey) {
+        this.hereApiKey=hereApiKey;
+    }
 }
