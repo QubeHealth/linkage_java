@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
+import com.linkage.core.validations.AddFamilyMemberSchema;
 import com.linkage.core.validations.AdjudicationStatusMessageSchema;
 import com.linkage.core.validations.AhcAppointmentReportSchema;
 import com.linkage.core.validations.AhcBookConfirmSchema;
@@ -19,9 +20,11 @@ import com.linkage.core.validations.CashbackTypeMessageSchema;
 import com.linkage.core.validations.CreditAssignedSchema;
 import com.linkage.core.validations.DisbursedMessageSchema;
 import com.linkage.core.validations.MessageProviderSchema;
+import com.linkage.core.validations.NewUserOnboardingSchema;
 import com.linkage.core.validations.MessageProviderSchema.SendMessageSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
+import com.linkage.core.validations.RepeatUserRetentionSchema;
 import com.linkage.utility.Helper;
 
 import jakarta.ws.rs.core.MediaType;
@@ -46,6 +49,12 @@ public class MessageProviderService extends BaseServiceClient {
     private static final String CREDIT_ASSIGNED = "qc_limit_assigned_22nov2023";
     private static final String DISBURSEMENT_SUCCESS = "qc_disbursement_successful_22nov2023";
     private static final String ALLOWED_TO_CREDIT_LIMIT = "qc_elign_29mar2024";
+
+    private static final String NEW_USER_ONBOARDING = "qp_awareness_ne_29mar2024";
+    private static final String REPEAT_USER_RETENTION = "qp_usage_rem_29mar2024";
+    private static final String ADD_FAMILY_MEMBER = "qcp_awareness_1_fam_22may2024";
+
+
 
     public ApiResponse<Object> templatesData;
 
@@ -260,6 +269,47 @@ public class MessageProviderService extends BaseServiceClient {
         params.add(body.getFirstName().toString());
         parameter.setParams(params);
         parameter.setElementName(ALLOWED_TO_CREDIT_LIMIT);
+        return sendMessage(parameter);
+    }
+
+    // New User Onboarding
+    public ApiResponse<Object> newUserOnboarding(NewUserOnboardingSchema body) {
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        // Add values to the list
+        params.add(body.getFirstName().toString());
+        params.add(body.getCompanyName().toString());
+        parameter.setParams(params);
+        parameter.setElementName(NEW_USER_ONBOARDING);
+        return sendMessage(parameter);
+    }
+
+    // Repeat User Retention
+    public ApiResponse<Object> repeatUserRetention(RepeatUserRetentionSchema body) {
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        // Add values to the list
+        params.add(String.valueOf(body.getAmount()));
+        parameter.setParams(params);
+        parameter.setElementName(REPEAT_USER_RETENTION);
+        return sendMessage(parameter);
+    }
+
+    // Add Family Member
+    public ApiResponse<Object> addFamilyMember(AddFamilyMemberSchema body) {
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());    
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        // Add values to the list
+        params.add(body.getPrimaryFname().toString());
+        params.add(body.getSecondaryFname().toString());
+        parameter.setParams(params);
+        parameter.setElementName(ADD_FAMILY_MEMBER);
         return sendMessage(parameter);
     }
 

@@ -7,6 +7,7 @@ import java.util.Set;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.MessageProviderService;
+import com.linkage.core.validations.AddFamilyMemberSchema;
 import com.linkage.core.validations.AdjudicationStatusMessageSchema;
 import com.linkage.core.validations.AhcAppointmentReportSchema;
 import com.linkage.core.validations.AhcBookConfirmSchema;
@@ -15,8 +16,10 @@ import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.CashbackTypeMessageSchema;
 import com.linkage.core.validations.CreditAssignedSchema;
 import com.linkage.core.validations.DisbursedMessageSchema;
+import com.linkage.core.validations.NewUserOnboardingSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
+import com.linkage.core.validations.RepeatUserRetentionSchema;
 import com.linkage.core.validations.SendCashbackMsgSchema;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -409,6 +412,88 @@ public class MessageProviderController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.allowedToRequestCredit(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
+
+    @POST
+    @Path("/newUserOnboarding")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> newUserOnboarding(NewUserOnboardingSchema body) {
+        Set<ConstraintViolation<NewUserOnboardingSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.newUserOnboarding(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
+    
+    @POST
+    @Path("/retentionOfRepeatUser")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> repeatUserRetention(RepeatUserRetentionSchema body) {
+        Set<ConstraintViolation<RepeatUserRetentionSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.repeatUserRetention(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        if (!response.get("status").equals("submitted")) {
+            messageProviderResponse.setMessage("Message failed to deliver");
+            return messageProviderResponse;
+        }
+        messageProviderResponse.setMessage("Message delivered successfully");
+        messageProviderResponse.setData(null);
+        return messageProviderResponse;
+    }
+    
+        
+    @POST
+    @Path("/addFamilyMember")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> addFamilyMember(AddFamilyMemberSchema body) {
+        Set<ConstraintViolation<AddFamilyMemberSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.addFamilyMember(body);
         if (messageProviderResponse.getData() == null) {
             return messageProviderResponse;
         }
