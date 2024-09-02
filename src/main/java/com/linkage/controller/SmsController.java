@@ -30,11 +30,11 @@ public class SmsController extends BaseController {
     }
 
     @POST
-    @Path("/commumnicationRefund")
+    @Path("/paymentStatus")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public  ApiResponse<Object>  commumnicationRefund(SmsSchema.CommumnicationRefund body) {
-         Set<ConstraintViolation<SmsSchema.CommumnicationRefund>> violations = validator.validate(body);
+    public  ApiResponse<Object>  paymentStatus(SmsSchema.PaymentStatus body) {
+         Set<ConstraintViolation<SmsSchema.PaymentStatus>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
             // Construct error message from violations
             String errorMessage = violations.stream()

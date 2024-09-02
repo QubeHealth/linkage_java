@@ -9,7 +9,7 @@ import com.linkage.core.validations.SmsSchema;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
-public class SmsService  extends BaseServiceClient {
+public class SmsService extends BaseServiceClient {
 
     public SmsService(LinkageConfiguration configuration) {
         super(configuration);
@@ -22,7 +22,7 @@ public class SmsService  extends BaseServiceClient {
         return headers;
     }
 
-    private Map<String, Object> prepareRequestBody(String mobile, String type,String messageBody, String templateId) {
+    private Map<String, Object> prepareRequestBody(String mobile, String type, String messageBody, String templateId) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("to", "+91" + mobile);
         requestBody.put("type", type);
@@ -32,12 +32,8 @@ public class SmsService  extends BaseServiceClient {
         return requestBody;
     }
 
-    private ApiResponse<Object> makeServiceCall(String url, String method, Map<String, Object> requestBody, MultivaluedHashMap<String, Object> headers) {
-        return networkCallInternalService(url, method, requestBody, headers);
-    }
-
-    public ApiResponse<Object> paymentPending(SmsSchema.CommumnicationRefund body) {
-        final String URL = configuration.getKaleyraBaseUrl()+"/v1/"+configuration.getKaleyraSid()+"/messages";
+    public ApiResponse<Object> paymentPending(SmsSchema.PaymentStatus body) {
+        final String URL = configuration.getKaleyraBaseUrl() + "/v1/" + configuration.getKaleyraSid() + "/messages";
         final String TEMPLATE_ID = configuration.getKayeraPaymentPendingTemplateId(); 
         final String TYPE = "TXN";
 
@@ -47,11 +43,11 @@ public class SmsService  extends BaseServiceClient {
                                             body.getTransactionId());
         Map<String, Object> requestBody = prepareRequestBody(body.getMobile(), TYPE, messageBody, TEMPLATE_ID);
 
-        return makeServiceCall(URL, "post", requestBody, headers);
+        return networkCallInternalService(URL, "post", requestBody, headers);
     }
 
-    public ApiResponse<Object> paymentFailed(SmsSchema.CommumnicationRefund body) {
-        final String URL = configuration.getKaleyraBaseUrl()+"/v1/"+configuration.getKaleyraSid()+"/messages";
+    public ApiResponse<Object> paymentFailed(SmsSchema.PaymentStatus body) {
+        final String URL = configuration.getKaleyraBaseUrl() + "/v1/" + configuration.getKaleyraSid() + "/messages";
         final String TEMPLATE_ID = configuration.getKayeraPaymentFailedTemplateId(); 
         final String TYPE = "TXN";
 
@@ -61,8 +57,6 @@ public class SmsService  extends BaseServiceClient {
                                             body.getTransactionId(), body.getType());
         Map<String, Object> requestBody = prepareRequestBody(body.getMobile(), TYPE, messageBody, TEMPLATE_ID);
 
-        return makeServiceCall(URL, "post", requestBody, headers);
+        return networkCallInternalService(URL, "post", requestBody, headers);
     }
-
-
 }

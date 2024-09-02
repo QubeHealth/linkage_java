@@ -13,7 +13,7 @@ public class UserService extends BaseServiceClient {
     public ApiResponse<Object> getMobileNo(Long userId) {
         String url = configuration.getUserUrl() + "users/getMobileNo";
 
-        return this.networkCallExternalService(url, "post", userId, null);
+        return this.networkCallInternalService(url, "post", userId, null);
     }
 
 }

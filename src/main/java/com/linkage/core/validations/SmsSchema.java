@@ -6,7 +6,7 @@ public class SmsSchema {
 
     }
     @Data
-    public static class CommumnicationRefund {
+    public static class PaymentStatus {
         private String status;
         private Long userID;
         private String transactionId;
