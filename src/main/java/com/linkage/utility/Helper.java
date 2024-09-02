@@ -1,6 +1,8 @@
 package com.linkage.utility;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -246,6 +248,26 @@ public final class Helper {
         }
     }
 
+    public static String convertToUrlEncoded(Map<String, String> params) {
+        // Convert the map to a URL-encoded string
+        StringBuilder encoded = new StringBuilder();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            try {
+                encoded.append(URLEncoder.encode(entry.getKey(), "UTF-8"))
+                       .append("=")
+                       .append(URLEncoder.encode(entry.getValue(), "UTF-8"))
+                       .append("&");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();  // Handle the encoding exception appropriately
+            }
+        }
+        // Remove the trailing "&"
+        if (encoded.length() > 0) {
+            encoded.setLength(encoded.length() - 1);
+        }
+        return encoded.toString();
+    }
+  
     public static boolean sendEmail(LinkageConfiguration configuration, String to, String subject, String body) {
         try {
             // SMTP server information
