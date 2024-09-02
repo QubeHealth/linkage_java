@@ -36,6 +36,13 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String hereApiKey;
 
+    @NotEmpty
+    private String emailSmtp;
+    @NotEmpty
+    private String emailPassword;
+    @NotEmpty
+    private String emailHost;
+
     public String getxApiKey() {
         return xApiKey;
     }
@@ -147,6 +154,30 @@ public class LinkageConfiguration extends Configuration {
 
     public void setDigitapUrl(String digitapUrl) {
         this.digitapUrl = digitapUrl;
+    }
+
+    public String getEmailSmtp() {
+        return emailSmtp;
+    }
+
+    public void setEmailSmtp(String emailSmtp) {
+        this.emailSmtp = emailSmtp;
+    }
+
+    public String getEmailPassword() {
+        return emailPassword;
+    }
+
+    public void setEmailPassword(String emailPassword) {
+        this.emailPassword = emailPassword;
+    }
+
+    public String getEmailHost() {
+        return emailHost;
+    }
+
+    public void setEmailHost(String emailHost) {
+        this.emailHost = emailHost;
     }
 
     public String getHereApiKey() {
