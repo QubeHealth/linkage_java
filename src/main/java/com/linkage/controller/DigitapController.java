@@ -80,7 +80,7 @@ public class DigitapController extends BaseController {
 
             Map<String, Object> report = (Map<String, Object>) creditResponse.get("result");
 
-            String xmlReport = Helper.jsonToXML(Helper.toJsonString(report.get("result_json")));
+            String xmlReport = Helper.downloadXmlAsString(report.getOrDefault("result_xml", "").toString());
 
             creditResponse.put("result", xmlReport);
 
