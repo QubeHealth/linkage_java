@@ -58,6 +58,9 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String emailHost;
 
+    @NotEmpty
+    private String googleApiKey;
+
     public String getxApiKey() {
         return xApiKey;
     }
@@ -201,6 +204,13 @@ public class LinkageConfiguration extends Configuration {
 
     public void setHereApiKey(String hereApiKey) {
         this.hereApiKey = hereApiKey;
+    }
+    public String getGoogleApiKey() {
+        return googleApiKey;
+    }
+
+    public void setGoogleApiKey(String googleApiKey) {
+        this.googleApiKey = googleApiKey;
     }
 
     public String getKaleyraBaseUrl() {
