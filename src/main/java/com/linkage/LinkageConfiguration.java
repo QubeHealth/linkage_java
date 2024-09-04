@@ -35,6 +35,21 @@ public class LinkageConfiguration extends Configuration {
     private String digitapClientSecret;
     @NotEmpty
     private String hereApiKey;
+    @NotEmpty
+    private String kaleyraBaseUrl;
+    @NotEmpty
+    private String kaleyraApiKey;
+    @NotEmpty
+    private String kaleyraSid;
+    @NotEmpty
+    private String kaleyraSenderId;
+    @NotEmpty
+    private String kayeraPaymentPendingTemplateId;
+    @NotEmpty
+    private String kayeraPaymentFailedTemplateId;
+
+    @NotEmpty
+    private String userJavaUrl;
 
     @NotEmpty
     private String emailSmtp;
@@ -196,5 +211,67 @@ public class LinkageConfiguration extends Configuration {
 
     public void setGoogleApiKey(String googleApiKey) {
         this.googleApiKey = googleApiKey;
+    }
+
+    public String getKaleyraBaseUrl() {
+        return kaleyraBaseUrl;
+
+    }
+
+    public void setKaleyraBaseUrl(String kaleyraBaseUrl) {
+        this.kaleyraBaseUrl = kaleyraBaseUrl;
+    }
+
+    public String getKaleyraApiKey() {
+        return kaleyraApiKey;
+
+    }
+
+    public void setKaleyraApiKey(String kaleyraApiKey) {
+        this.kaleyraApiKey = kaleyraApiKey;
+    }
+
+    public String getKaleyraSid() {
+        return kaleyraSid;
+
+    }
+
+    public void setKaleyraSid(String kaleyraSid) {
+        this.kaleyraSid = kaleyraSid;
+    }
+
+    public String getKaleyraSenderId() {
+        return kaleyraSenderId;
+
+    }
+
+    public void setkaleyraSenderId(String kaleyraSenderId) {
+        this.kaleyraSenderId = kaleyraSenderId;
+    }
+
+    public String getKayeraPaymentPendingTemplateId() {
+        return kayeraPaymentPendingTemplateId;
+
+    }
+
+    public void setKayeraPaymentPendingTemplateId(String kayeraPaymentPendingTemplateId) {
+        this.kayeraPaymentPendingTemplateId = kayeraPaymentPendingTemplateId;
+    }
+
+    public String getKayeraPaymentFailedTemplateId() {
+        return kayeraPaymentFailedTemplateId;
+
+    }
+
+    public void setKayeraPaymentFailedTemplateId(String kayeraPaymentFailedTemplateId) {
+        this.kayeraPaymentFailedTemplateId = kayeraPaymentFailedTemplateId;
+    }
+
+    public String getUserJavaUrl() {
+        return userJavaUrl;
+    }
+
+    public void setUserJavaUrl(String userJavaUrl) {
+        this.userJavaUrl = userJavaUrl;
     }
 }
