@@ -33,8 +33,8 @@ public class SmsController extends BaseController {
     @Path("/paymentStatus")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public  ApiResponse<Object>  paymentStatus(SmsSchema.PaymentStatus body) {
-         Set<ConstraintViolation<SmsSchema.PaymentStatus>> violations = validator.validate(body);
+    public ApiResponse<Object> paymentStatus(SmsSchema.PaymentStatus body) {
+        Set<ConstraintViolation<SmsSchema.PaymentStatus>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
             // Construct error message from violations
             String errorMessage = violations.stream()
@@ -43,24 +43,16 @@ public class SmsController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
 
-        ApiResponse<Object> userRes = this.userService.getMobileNo(body.getUserID());
-        String mobileNo = (String) userRes.getData();
-
-        body.setMobile(mobileNo);
-        
-        ApiResponse<Object> result = null;
-        if (body.getStatus().equals("payment_pending")){
-
-            result = this.smsService.paymentPending(body);
-
-        }else if(body.getStatus().equals("payment_failed")){
-
-            result = this.smsService.paymentFailed(body);
-
+        ApiResponse<Object> result = this.userService.getMobileNo(body.getUserID());
+        if (!result.getStatus()) {
+            return new ApiResponse<>(false, "User mobile not found", result);
         }
-        return result;
+
+        String mobileNo = (String) result.getData();
+        body.setMobile(mobileNo);
+
+        return this.smsService.sendPaymentSms(body);
+
     }
 
-    
 }
-

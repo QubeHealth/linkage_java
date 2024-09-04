@@ -26,36 +26,34 @@ public class SmsService extends BaseServiceClient {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("to", "+91" + mobile);
         requestBody.put("type", type);
-        requestBody.put("sender", configuration.getKaleyraSenderId()); 
+        requestBody.put("sender", configuration.getKaleyraSenderId());
         requestBody.put("body", messageBody);
         requestBody.put("template_id", templateId);
         return requestBody;
     }
 
-    public ApiResponse<Object> paymentPending(SmsSchema.PaymentStatus body) {
+    public ApiResponse<Object> sendPaymentSms(SmsSchema.PaymentStatus body) {
         final String URL = configuration.getKaleyraBaseUrl() + "/v1/" + configuration.getKaleyraSid() + "/messages";
-        final String TEMPLATE_ID = configuration.getKayeraPaymentPendingTemplateId(); 
+        final String TEMPLATE_ID = configuration.getKayeraPaymentPendingTemplateId();
         final String TYPE = "TXN";
 
         MultivaluedHashMap<String, Object> headers = prepareHeaders(configuration.getKaleyraApiKey());
 
-        String messageBody = String.format("Payment Pending:\nQubePay Payment Pending Txn. ID %s. Please check the app after 30 mins",
-                                            body.getTransactionId());
-        Map<String, Object> requestBody = prepareRequestBody(body.getMobile(), TYPE, messageBody, TEMPLATE_ID);
+        String message = "";
 
-        return networkCallInternalService(URL, "post", requestBody, headers);
-    }
+        if (body.getStatus().equals("payment_pending")) {
+            message = String.format(
+                    "Payment Pending:\nQubePay Payment Pending Txn. ID %s. Please check the app after 30 mins",
+                    body.getTransactionId());
+        } else if (body.getStatus().equals("payment_failed")) {
+            message = String.format(
+                    "Payment Failed: \nOh! Your payment via QubePay Txn. ID %s FAILED. Don't worry, any amount debited from %s will be REFUNDED within 7 Business days.",
+                    body.getTransactionId(), body.getType());
+        } else {
+            return new ApiResponse<Object>(false, "Invalid payment status", null);
+        }
 
-    public ApiResponse<Object> paymentFailed(SmsSchema.PaymentStatus body) {
-        final String URL = configuration.getKaleyraBaseUrl() + "/v1/" + configuration.getKaleyraSid() + "/messages";
-        final String TEMPLATE_ID = configuration.getKayeraPaymentFailedTemplateId(); 
-        final String TYPE = "TXN";
-
-        MultivaluedHashMap<String, Object> headers = prepareHeaders(configuration.getKaleyraApiKey());
-
-        String messageBody = String.format("Payment Failed: \nOh! Your payment via QubePay Txn. ID %s FAILED. Don't worry, any amount debited from %s will be REFUNDED within 7 Business days.",
-                                            body.getTransactionId(), body.getType());
-        Map<String, Object> requestBody = prepareRequestBody(body.getMobile(), TYPE, messageBody, TEMPLATE_ID);
+        Map<String, Object> requestBody = prepareRequestBody(body.getMobile(), TYPE, message, TEMPLATE_ID);
 
         return networkCallInternalService(URL, "post", requestBody, headers);
     }
