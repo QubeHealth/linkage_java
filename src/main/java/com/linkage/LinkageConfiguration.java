@@ -49,7 +49,7 @@ public class LinkageConfiguration extends Configuration {
     private String kayeraPaymentFailedTemplateId;
 
     @NotEmpty
-    private String userUrl;
+    private String userJavaUrl;
 
     @NotEmpty
     private String emailSmtp;
@@ -113,6 +113,7 @@ public class LinkageConfiguration extends Configuration {
     public void setMessageProviderSendMessageUrl(String messageProviderSendMessageUrl) {
         this.messageProviderSendMessageUrl = messageProviderSendMessageUrl;
     }
+
     public String getMessageProviderToken() {
         return messageProviderToken;
     }
@@ -137,7 +138,6 @@ public class LinkageConfiguration extends Configuration {
         this.messageProviderChannel = messageProviderChannel;
     }
 
-
     public String getMessageProviderSrcName() {
         return messageProviderSrcName;
     }
@@ -145,7 +145,6 @@ public class LinkageConfiguration extends Configuration {
     public void setMessageProviderSrcName(String messageProviderSrcName) {
         this.messageProviderSrcName = messageProviderSrcName;
     }
-
 
     public String getDigitapClientId() {
         return digitapClientId;
@@ -201,56 +200,68 @@ public class LinkageConfiguration extends Configuration {
     }
 
     public void setHereApiKey(String hereApiKey) {
-        this.hereApiKey=hereApiKey;
+        this.hereApiKey = hereApiKey;
     }
+
     public String getKaleyraBaseUrl() {
         return kaleyraBaseUrl;
 
     }
+
     public void setKaleyraBaseUrl(String kaleyraBaseUrl) {
-        this.kaleyraBaseUrl=kaleyraBaseUrl;
+        this.kaleyraBaseUrl = kaleyraBaseUrl;
     }
+
     public String getKaleyraApiKey() {
         return kaleyraApiKey;
 
     }
+
     public void setKaleyraApiKey(String kaleyraApiKey) {
-        this.kaleyraApiKey=kaleyraApiKey;
+        this.kaleyraApiKey = kaleyraApiKey;
     }
+
     public String getKaleyraSid() {
         return kaleyraSid;
 
     }
+
     public void setKaleyraSid(String kaleyraSid) {
-        this.kaleyraSid=kaleyraSid;
+        this.kaleyraSid = kaleyraSid;
     }
+
     public String getKaleyraSenderId() {
         return kaleyraSenderId;
 
     }
+
     public void setkaleyraSenderId(String kaleyraSenderId) {
-        this.kaleyraSenderId=kaleyraSenderId;
+        this.kaleyraSenderId = kaleyraSenderId;
     }
+
     public String getKayeraPaymentPendingTemplateId() {
         return kayeraPaymentPendingTemplateId;
 
     }
+
     public void setKayeraPaymentPendingTemplateId(String kayeraPaymentPendingTemplateId) {
-        this.kayeraPaymentPendingTemplateId=kayeraPaymentPendingTemplateId;
+        this.kayeraPaymentPendingTemplateId = kayeraPaymentPendingTemplateId;
     }
+
     public String getKayeraPaymentFailedTemplateId() {
         return kayeraPaymentFailedTemplateId;
 
     }
+
     public void setKayeraPaymentFailedTemplateId(String kayeraPaymentFailedTemplateId) {
-        this.kayeraPaymentFailedTemplateId=kayeraPaymentFailedTemplateId;
+        this.kayeraPaymentFailedTemplateId = kayeraPaymentFailedTemplateId;
     }
 
-    public String getUserUrl() {
-        return userUrl;
-
+    public String getUserJavaUrl() {
+        return userJavaUrl;
     }
-    public void setUserUrl(String userUrl) {
-        this.userUrl=userUrl;
+
+    public void setUserJavaUrl(String userJavaUrl) {
+        this.userJavaUrl = userJavaUrl;
     }
 }
