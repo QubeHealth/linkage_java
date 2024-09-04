@@ -43,6 +43,9 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String emailHost;
 
+    @NotEmpty
+    private String googleApiKey;
+
     public String getxApiKey() {
         return xApiKey;
     }
@@ -98,6 +101,7 @@ public class LinkageConfiguration extends Configuration {
     public void setMessageProviderSendMessageUrl(String messageProviderSendMessageUrl) {
         this.messageProviderSendMessageUrl = messageProviderSendMessageUrl;
     }
+
     public String getMessageProviderToken() {
         return messageProviderToken;
     }
@@ -122,7 +126,6 @@ public class LinkageConfiguration extends Configuration {
         this.messageProviderChannel = messageProviderChannel;
     }
 
-
     public String getMessageProviderSrcName() {
         return messageProviderSrcName;
     }
@@ -130,7 +133,6 @@ public class LinkageConfiguration extends Configuration {
     public void setMessageProviderSrcName(String messageProviderSrcName) {
         this.messageProviderSrcName = messageProviderSrcName;
     }
-
 
     public String getDigitapClientId() {
         return digitapClientId;
@@ -186,6 +188,13 @@ public class LinkageConfiguration extends Configuration {
     }
 
     public void setHereApiKey(String hereApiKey) {
-        this.hereApiKey=hereApiKey;
+        this.hereApiKey = hereApiKey;
+    }
+    public String getGoogleApiKey() {
+        return googleApiKey;
+    }
+
+    public void setGoogleApiKey(String googleApiKey) {
+        this.googleApiKey = googleApiKey;
     }
 }
