@@ -7,6 +7,7 @@ import com.linkage.controller.FirebaseController;
 import com.linkage.controller.MessageProviderController;
 import com.linkage.controller.SubscriptionController;
 import com.linkage.controller.HereController;
+import com.linkage.controller.SmsController;
 import com.linkage.controller.WebhookController;
 import com.linkage.utility.AuthFilter;
 
@@ -43,6 +44,7 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         MessageProviderController messageProviderController = new MessageProviderController(configuration, validator);
         DigitapController digitapController = new DigitapController(configuration, validator);
         SubscriptionController subscriptionController = new SubscriptionController(configuration, validator);
+        SmsController smsController = new SmsController(configuration, validator);
 
         ErupeeController erupeeController = new ErupeeController(configuration, validator);
                 HereController hereController= new HereController(configuration, validator);
@@ -55,6 +57,7 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         environment.jersey().register(subscriptionController);
         environment.jersey().register(erupeeController);
         environment.jersey().register(hereController);
+        environment.jersey().register(smsController);
 
     }
 }
