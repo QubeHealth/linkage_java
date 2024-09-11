@@ -74,7 +74,7 @@ public class DigitapController extends BaseController {
 
             if (creditResponse.get("result_code") != null && !creditResponse.get("result_code").equals(101)) {
                 if (creditResponse.get("result_code").equals(102)) {
-                    return response(Response.Status.FORBIDDEN,
+                    return response(Response.Status.OK,
                             new ApiResponse<>(true, creditResponse.get("message").toString(), creditResponse));
                 }
                 return response(Response.Status.FORBIDDEN,
