@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class HereSearchSchema {
+public class HspByLocation {
   
    @NotBlank(message = "Latitude is required")
    @JsonProperty("latitude")
@@ -20,11 +20,6 @@ public class HereSearchSchema {
    @NotBlank(message = "Longitude code is required")
    @JsonProperty("longitude")
    private String longitude;
-
-   @NotBlank(message = "Longitude code is required")
-   @JsonProperty("keyword")
-   private String keyword;
-
 
 }
 

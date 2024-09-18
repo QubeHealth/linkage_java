@@ -4,8 +4,10 @@ import com.linkage.controller.BefiscController;
 import com.linkage.controller.DigitapController;
 import com.linkage.controller.ErupeeController;
 import com.linkage.controller.FirebaseController;
-import com.linkage.controller.HereController;
-import com.linkage.controller.WatiController;
+import com.linkage.controller.GoogleMapsController;
+import com.linkage.controller.MessageProviderController;
+import com.linkage.controller.SubscriptionController;
+import com.linkage.controller.SmsController;
 import com.linkage.controller.WebhookController;
 import com.linkage.utility.AuthFilter;
 
@@ -39,19 +41,22 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         BefiscController befiscController = new BefiscController(configuration, validator);
         WebhookController webhookController = new WebhookController(configuration, validator);
         FirebaseController firebaseController = new FirebaseController(configuration, validator);
-        WatiController watiController = new WatiController(configuration, validator);
+        MessageProviderController messageProviderController = new MessageProviderController(configuration, validator);
         DigitapController digitapController = new DigitapController(configuration, validator);
+        SubscriptionController subscriptionController = new SubscriptionController(configuration, validator);
+        SmsController smsController = new SmsController(configuration, validator);
 
         ErupeeController erupeeController = new ErupeeController(configuration, validator);
-                HereController hereController= new HereController(configuration, validator);
-
+        GoogleMapsController googleMapsController=new GoogleMapsController(configuration, validator);
         environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
-        environment.jersey().register(watiController);
+        environment.jersey().register(messageProviderController);
         environment.jersey().register(digitapController);
+        environment.jersey().register(subscriptionController);
         environment.jersey().register(erupeeController);
-        environment.jersey().register(hereController);
+        environment.jersey().register(googleMapsController);
+        environment.jersey().register(smsController);
 
     }
 }
