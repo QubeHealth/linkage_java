@@ -57,8 +57,8 @@ public class EmailController extends BaseController {
             "Thanks,\n" + //
             "Qubehealth";
 
-            Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, "noelpinto47@gmail.com", emailSubject, emailBody);
-            if(!sendSubscriptionEmailRes) {
+            Boolean sendAdBannerEmailRes = Helper.sendEmail(configuration, "noelpinto47@gmail.com", emailSubject, emailBody);
+            if(!sendAdBannerEmailRes) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error sending email", null)).build();
             }
 
