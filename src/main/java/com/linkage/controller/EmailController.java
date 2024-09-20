@@ -16,6 +16,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Path("/api/email")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -30,6 +33,12 @@ public class EmailController extends BaseController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendAdBannerEmail(EmailModel.sendAdBannerEmailReq req) {
+        if(req == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ApiResponse<>(false, "Request body is required", null))
+                    .build();
+        }
+
         Set<ConstraintViolation<EmailModel.sendAdBannerEmailReq>> violations = validator.validate(req);
         if (!violations.isEmpty()) {
             // Construct error message from violations
@@ -42,11 +51,18 @@ public class EmailController extends BaseController {
         }
 
         try {
-            
+            // Parse the original date string into LocalDateTime
+            DateTimeFormatter originalFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime dateTime = LocalDateTime.parse(req.getTriggerDateTime(), originalFormat);
+
+            // Format the date to the desired format: "MMM d, yyyy 'at' hh.mm a"
+            DateTimeFormatter desiredFormat = DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' hh.mm a");
+            String formattedDate = dateTime.format(desiredFormat);
+
             String emailSubject = req.getProductName() + " Interested: " + req.getHrName() + " - " + req.getClusterName();
             String emailBody = "Hi Shweta, \n\n"+
             "This is an auto-triggered mail by our Qubehealth System basis on the interest shown by " + req.getHrName() + " of “Cluster Dashboard“.\n" + //
-            "The interest shown is for our " + req.getProductName() + " Product on May 12, 2024 at 03.05 pm.\n" + //
+            "The interest shown is for our " + req.getProductName() + " Product on " + formattedDate + ".\n" + //
             "\n" + //
             "Requesting to contact HR to take this ahead.\n" + //
             "HR Contact Number -\n" + //
@@ -57,7 +73,7 @@ public class EmailController extends BaseController {
             "Thanks,\n" + //
             "Qubehealth";
 
-            Boolean sendAdBannerEmailRes = Helper.sendEmail(configuration, "aadesh.bakliwal@qubehealth.com", emailSubject, emailBody);
+            Boolean sendAdBannerEmailRes = Helper.sendEmail(configuration, "noel.pinto@qubehealth.com", emailSubject, emailBody);
             if(!sendAdBannerEmailRes) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error sending email", null)).build();
             }

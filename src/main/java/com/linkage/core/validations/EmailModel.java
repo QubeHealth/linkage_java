@@ -17,5 +17,8 @@ public class EmailModel {
 
         @JsonProperty("cluster_name")
         private String clusterName;
+
+        @JsonProperty("trigger_date_time")
+        private String triggerDateTime;
     }
 }
