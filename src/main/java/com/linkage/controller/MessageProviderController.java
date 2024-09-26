@@ -16,6 +16,7 @@ import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.CashbackTypeMessageSchema;
 import com.linkage.core.validations.CreditAssignedSchema;
 import com.linkage.core.validations.DisbursedMessageSchema;
+import com.linkage.core.validations.DynamicMessageSchema;
 import com.linkage.core.validations.NewUserOnboardingSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
@@ -529,4 +530,28 @@ public class MessageProviderController extends BaseController {
     }
 
 
+    @POST
+    @Path("/dynamicWsapMessage")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> dynamicWsapMessage(@Context HttpServletRequest request,
+            DynamicMessageSchema body) {
+        Set<ConstraintViolation<DynamicMessageSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.dynamicWsapMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        return new ApiResponse<Object>(true, null, response);
+
+    }
 }
