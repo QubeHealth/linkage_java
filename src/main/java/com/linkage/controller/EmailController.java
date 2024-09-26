@@ -55,8 +55,8 @@ public class EmailController extends BaseController {
             DateTimeFormatter originalFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime dateTime = LocalDateTime.parse(req.getTriggerDateTime(), originalFormat);
 
-            // Format the date to the desired format: "MMM d, yyyy 'at' hh.mm a"
-            DateTimeFormatter desiredFormat = DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' hh.mm a");
+            // Format the date to the desired format: "MMM d, yyyy 'at' hh:mm a"
+            DateTimeFormatter desiredFormat = DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' hh:mm a");
             String formattedDate = dateTime.format(desiredFormat);
 
             String emailSubject = req.getProductName() + " Interested: " + req.getHrName() + " - " + req.getClusterName();
