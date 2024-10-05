@@ -1,6 +1,8 @@
 package com.linkage.controller;
 
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
@@ -45,7 +47,7 @@ public class EmailController extends BaseController {
             String errorMessage = violations.stream()
                     .map(ConstraintViolation::getMessage)
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
-            return Response.status(Response.Status.OK)
+            return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ApiResponse<>(false, errorMessage, null))
                     .build();
         }
@@ -59,10 +61,15 @@ public class EmailController extends BaseController {
             DateTimeFormatter desiredFormat = DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' hh:mm a");
             String formattedDate = dateTime.format(desiredFormat);
 
-            String emailSubject = req.getProductName() + " Interested: " + req.getHrName() + " - " + req.getClusterName();
+            // Format the product name to title case: "Product Name"
+            String formattedProductName = Arrays.stream(req.getProductName().split("_"))
+                 .map(word -> word.charAt(0) + word.substring(1).toLowerCase()) // Capitalize first letter
+                 .collect(Collectors.joining(" "));
+
+            String emailSubject = formattedProductName + " Interested: " + req.getHrName() + " - " + req.getClusterName();
             String emailBody = "Hi Shweta, \n\n"+
             "This is an auto-triggered mail by our Qubehealth System basis on the interest shown by " + req.getHrName() + " of “Cluster Dashboard“.\n" + //
-            "The interest shown is for our " + req.getProductName() + " Product on " + formattedDate + ".\n" + //
+            "The interest shown is for our " + formattedProductName + " Product on " + formattedDate + ".\n" + //
             "\n" + //
             "Requesting to contact HR to take this ahead.\n" + //
             "HR Contact Number -\n" + //
