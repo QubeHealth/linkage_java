@@ -1,6 +1,7 @@
 package com.linkage;
 
 import com.linkage.controller.BefiscController;
+import com.linkage.controller.BbpsController;
 import com.linkage.controller.DigitapController;
 import com.linkage.controller.ErupeeController;
 import com.linkage.controller.FirebaseController;
@@ -45,6 +46,8 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         DigitapController digitapController = new DigitapController(configuration, validator);
         SubscriptionController subscriptionController = new SubscriptionController(configuration, validator);
         SmsController smsController = new SmsController(configuration, validator);
+        BbpsController bbpsController = new BbpsController(configuration, validator);
+
 
         ErupeeController erupeeController = new ErupeeController(configuration, validator);
         GoogleMapsController googleMapsController=new GoogleMapsController(configuration, validator);
@@ -57,6 +60,8 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         environment.jersey().register(erupeeController);
         environment.jersey().register(googleMapsController);
         environment.jersey().register(smsController);
+        environment.jersey().register(bbpsController);
+
 
     }
 }
