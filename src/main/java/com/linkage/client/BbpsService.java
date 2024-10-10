@@ -29,11 +29,18 @@ public class BbpsService extends BaseServiceClient {
     }
 
     // Unified method to handle requests
-    private ApiResponse<Object> processRequest(String endpoint, Map<String, Object> body) throws Exception {
+    private  Map<String, Object> processRequest(String endpoint, Map<String, Object> body) throws Exception {
         String url = buildApiUrlWithParameters(endpoint);
         MultivaluedHashMap<String, Object> header = createHeader();
         String encryptedRequest = encryptMapToJson(body, configuration.getBbpsEncryptionKey(), Constants.BbpsConstants.ALGORITHM);
-        return this.networkCallExternalService(url, "POST", encryptedRequest, header);
+
+        ApiResponse<Object> result = this.networkCallExternalService(url, "POST", encryptedRequest, header);
+        if (result.getData() == null) {
+            return null;
+        }
+
+        Map<String, Object> apiData = decryptJsonToMap(result.getData().toString(), configuration.getBbpsEncryptionKey(), Constants.BbpsConstants.ALGORITHM);
+        return apiData;
     }
 
     private String buildApiUrlWithParameters(String endpoint) throws Exception {
@@ -48,31 +55,31 @@ public class BbpsService extends BaseServiceClient {
     }
 
     // API Request Methods
-    public ApiResponse<Object> billerInfoRequest(Map<String, Object> body) throws Exception {
+    public  Map<String, Object> billerInfoRequest(Map<String, Object> body) throws Exception {
         return processRequest("extMdmCntrl/mdmRequestNew/xml", body);
     }
 
-    public ApiResponse<Object> billFetchRequest(Map<String, Object> body) throws Exception {
+    public  Map<String, Object> billFetchRequest(Map<String, Object> body) throws Exception {
         return processRequest("extBillCntrl/billFetchRequest/xml", body);
     }
 
-    public ApiResponse<Object> billPaymentRequest(Map<String, Object> body) throws Exception {
+    public  Map<String, Object> billPaymentRequest(Map<String, Object> body) throws Exception {
         return processRequest("extBillPayCntrl/billPayRequest/xml", body);
     }
 
-    public ApiResponse<Object> complaintRegistrationReq(Map<String, Object> body) throws Exception {
+    public  Map<String, Object> complaintRegistrationReq(Map<String, Object> body) throws Exception {
         return processRequest("extComplaints/register/xml", body);
     }
 
-    public ApiResponse<Object> transactionStatusReq(Map<String, Object> body) throws Exception {
+    public  Map<String, Object> transactionStatusReq(Map<String, Object> body) throws Exception {
         return processRequest("transactionStatus/fetchInfo/xml", body);
     }
 
-    public ApiResponse<Object> billValidationRequest(Map<String, Object> body) throws Exception {
+    public  Map<String, Object> billValidationRequest(Map<String, Object> body) throws Exception {
         return processRequest("extBillValCntrl/billValidationRequest/xml", body);
     }
 
-    public ApiResponse<Object> complaintTrackingReq(Map<String, Object> body) throws Exception {
+    public  Map<String, Object> complaintTrackingReq(Map<String, Object> body) throws Exception {
         return processRequest("extComplaints/track/xml", body);
     }
 
@@ -134,6 +141,40 @@ public class BbpsService extends BaseServiceClient {
         byte[] encryptedBytes = cipher.doFinal(jsonString.getBytes("UTF-8"));
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> decryptJsonToMap(String encryptedData, String hexKey, String algorithm) {
+        try {
+            byte[] encryptionKey = hexStringToByteArray(hexKey);
+    
+            // Validate key size
+            if (encryptionKey.length != 16) {
+                throw new IllegalArgumentException("Encryption key must be 16 bytes (128 bits) for AES-128.");
+            }
+    
+            // Decode the Base64 encoded string
+            byte[] encryptedBytes = Base64.getDecoder().decode(encryptedData);
+    
+            // Initialize cipher and secret key
+            SecretKeySpec secretKey = new SecretKeySpec(encryptionKey, algorithm);
+            Cipher cipher = Cipher.getInstance(algorithm);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+    
+            // Decrypt the bytes
+            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+    
+            // Convert bytes to JSON string
+            String jsonString = new String(decryptedBytes, StandardCharsets.UTF_8);
+    
+            // Convert JSON string back to Map
+            return objectMapper.readValue(jsonString, Map.class);
+        } catch (Exception e) {
+            // Log the exception if needed
+            // e.g., logger.error("Decryption failed: {}", e.getMessage());
+            return null; // Return null on any error
+        }
+    }
+    
 
     private byte[] hexStringToByteArray(String s) {
         int len = s.length();
