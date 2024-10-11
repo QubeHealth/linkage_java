@@ -56,7 +56,7 @@ public class WebengageController extends BaseController {
             return new ApiResponse<>(false, "Invalid event name", null);
         }
 
-        return this.webengageService.createBulkUser(Map.of("users", body.getEventBody()));
+        return this.webengageService.createBulkUser(Map.of("users", body.getEventData()));
 
     }
 
