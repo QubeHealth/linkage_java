@@ -40,7 +40,7 @@ public final class ThirdPartyAPICall {
         if (request.getMethod().equalsIgnoreCase("GET")) {
             response = builder.get();
         } else {
-            if (request.getHeaders().get("Content-Type").get(0).equals(MediaType.APPLICATION_FORM_URLENCODED)) {
+            if (request.getHeaders().get("Content-Type")!= null && request.getHeaders().get("Content-Type").get(0).equals(MediaType.APPLICATION_FORM_URLENCODED)) {
                 response = builder.post(Entity.entity(request.getBody(), MediaType.APPLICATION_FORM_URLENCODED));
             } else {
                 response = builder.post(Entity.json(request.getBody()));
