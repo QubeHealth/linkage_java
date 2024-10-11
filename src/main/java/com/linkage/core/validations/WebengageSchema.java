@@ -17,9 +17,9 @@ public class WebengageSchema {
         @JsonProperty("event_name")
         private String eventName;
 
-        @NotNull(message = "event body cannot be null")
-        @JsonProperty("event_body")
-        private Object eventBody;
+        @NotNull(message = "event data cannot be null")
+        @JsonProperty("event_data")
+        private Object eventData;
     }
 
     @Data
