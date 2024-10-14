@@ -1,5 +1,8 @@
 package com.linkage.utility;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -248,6 +251,7 @@ public final class Helper {
         }
     }
 
+
     public static String convertToUrlEncoded(Map<String, String> params) {
         // Convert the map to a URL-encoded string
         StringBuilder encoded = new StringBuilder();
@@ -327,5 +331,40 @@ public final class Helper {
             return null;
         }
     }
-    
+
+    public static String downloadXmlAsString(String urlString) {
+        try {
+            // Create a URL object from the string
+            URL url = new URL(urlString);
+
+            // Open a connection to the URL
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            // Check the response code (200 means OK)
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Create an InputStream to read the response
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String inputLine;
+                StringBuilder content = new StringBuilder();
+
+                // Read the response line by line and append to content
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                 // Close the BufferedReader
+                in.close();
+                // Return the content as a string
+                return content.toString();
+            } else {
+                System.out.println("Failed to download XML. HTTP response code: " + responseCode);
+                return "";
+            }
+        } catch (Exception e) {
+            System.out.println("Error while downloading xml " + e.getMessage());
+            return "";
+        }
+    }
+
 }
