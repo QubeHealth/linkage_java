@@ -52,9 +52,9 @@ public class WebengageController extends BaseController {
             return new ApiResponse<>(false, errorMessage, null);
         }
 
-        if (!userUpload.equals(body.getEventName())) {
-            return new ApiResponse<>(false, "Invalid event name", null);
-        }
+        // if (!userUpload.equals(body.getEventName())) {
+        //     return new ApiResponse<>(false, "Invalid event name", null);
+        // }
 
         return this.webengageService.createBulkUser(Map.of("users", body.getEventData()));
 
