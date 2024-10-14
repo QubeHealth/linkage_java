@@ -59,6 +59,18 @@ public class LinkageConfiguration extends Configuration {
     private String emailHost;
 
     @NotEmpty
+    private String bbpsUrl;
+
+    @NotEmpty
+    private String bbpsAccessCode;
+
+    @NotEmpty
+    private String bbpsInstituteId;
+
+    @NotEmpty
+    private String bbpsEncryptionKey;
+
+    @NotEmpty
     private String googleApiKey;
 
     @NotEmpty
@@ -306,4 +318,36 @@ public class LinkageConfiguration extends Configuration {
         this.webEngageLiscenseCode = webEngageLiscenseCode;
     }
 
+
+    public String getBbpsUrl() {
+        return bbpsUrl;
+    }
+
+    public void setBbpsUrl(String bbpsUrl) {
+        this.bbpsUrl = bbpsUrl;
+    }
+
+    public String getBbpsAccessCode() {
+        return bbpsAccessCode;
+    }
+
+    public void setBbpsAccessCode(String bbpsAccessCode) {
+        this.bbpsAccessCode = bbpsAccessCode;
+    }
+
+    public String getBbpsInstituteId() {
+        return bbpsInstituteId;
+    }
+
+    public void setBbpsInstituteId(String bbpsInstituteId) {
+        this.bbpsInstituteId = bbpsInstituteId;
+    }
+
+    public String getBbpsEncryptionKey() {
+        return bbpsEncryptionKey;
+    }
+
+    public void setBbpsEncryptionKey(String bbpsEncryptionKey) {
+        this.bbpsEncryptionKey = bbpsEncryptionKey;
+    }
 }

@@ -28,36 +28,51 @@ public final class ThirdPartyAPICall {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(request.getUrl());
 
+        // Handle GET requests with query parameters
         if (request.getMethod().equalsIgnoreCase("GET")) {
             target = appendQueryParams(target, (Map<String, Object>) request.getBody());
         }
 
         Invocation.Builder builder = target
-                .request(MediaType.APPLICATION_JSON) // Explicitly specify JSON media type
+                .request(MediaType.APPLICATION_XML) // Expect XML responses
                 .headers(request.getHeaders());
 
         Response response;
         if (request.getMethod().equalsIgnoreCase("GET")) {
             response = builder.get();
         } else {
-            if (request.getHeaders().get("Content-Type")!= null && request.getHeaders().get("Content-Type").get(0).equals(MediaType.APPLICATION_FORM_URLENCODED)) {
-                response = builder.post(Entity.entity(request.getBody(), MediaType.APPLICATION_FORM_URLENCODED));
-            } else {
-                response = builder.post(Entity.json(request.getBody()));
+            response = builder.post(Entity.json(request.getBody())); // Fallback to JSON
+            if (request.getHeaders().get("Content-Type") != null) {
+                if (request.getHeaders().get("Content-Type").get(0).equals(MediaType.APPLICATION_FORM_URLENCODED)) {
+                    response = builder.post(Entity.entity(request.getBody(), MediaType.APPLICATION_FORM_URLENCODED));
+                } else if (request.getHeaders().get("Content-Type").get(0).equals(MediaType.TEXT_PLAIN)) {
+                    response = builder.post(Entity.entity(request.getBody(), MediaType.TEXT_PLAIN)); // Send XML
+                }
             }
         }
 
         logger.info("\n\nThird party api request => {}", Helper.toJsonString(request));
-        // Use GenericType to specify the type parameter for readEntity method
-        Map<String, Object> responseBody = response.readEntity(new GenericType<Map<String, Object>>() {
-        });
+
+        logger.info("\n\nThird party api response => {}", response);
+
+        Object responseBody;
+        String contentType = response.getMediaType().toString(); // Get the content type as a string
+
+        if (contentType.equals(MediaType.APPLICATION_XML) || contentType.equals(MediaType.TEXT_XML)) {
+            // Read the response as a String for XML
+            responseBody = response.readEntity(String.class);
+        } else if (contentType.startsWith("text/html")) {
+            // Read the response as a String for HTML
+            responseBody = response.readEntity(String.class);
+        } else {
+            // Read the response as a Map<String, Object> for JSON or other types
+            responseBody = response.readEntity(new GenericType<Map<String, Object>>() {});
+        }
 
         System.out.println("Response status => " + response.toString());
         logger.info("\n\nThird party api response => {}", responseBody);
-        boolean status = false;
-        if (Response.Status.OK.getStatusCode() <= response.getStatus() && response.getStatus() < 300) {
-            status = true;
-        }
+        
+        boolean status = Response.Status.OK.getStatusCode() <= response.getStatus() && response.getStatus() < 300;
         String message = status ? "success" : "failed";
 
         client.close();
@@ -74,5 +89,4 @@ public final class ThirdPartyAPICall {
         }
         return target;
     }
-
 }

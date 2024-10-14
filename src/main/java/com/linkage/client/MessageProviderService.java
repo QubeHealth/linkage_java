@@ -60,7 +60,7 @@ public class MessageProviderService extends BaseServiceClient {
 
     public MessageProviderService(LinkageConfiguration configuration) {
         super(configuration);
-        this.templatesData = getTemplates();
+       //  this.templatesData = getTemplates();
     }
 
     // referee Invite message
