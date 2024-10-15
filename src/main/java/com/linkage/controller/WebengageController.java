@@ -66,7 +66,7 @@ public class WebengageController extends BaseController {
     @Path("/addEvent")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ApiResponse<Object> addEvent(@Context HttpServletRequest request, WebengageSchema.EventSchema body) {
+    public ApiResponse<Object> addEvent(WebengageSchema.EventSchema body) {
 
         Set<ConstraintViolation<WebengageSchema.EventSchema>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
@@ -115,7 +115,7 @@ public class WebengageController extends BaseController {
                 event.setUserId(user.get("userId").toString());
                 event.setEventData(new HashMap<>());
 
-                ApiResponse<Object> triggerEvent = addEvent(request, event);
+                ApiResponse<Object> triggerEvent = addEvent(event);
                 if(triggerEvent == null || !triggerEvent.getStatus()) {
                     return new ApiResponse<Object>(false, triggerEvent != null ? triggerEvent.getMessage() : "Error occurred", null);
                 }

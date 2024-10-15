@@ -30,7 +30,7 @@ public class WebengageSchema {
         @NotEmpty(message = "userId is required")
         private String userId;
 
-        @NotEmpty(message = "userId is required")
+        @NotEmpty(message = "eventTime is required")
         private String eventTime;
 
         @NotNull(message = "event data cannot be null")
