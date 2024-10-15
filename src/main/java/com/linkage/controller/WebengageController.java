@@ -2,6 +2,8 @@ package com.linkage.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,4 +81,50 @@ public class WebengageController extends BaseController {
 
     }
 
+    @POST
+    @Path("/uploadEmployeeData")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> uploadEmployeeData(@Context HttpServletRequest request,
+            WebengageSchema.UploadEmployeeSchema body) {
+        Set<ConstraintViolation<WebengageSchema.UploadEmployeeSchema>> violations = validator
+                .validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+
+        try {
+            if (!userUpload.equals(body.getEventName())) {
+                return new ApiResponse<>(false, "Invalid event name", null);
+            }
+
+            ApiResponse<Object>  res = this.webengageService.pushEvent(body);
+            if(res == null || !res.getStatus()) {
+                return new ApiResponse<Object>(false, res != null ? res.getMessage() : "Error occurred", null);
+            }
+
+            ArrayList<HashMap<String, Object>> users = (ArrayList<HashMap<String, Object>>) body.getEventData();
+            for(HashMap<String, Object> user : users) {
+            WebengageSchema.EventSchema event = new WebengageSchema.EventSchema();
+                event.setEventName(body.getEventName());
+                event.setEventTime(Helper.getCurrentTimeForWebEngage());
+                event.setUserId(user.get("userId").toString());
+                event.setEventData(new HashMap<>());
+
+                ApiResponse<Object> triggerEvent = addEvent(request, event);
+                if(triggerEvent == null || !triggerEvent.getStatus()) {
+                    return new ApiResponse<Object>(false, triggerEvent != null ? triggerEvent.getMessage() : "Error occurred", null);
+                }
+            }
+
+            return new ApiResponse<Object>(true, "", "");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<Object>(false, e.getMessage(), null);
+        }
+    }
 }
