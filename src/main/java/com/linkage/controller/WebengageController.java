@@ -116,7 +116,6 @@ public class WebengageController extends BaseController {
                 event.setEventName(body.getEventName());
                 event.setEventTime(Helper.getCurrentTimeForWebEngage());
                 event.setUserId(user.get("userId").toString());
-                event.setEventData(new HashMap<>());
 
                 ApiResponse<Object> triggerEvent = addEvent(event);
                 LOGGER.info("triggerEvent {}" + Helper.toJsonString(triggerEvent));

@@ -33,7 +33,6 @@ public class WebengageSchema {
         @NotEmpty(message = "eventTime is required")
         private String eventTime;
 
-        @NotNull(message = "event data cannot be null")
         private Object eventData;
     }
 
