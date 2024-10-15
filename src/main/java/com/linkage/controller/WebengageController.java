@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.google.protobuf.Api;
 import com.linkage.LinkageConfiguration;
@@ -33,6 +34,7 @@ public class WebengageController extends BaseController {
 
     private WebengageService webengageService;
     private String userUpload = "User_Uploaded";
+    private static final Logger LOGGER = Logger.getLogger(WebengageController.class.getName());
 
     public WebengageController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
@@ -102,9 +104,10 @@ public class WebengageController extends BaseController {
                 return new ApiResponse<>(false, "Invalid event name", null);
             }
 
-            ApiResponse<Object>  res = this.webengageService.createBulkUser(Map.of("users", body.getEventData()));
-            if(res == null || !res.getStatus()) {
-                return new ApiResponse<Object>(false, res != null ? res.getMessage() : "Error occurred", null);
+            ApiResponse<Object>  uploadBulkUsers = this.webengageService.createBulkUser(Map.of("users", body.getEventData()));
+            LOGGER.info("uploadBulkUsers {}" + Helper.toJsonString(uploadBulkUsers));
+            if(uploadBulkUsers == null || !uploadBulkUsers.getStatus()) {
+                return new ApiResponse<Object>(false, uploadBulkUsers != null ? uploadBulkUsers.getMessage() : "Error occurred", null);
             }
 
             ArrayList<HashMap<String, Object>> users = (ArrayList<HashMap<String, Object>>) body.getEventData();
@@ -116,6 +119,7 @@ public class WebengageController extends BaseController {
                 event.setEventData(new HashMap<>());
 
                 ApiResponse<Object> triggerEvent = addEvent(event);
+                LOGGER.info("triggerEvent {}" + Helper.toJsonString(triggerEvent));
                 if(triggerEvent == null || !triggerEvent.getStatus()) {
                     return new ApiResponse<Object>(false, triggerEvent != null ? triggerEvent.getMessage() : "Error occurred", null);
                 }
