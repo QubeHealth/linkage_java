@@ -8,7 +8,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.crypto.Cipher;
@@ -25,6 +26,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -184,14 +186,14 @@ public final class Helper {
     }
 
     public static String getCurrentDate(String format) {
-        LocalDateTime currentDate = LocalDateTime.now();
+        ZonedDateTime nowIST = ZonedDateTime.now(ZoneId.of("Asia/Kolkata"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         if (format != null && !format.isBlank()) {
             formatter = DateTimeFormatter.ofPattern(format);
         }
 
-        return currentDate.format(formatter);
+        return nowIST.format(formatter);
 
     }
 
@@ -364,6 +366,17 @@ public final class Helper {
         } catch (Exception e) {
             System.out.println("Error while downloading xml " + e.getMessage());
             return "";
+        }
+    }
+
+    public static Map<String, Object> jsonStringToMap(String jsonString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            // Convert JSON string directly into HashMap
+            return objectMapper.readValue(jsonString, HashMap.class);
+        } catch (JsonProcessingException e) {
+            // Return an empty map in case of error
+            return Collections.emptyMap();
         }
     }
 

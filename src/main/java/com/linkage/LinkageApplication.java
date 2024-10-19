@@ -10,6 +10,7 @@ import com.linkage.controller.SubscriptionController;
 import com.linkage.controller.SmsController;
 import com.linkage.controller.WebhookController;
 import com.linkage.utility.AuthFilter;
+import com.linkage.utility.RedisClient;
 
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Environment;
@@ -32,6 +33,8 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
     public void run(LinkageConfiguration configuration, Environment environment) throws Exception {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
+
+        RedisClient.start();
 
         AuthFilter authFilter = new AuthFilter(configuration.getxApiKey(), configuration.getAuthorizationKey());
 

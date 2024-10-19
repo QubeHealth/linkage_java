@@ -3,6 +3,7 @@ package com.linkage.core.validations;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -75,6 +76,19 @@ public class DigitapSchema {
         @JsonProperty("report_type")
         private Integer reportType;
 
+    }
+
+    @Data
+    public static class SendAadharOtp {
+
+        @JsonProperty("aadhar_number")
+        @NotEmpty(message = "aadhar number is required")
+        private String aadharNumber;
+
+        @JsonProperty("user_id")
+        @NotEmpty(message = "user id is required")
+        private String userId;
+        
     }
 
 }
