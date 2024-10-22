@@ -10,6 +10,7 @@ import com.linkage.api.ApiResponse;
 
 import com.linkage.core.validations.DigitapSchema.GetCreditBureau;
 import com.linkage.core.validations.DigitapSchema.SendAadharOtp;
+import com.linkage.core.validations.DigitapSchema.VerifyAadharOtp;
 import com.linkage.utility.Helper;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
@@ -58,7 +59,7 @@ public class DigitapService extends BaseServiceClient {
     public ApiResponse<Object> sendAadharOtp(SendAadharOtp body) {
 
         Map<String, String> reqBody = new HashMap<>();
-        reqBody.put("uniqueId", body.getUserId());
+        reqBody.put("uniqueId", body.getUniqueId());
         reqBody.put("uid", body.getAadharNumber());
 
         // Encode the string in Base64
@@ -72,6 +73,23 @@ public class DigitapService extends BaseServiceClient {
         final String url = configuration.getDigitapKycUrl() + "ent/v3/kyc/intiate-kyc-auto";
 
         return this.networkCallExternalService(url, "POST", reqBody, header);
+
+    }
+
+    public ApiResponse<Object> verifyAadharOtp(Map<String,Object> body) {
+
+
+        // Encode the string in Base64
+        String authString = configuration.getDigitapClientId() + ":" + configuration.getDigitapClientSecret();
+        String encodedAuthString = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8));
+
+        MultivaluedHashMap<String, Object> header = new MultivaluedHashMap<>();
+        header.putSingle("content-type", "application/json");
+        header.putSingle("authorization", encodedAuthString);
+
+        final String url = configuration.getDigitapKycUrl() + "ent/v3/kyc/submit-otp";
+
+        return this.networkCallExternalService(url, "POST", body, header);
 
     }
 

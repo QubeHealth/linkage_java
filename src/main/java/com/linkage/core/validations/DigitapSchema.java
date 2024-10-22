@@ -85,9 +85,26 @@ public class DigitapSchema {
         @NotEmpty(message = "aadhar number is required")
         private String aadharNumber;
 
-        @JsonProperty("user_id")
-        @NotEmpty(message = "user id is required")
-        private String userId;
+        @JsonProperty("unique_id")
+        @NotEmpty(message = "unique id is required")
+        private String uniqueId;
+        
+    }
+
+    @Data
+    public static class VerifyAadharOtp {
+
+        @JsonProperty("aadhar_number")
+        @NotEmpty(message = "aadhar number is required")
+        private String aadharNumber;
+
+        @JsonProperty("otp")
+        @NotEmpty(message = "otp is required")
+        private String otp;
+
+        @JsonProperty("access_key")
+        @NotEmpty(message = "access key is required")
+        private String accessKey;
         
     }
 
