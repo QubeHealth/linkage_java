@@ -51,9 +51,8 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         GoogleMapsController googleMapsController=new GoogleMapsController(configuration, validator);
         VendorController vendorController=new VendorController(configuration, validator);
         WebengageController webengageController = new WebengageController(configuration, validator);
-        BefiscController befiscControllers = new BefiscController(configuration, validator);
 
-        environment.jersey().register(befiscControllers);
+        environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
         environment.jersey().register(messageProviderController);
