@@ -24,7 +24,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 @Path("/api/befisc")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,11 +36,6 @@ public class BefiscController extends BaseController {
 
         this.befiscService = new BefiscService(configuration);
     }
-
-    private Response response(Response.Status status, Object data) {
-        return Response.status(status).entity(data).build();
-    }
-
 
     @POST
     @Path("/getVpaByMobile")

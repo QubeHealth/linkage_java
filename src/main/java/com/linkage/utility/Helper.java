@@ -369,17 +369,6 @@ public final class Helper {
         }
     }
 
-    public static Map<String, Object> jsonStringToMap(String jsonString) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            // Convert JSON string directly into HashMap
-            return objectMapper.readValue(jsonString, HashMap.class);
-        } catch (JsonProcessingException e) {
-            // Return an empty map in case of error
-            return Collections.emptyMap();
-        }
-    }
-
     // to extract values based on field mappings from a Map
     public static Map<String, Object> getMappedValuesFromMap(Map<String, Object> rootMap, Map<String, Object> fieldMappings) {
         Map<String, Object> resultMap = new HashMap<>();

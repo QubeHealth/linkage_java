@@ -65,9 +65,6 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String googleApiKey;
 
-    @NotEmpty
-    private String digitapKycUrl;
-
     public String getxApiKey() {
         return xApiKey;
     }
@@ -299,11 +296,4 @@ public class LinkageConfiguration extends Configuration {
         this.userJavaUrl = userJavaUrl;
     }
 
-    public String getDigitapKycUrl() {
-        return digitapKycUrl;
-    }
-
-    public void setDigitapKycUrl(String digitapKycUrl) {
-        this.digitapKycUrl = digitapKycUrl;
-    }
 }
