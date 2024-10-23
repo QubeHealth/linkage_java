@@ -95,32 +95,32 @@ public class VendorController extends BaseController {
             return response(Response.Status.BAD_REQUEST, new ApiResponse<>(false, errorMessage, null));
         }
 
-        final Map<String, Object> befiscRequest = new HashMap<>();
-        befiscRequest.put("aadhaar", body.getAadharNumber());
-        befiscRequest.put("referenceId", body.getAccessKey());
-        befiscRequest.put("otp", body.getOtp());
+        final Map<String, Object> vendorRequest = new HashMap<>();
+        vendorRequest.put("aadhaar", body.getAadharNumber());
+        vendorRequest.put("referenceId", body.getAccessKey());
+        vendorRequest.put("otp", body.getOtp());
 
         // Call the service to send the OTP
-        final ApiResponse<Object> befiscResponse = this.vendorService.verifyAadharOtp(befiscRequest);
-        if (!befiscResponse.getStatus()) {
-            return response(Response.Status.INTERNAL_SERVER_ERROR, befiscResponse);
+        final ApiResponse<Object> vendorResponse = this.vendorService.verifyAadharOtp(vendorRequest);
+        if (!vendorResponse.getStatus()) {
+            return response(Response.Status.INTERNAL_SERVER_ERROR, vendorResponse);
         }
         // Cast the response data to the appropriate type
-        final Map<String, Object> befiscResponseData = (Map<String, Object>) befiscResponse.getData();
-        if (befiscResponseData == null) {
+        final Map<String, Object> vendorResponseData = (Map<String, Object>) vendorResponse.getData();
+        if (vendorResponseData == null) {
              // Return success response
             return response(Response.Status.EXPECTATION_FAILED,
         new ApiResponse<>(false, "Aadhar verification failed", null));
         }
 
-        final Map<String,Object> befiscResultData = (Map<String, Object> ) befiscResponseData;
+        final Map<String,Object> vendorResultData = (Map<String, Object> ) vendorResponseData;
 
         Map<String, Object> clientRequiredData = new HashMap<>();
         clientRequiredData.put("file", "result.xml_file");
         clientRequiredData.put("address", "result.splitAddress");
         clientRequiredData.put("image", "result.image");
         clientRequiredData.put("zip", "result.pincode");
-        Map<String, Object> mappedValues = Helper.getMappedValuesFromMap(befiscResultData, clientRequiredData);
+        Map<String, Object> mappedValues = Helper.getMappedValuesFromMap(vendorResultData, clientRequiredData);
         // Return success response
         return response(Response.Status.OK,
                 new ApiResponse<>(true, "aadhar verification success", mappedValues));
