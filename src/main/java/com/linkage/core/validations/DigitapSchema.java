@@ -85,10 +85,6 @@ public class DigitapSchema {
         @NotEmpty(message = "aadhar number is required")
         private String aadharNumber;
 
-        @JsonProperty("unique_id")
-        @NotEmpty(message = "unique id is required")
-        private String uniqueId;
-        
     }
 
     @Data

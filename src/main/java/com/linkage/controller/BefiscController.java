@@ -256,14 +256,12 @@ public class BefiscController extends BaseController {
         // Cast the response data to the appropriate type
         final Map<String, Object> sendAadharOtpData = (Map<String, Object>) sendAadharOtpResponse.getData();
         if (sendAadharOtpData == null) {
-            return response(Response.Status.OK,
+            return response(Response.Status.EXPECTATION_FAILED,
             new ApiResponse<>(false, "Send OTP failed", null));
         }
-        // Store the result in Redis
-        RedisClient.set(body.getUniqueId(), Helper.toJsonString(sendAadharOtpData));
         final Map<String, Object> sendAadharOtpResult = (Map<String, Object>) sendAadharOtpData.get("result");
         if (sendAadharOtpResult == null) {
-            return response(Response.Status.OK,
+            return response(Response.Status.EXPECTATION_FAILED,
             new ApiResponse<>(false, "Send OTP failed", sendAadharOtpData));
         }
         // Return success response
