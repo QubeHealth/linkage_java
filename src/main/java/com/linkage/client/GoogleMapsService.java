@@ -85,6 +85,7 @@ public class GoogleMapsService extends BaseServiceClient {
                             Double lon = (Double) loc.get("lng");
     
                             String pincode = "";
+                            String city = "";
                             String state = "";
                             String country = "";
                             List<Map<String, Object>> addressComponents = (List<Map<String, Object>>) result.get("address_components");
@@ -97,6 +98,8 @@ public class GoogleMapsService extends BaseServiceClient {
                                     state = (String) component.get("long_name");
                                 } else if (typesList.contains("country")) {
                                     country = (String) component.get("long_name");
+                                } else if(typesList.contains("locality")) {
+                                    city = (String) component.get("long_name");
                                 }
                             }
     
@@ -105,7 +108,7 @@ public class GoogleMapsService extends BaseServiceClient {
                             }
     
                             // Create HspDetails object with types
-                            HspDetails details = new HspDetails(name, phoneNumber, address, lat, lon, pincode, state, country, placeTypes);
+                            HspDetails details = new HspDetails(name, phoneNumber, address, lat, lon, pincode, city, state, country, placeTypes);
                             placeDetailsList.add(details);
                         }
                     }
