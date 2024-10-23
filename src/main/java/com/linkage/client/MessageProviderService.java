@@ -19,6 +19,7 @@ import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.CashbackTypeMessageSchema;
 import com.linkage.core.validations.CreditAssignedSchema;
 import com.linkage.core.validations.DisbursedMessageSchema;
+import com.linkage.core.validations.DynamicMessageSchema;
 import com.linkage.core.validations.MessageProviderSchema;
 import com.linkage.core.validations.NewUserOnboardingSchema;
 import com.linkage.core.validations.MessageProviderSchema.SendMessageSchema;
@@ -378,5 +379,21 @@ public class MessageProviderService extends BaseServiceClient {
             // Handle exceptions (e.g., logging)
             return null;
         }
+    }
+
+    // Dynamic Wsap Message
+    public ApiResponse<Object> dynamicWsapMessage(DynamicMessageSchema body) {
+
+        // Arraylist of key value pairs then added to hashmap
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());
+        parameter.setElementName(body.getTemplateId());
+        
+        // Create a list to hold the parameter values
+        List<String> params = new ArrayList<>();
+        params.add(body.getFirstname());
+        parameter.setParams(params);
+        return sendMessage(parameter);
+
     }
 }
