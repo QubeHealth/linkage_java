@@ -85,11 +85,6 @@
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>2.12.3</version>
         </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>5.2.0</version>
-        </dependency>
         <!-- Zip4j for handling password-protected ZIPs -->
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
