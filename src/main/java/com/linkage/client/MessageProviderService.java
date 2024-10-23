@@ -53,7 +53,7 @@ public class MessageProviderService extends BaseServiceClient {
 
     private static final String NEW_USER_ONBOARDING = "qp_awareness_ne_29mar2024";
     private static final String REPEAT_USER_RETENTION = "qp_usage_rem_29mar2024";
-    private static final String ADD_FAMILY_MEMBER = "qcp_awareness_1_fam_22may2024";
+    private static final String ADD_FAMILY_MEMBER = "qa_add_family_01sep2024";
 
 
 
