@@ -65,6 +65,13 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String googleApiKey;
 
+    @NotEmpty
+    private String webEngageLiscenseCode;
+    @NotEmpty
+    private String webEngageApiKey;
+    @NotEmpty
+    private String webEngageApiUrl;
+
     public String getxApiKey() {
         return xApiKey;
     }
@@ -294,6 +301,30 @@ public class LinkageConfiguration extends Configuration {
 
     public void setUserJavaUrl(String userJavaUrl) {
         this.userJavaUrl = userJavaUrl;
+    }
+
+    public String getWebEngageApiKey() {
+        return webEngageApiKey;
+    }
+
+    public String getWebEngageApiUrl() {
+        return webEngageApiUrl;
+    }
+
+    public String getWebEngageLiscenseCode() {
+        return webEngageLiscenseCode;
+    }
+
+    public void setWebEngageApiKey(String webEngageApiKey) {
+        this.webEngageApiKey = webEngageApiKey;
+    }
+
+    public void setWebEngageApiUrl(String webEngageApiUrl) {
+        this.webEngageApiUrl = webEngageApiUrl;
+    }
+
+    public void setWebEngageLiscenseCode(String webEngageLiscenseCode) {
+        this.webEngageLiscenseCode = webEngageLiscenseCode;
     }
 
 }

@@ -8,6 +8,7 @@ import com.linkage.controller.GoogleMapsController;
 import com.linkage.controller.MessageProviderController;
 import com.linkage.controller.SubscriptionController;
 import com.linkage.controller.VendorController;
+import com.linkage.controller.WebengageController;
 import com.linkage.controller.SmsController;
 import com.linkage.controller.WebhookController;
 import com.linkage.utility.AuthFilter;
@@ -49,7 +50,10 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         ErupeeController erupeeController = new ErupeeController(configuration, validator);
         GoogleMapsController googleMapsController=new GoogleMapsController(configuration, validator);
         VendorController vendorController=new VendorController(configuration, validator);
-        environment.jersey().register(befiscController);
+        WebengageController webengageController = new WebengageController(configuration, validator);
+        BefiscController befiscControllers = new BefiscController(configuration, validator);
+
+        environment.jersey().register(befiscControllers);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
         environment.jersey().register(messageProviderController);
@@ -59,6 +63,7 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         environment.jersey().register(googleMapsController);
         environment.jersey().register(smsController);
         environment.jersey().register(vendorController);
+        environment.jersey().register(webengageController);
 
     }
 }
