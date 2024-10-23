@@ -230,6 +230,7 @@ public class BefiscController extends BaseController {
         return Map.of("valid_hsp", valid, "keyword", key);
     }
 
+    @SuppressWarnings("unchecked")
     @POST
     @Path("/sendAadharOtp")
     @Produces(MediaType.APPLICATION_JSON)
@@ -272,6 +273,7 @@ public class BefiscController extends BaseController {
 
 
     
+    @SuppressWarnings("unchecked")
     @POST
     @Path("/verifyAadharOtp")
     @Produces(MediaType.APPLICATION_JSON)
@@ -305,9 +307,18 @@ public class BefiscController extends BaseController {
             return response(Response.Status.EXPECTATION_FAILED,
         new ApiResponse<>(false, "Aadhar verification failed", null));
         }
+
+        final Map<String,Object> befiscResultData = (Map<String, Object> ) befiscResponseData;
+
+        Map<String, Object> clientRequiredData = new HashMap<>();
+        clientRequiredData.put("file", "result.xml_file");
+        clientRequiredData.put("address", "result.splitAddress");
+        clientRequiredData.put("image", "result.image");
+        clientRequiredData.put("zip", "result.pincode");
+        Map<String, Object> mappedValues = Helper.getMappedValuesFromMap(befiscResultData, clientRequiredData);
         // Return success response
         return response(Response.Status.OK,
-                new ApiResponse<>(true, "aadhar verification success", befiscResponseData));
+                new ApiResponse<>(true, "aadhar verification success", mappedValues));
     }
 
 
