@@ -26,6 +26,10 @@ public class LinkageConfiguration extends Configuration {
     private String messageProviderSrcName;
     @NotEmpty
     private String befiscAuthKey;
+    @NotEmpty
+    private String befiscSendAadharOtpUrl;
+    @NotEmpty
+    private String befiscVerifyAadharOtpUrl;
 
     @NotEmpty
     private String digitapUrl;
@@ -103,6 +107,23 @@ public class LinkageConfiguration extends Configuration {
     public void setBefiscAuthKey(String befiscAuthKey) {
         this.befiscAuthKey = befiscAuthKey;
     }
+
+    public String getBefiscSendAadharOtpUrl() {
+        return befiscSendAadharOtpUrl;
+    }
+
+    public void setBefiscSendAadharOtpUrl(String befiscSendAadharOtpUrl) {
+        this.befiscSendAadharOtpUrl = befiscSendAadharOtpUrl;
+    }
+
+    public String getBefiscVerifyAadharOtpUrl() {
+        return befiscVerifyAadharOtpUrl;
+    }
+
+    public void setBefiscVerifyAadharOtpUrl(String befiscVerifyAadharOtpUrl) {
+        this.befiscVerifyAadharOtpUrl = befiscVerifyAadharOtpUrl;
+    }
+
 
     public String getMessageProviderTemplateUrl() {
         return messageProviderTemplateUrl;
