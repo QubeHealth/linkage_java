@@ -75,7 +75,7 @@ public class VendorController extends BaseController {
         }
         // Return success response
         return response(Response.Status.OK,
-                new ApiResponse<>(true, "Send OTP success", Map.of("access_key", sendAadharOtpResult.get("requestId"))));
+                new ApiResponse<>(true, "Send OTP success", Map.of("accessKey", sendAadharOtpResult.get("requestId"))));
     }
     
     @SuppressWarnings("unchecked")
