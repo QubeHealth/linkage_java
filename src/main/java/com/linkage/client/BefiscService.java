@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.core.validations.DigitapSchema.SendAadharOtp;
 import com.linkage.core.validations.GetBankDetailsByAccSchema;
 import com.linkage.core.validations.GetVpaByMobileSchema;
 import com.linkage.core.validations.GetVpaDetailsSchema;

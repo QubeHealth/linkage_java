@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.VendorService;
-import com.linkage.core.validations.DigitapSchema.SendAadharOtp;
-import com.linkage.core.validations.DigitapSchema.VerifyAadharOtp;
+import com.linkage.core.validations.VendorSchema.SendAadharOtp;
+import com.linkage.core.validations.VendorSchema.VerifyAadharOtp;
 import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
