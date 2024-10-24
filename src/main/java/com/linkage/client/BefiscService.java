@@ -62,4 +62,5 @@ public class BefiscService extends BaseServiceClient {
             return new ApiResponse<>(false, "Something went wrong", null);
         }
     }
+
 }

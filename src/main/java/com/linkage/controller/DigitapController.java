@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.DigitapService;
@@ -97,4 +96,5 @@ public class DigitapController extends BaseController {
         }
 
     }
+
 }
