@@ -53,8 +53,7 @@ public class MessageProviderService extends BaseServiceClient {
 
     private static final String NEW_USER_ONBOARDING = "qp_awareness_ne_29mar2024";
     private static final String REPEAT_USER_RETENTION = "qp_usage_rem_29mar2024";
-    private static final String ADD_FAMILY_MEMBER = "qa_add_family_01sep2024";
-
+    private static final String ADD_FAMILY_MEMBER = "qhsms_adfam_25oct2024";
 
 
     public ApiResponse<Object> templatesData;
@@ -307,8 +306,8 @@ public class MessageProviderService extends BaseServiceClient {
         // Create a list to hold the parameter values
         List<String> params = new ArrayList<>();
         // Add values to the list
-        params.add(body.getPrimaryFname().toString());
         params.add(body.getSecondaryFname().toString());
+        params.add(body.getPrimaryFname().toString());
         parameter.setParams(params);
         parameter.setElementName(ADD_FAMILY_MEMBER);
         return sendMessage(parameter);
