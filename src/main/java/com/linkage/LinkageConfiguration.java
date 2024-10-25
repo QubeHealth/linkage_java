@@ -15,11 +15,23 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String firebaseWebApiKey;
     @NotEmpty
-    private String watiUrl;
+    private String messageProviderTemplateUrl;
     @NotEmpty
-    private String watiToken;
+    private String messageProviderSendMessageUrl;
+    @NotEmpty
+    private String messageProviderToken;
+    @NotEmpty
+    private String messageProviderSource;
+    @NotEmpty
+    private String messageProviderChannel;
+    @NotEmpty
+    private String messageProviderSrcName;
     @NotEmpty
     private String befiscAuthKey;
+    @NotEmpty
+    private String befiscSendAadharOtpUrl;
+    @NotEmpty
+    private String befiscVerifyAadharOtpUrl;
 
     @NotEmpty
     private String digitapUrl;
@@ -29,20 +41,53 @@ public class LinkageConfiguration extends Configuration {
     private String digitapClientSecret;
     @NotEmpty
     private String hereApiKey;
+    @NotEmpty
+    private String kaleyraBaseUrl;
+    @NotEmpty
+    private String kaleyraApiKey;
+    @NotEmpty
+    private String kaleyraSid;
+    @NotEmpty
+    private String kaleyraSenderId;
+    @NotEmpty
+    private String kayeraPaymentPendingTemplateId;
+    @NotEmpty
+    private String kayeraPaymentFailedTemplateId;
+
+    @NotEmpty
+    private String userJavaUrl;
+
+    @NotEmpty
+    private String emailSmtp;
+    @NotEmpty
+    private String emailPassword;
+    @NotEmpty
+    private String emailHost;
+
+    @NotEmpty
+    private String googleApiKey;
+
+    @NotEmpty
+    private String webEngageLiscenseCode;
+    @NotEmpty
+    private String webEngageApiKey;
+    @NotEmpty
+    private String webEngageApiUrl;
 
     @NotEmpty
     private String appSignature;
 
  
 
-    public String appSignature() {
+    public String getxApiKey() {
         return xApiKey;
+    
     }
     public void setAppSignature(String appSignature) {
         this.appSignature = appSignature;
     }
 
-    public String getxApiKey() {
+    public String appSignature() {
         return appSignature;
     }
 
@@ -82,20 +127,69 @@ public class LinkageConfiguration extends Configuration {
         this.befiscAuthKey = befiscAuthKey;
     }
 
-    public String getWatiUrl() {
-        return watiUrl;
+    public String getBefiscSendAadharOtpUrl() {
+        return befiscSendAadharOtpUrl;
     }
 
-    public void setWatiUrl(String watiUrl) {
-        this.watiUrl = watiUrl;
+    public void setBefiscSendAadharOtpUrl(String befiscSendAadharOtpUrl) {
+        this.befiscSendAadharOtpUrl = befiscSendAadharOtpUrl;
     }
 
-    public String getWatiToken() {
-        return watiToken;
+    public String getBefiscVerifyAadharOtpUrl() {
+        return befiscVerifyAadharOtpUrl;
     }
 
-    public void setWatiToken(String watiToken) {
-        this.watiToken = watiToken;
+    public void setBefiscVerifyAadharOtpUrl(String befiscVerifyAadharOtpUrl) {
+        this.befiscVerifyAadharOtpUrl = befiscVerifyAadharOtpUrl;
+    }
+
+
+    public String getMessageProviderTemplateUrl() {
+        return messageProviderTemplateUrl;
+    }
+
+    public void setMessageProviderTemplateUrl(String messageProviderTemplateUrl) {
+        this.messageProviderTemplateUrl = messageProviderTemplateUrl;
+    }
+
+    public String getMessageProviderSendMessageUrl() {
+        return messageProviderSendMessageUrl;
+    }
+
+    public void setMessageProviderSendMessageUrl(String messageProviderSendMessageUrl) {
+        this.messageProviderSendMessageUrl = messageProviderSendMessageUrl;
+    }
+
+    public String getMessageProviderToken() {
+        return messageProviderToken;
+    }
+
+    public void setMessageProviderToken(String messageProviderToken) {
+        this.messageProviderToken = messageProviderToken;
+    }
+
+    public String getMessageProviderSource() {
+        return messageProviderSource;
+    }
+
+    public void setMessageProviderSource(String messageProviderSource) {
+        this.messageProviderSource = messageProviderSource;
+    }
+
+    public String getMessageProviderChannel() {
+        return messageProviderChannel;
+    }
+
+    public void setMessageProviderChannel(String messageProviderChannel) {
+        this.messageProviderChannel = messageProviderChannel;
+    }
+
+    public String getMessageProviderSrcName() {
+        return messageProviderSrcName;
+    }
+
+    public void setMessageProviderSrcName(String messageProviderSrcName) {
+        this.messageProviderSrcName = messageProviderSrcName;
     }
 
     public String getDigitapClientId() {
@@ -122,13 +216,37 @@ public class LinkageConfiguration extends Configuration {
         this.digitapUrl = digitapUrl;
     }
 
+    public String getEmailSmtp() {
+        return emailSmtp;
+    }
+
+    public void setEmailSmtp(String emailSmtp) {
+        this.emailSmtp = emailSmtp;
+    }
+
+    public String getEmailPassword() {
+        return emailPassword;
+    }
+
+    public void setEmailPassword(String emailPassword) {
+        this.emailPassword = emailPassword;
+    }
+
+    public String getEmailHost() {
+        return emailHost;
+    }
+
+    public void setEmailHost(String emailHost) {
+        this.emailHost = emailHost;
+    }
+
     public String getHereApiKey() {
         return hereApiKey;
 
     }
 
     public void setHereApiKey(String hereApiKey) {
-        this.hereApiKey=hereApiKey;
+        this.hereApiKey = hereApiKey;
     }
 
     @JsonProperty("sms")
@@ -175,4 +293,98 @@ public class LinkageConfiguration extends Configuration {
             return gupshupPassword;
         }
     }
+    public String getGoogleApiKey() {
+        return googleApiKey;
+    }
+
+    public void setGoogleApiKey(String googleApiKey) {
+        this.googleApiKey = googleApiKey;
+    }
+
+    public String getKaleyraBaseUrl() {
+        return kaleyraBaseUrl;
+
+    }
+
+    public void setKaleyraBaseUrl(String kaleyraBaseUrl) {
+        this.kaleyraBaseUrl = kaleyraBaseUrl;
+    }
+
+    public String getKaleyraApiKey() {
+        return kaleyraApiKey;
+
+    }
+
+    public void setKaleyraApiKey(String kaleyraApiKey) {
+        this.kaleyraApiKey = kaleyraApiKey;
+    }
+
+    public String getKaleyraSid() {
+        return kaleyraSid;
+
+    }
+
+    public void setKaleyraSid(String kaleyraSid) {
+        this.kaleyraSid = kaleyraSid;
+    }
+
+    public String getKaleyraSenderId() {
+        return kaleyraSenderId;
+
+    }
+
+    public void setkaleyraSenderId(String kaleyraSenderId) {
+        this.kaleyraSenderId = kaleyraSenderId;
+    }
+
+    public String getKayeraPaymentPendingTemplateId() {
+        return kayeraPaymentPendingTemplateId;
+
+    }
+
+    public void setKayeraPaymentPendingTemplateId(String kayeraPaymentPendingTemplateId) {
+        this.kayeraPaymentPendingTemplateId = kayeraPaymentPendingTemplateId;
+    }
+
+    public String getKayeraPaymentFailedTemplateId() {
+        return kayeraPaymentFailedTemplateId;
+
+    }
+
+    public void setKayeraPaymentFailedTemplateId(String kayeraPaymentFailedTemplateId) {
+        this.kayeraPaymentFailedTemplateId = kayeraPaymentFailedTemplateId;
+    }
+
+    public String getUserJavaUrl() {
+        return userJavaUrl;
+    }
+
+    public void setUserJavaUrl(String userJavaUrl) {
+        this.userJavaUrl = userJavaUrl;
+    }
+
+    public String getWebEngageApiKey() {
+        return webEngageApiKey;
+    }
+
+    public String getWebEngageApiUrl() {
+        return webEngageApiUrl;
+    }
+
+    public String getWebEngageLiscenseCode() {
+        return webEngageLiscenseCode;
+    }
+
+    public void setWebEngageApiKey(String webEngageApiKey) {
+        this.webEngageApiKey = webEngageApiKey;
+    }
+
+    public void setWebEngageApiUrl(String webEngageApiUrl) {
+        this.webEngageApiUrl = webEngageApiUrl;
+    }
+
+    public void setWebEngageLiscenseCode(String webEngageLiscenseCode) {
+        this.webEngageLiscenseCode = webEngageLiscenseCode;
+    }
+
 }

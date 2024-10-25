@@ -42,7 +42,7 @@ PORT=5016
 
 # Remote paths
 REMOTE_PROJECT_DIR = '/root/java_service/' + APP_NAME + '/'
-REMOTE_JAR_PATH = REMOTE_PROJECT_DIR + APP_NAME + '.jar'
+REMOTE_JAR_PATH = REMOTE_PROJECT_DIR + APP_NAME+ '.jar'
 REMOTE_CONFIG_PATH = REMOTE_PROJECT_DIR + 'config.yml'
 REMOTE_NOHUP_LOG_PATH = REMOTE_PROJECT_DIR + APP_NAME +'.out'  # Path to the nohup log file
 
@@ -90,6 +90,12 @@ def put_binary(c):
 def put_config(c):
      logger.info(f"{bcolors.OKBLUE}Uploading the config {CONFIG_FILE} file to the remote server path {REMOTE_PROJECT_DIR} ...{bcolors.ENDC}")
      conn.put(CONFIG_FILE, REMOTE_CONFIG_PATH)
+     logger.info(f"{bcolors.OKGREEN}Uploaded {CONFIG_FILE} to {REMOTE_CONFIG_PATH}{bcolors.ENDC}")
+
+@task
+def put_ssh_file(c):
+     logger.info(f"{bcolors.OKBLUE}Uploading the config {CONFIG_FILE} file to the remote server path {REMOTE_PROJECT_DIR} ...{bcolors.ENDC}")
+     conn.put('sslPrivateKey.p1',REMOTE_PROJECT_DIR)
      logger.info(f"{bcolors.OKGREEN}Uploaded {CONFIG_FILE} to {REMOTE_CONFIG_PATH}{bcolors.ENDC}")
 
 @task
