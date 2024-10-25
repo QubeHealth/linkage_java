@@ -25,6 +25,9 @@ public class HspDetails {
     @JsonProperty("pincode")
     private String pincode;
 
+    @JsonProperty("city")
+    private String city;
+
     @JsonProperty("state")
     private String state;
 
@@ -34,13 +37,14 @@ public class HspDetails {
     private List<String> types; 
 
     // Updated constructor including pincode, state, and county
-    public HspDetails(String name, String phoneNumber, String address, Double latitude, Double longitude, String pincode, String state, String country,List<String>types) {
+    public HspDetails(String name, String phoneNumber, String address, Double latitude, Double longitude, String pincode, String city, String state, String country,List<String>types) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
         this.pincode = pincode;
+        this.city = city;
         this.state = state;
         this.country = country;
         this.types=types;
@@ -93,6 +97,14 @@ public class HspDetails {
 
     public void setPincode(String pincode) {
         this.pincode = pincode;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getState() {

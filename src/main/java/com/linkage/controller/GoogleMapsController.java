@@ -8,6 +8,8 @@ import com.linkage.client.GoogleMapsService;
 
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
 import com.linkage.core.validations.HspByLocation;
 import com.linkage.utility.Helper;
 
@@ -57,9 +59,9 @@ public class GoogleMapsController extends BaseController {
                         .entity(new ApiResponse<>(false, "Failed to fetch data from external service", null))
                         .build();
             }
-    
+
             return Response.status(Response.Status.OK)
-                    .entity(new ApiResponse<>(true, "Data fetched successfully", response.getData()))
+                    .entity(new ApiResponse<>(true, "Data fetched successfully", Helper.toJsonString(response.getData())))
                     .build();
         } catch (Exception e) {
             // Log the exception for debugging purposes
