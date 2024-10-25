@@ -26,6 +26,10 @@ public class LinkageConfiguration extends Configuration {
     private String messageProviderSrcName;
     @NotEmpty
     private String befiscAuthKey;
+    @NotEmpty
+    private String befiscSendAadharOtpUrl;
+    @NotEmpty
+    private String befiscVerifyAadharOtpUrl;
 
     @NotEmpty
     private String digitapUrl;
@@ -60,6 +64,13 @@ public class LinkageConfiguration extends Configuration {
 
     @NotEmpty
     private String googleApiKey;
+
+    @NotEmpty
+    private String webEngageLiscenseCode;
+    @NotEmpty
+    private String webEngageApiKey;
+    @NotEmpty
+    private String webEngageApiUrl;
 
     public String getxApiKey() {
         return xApiKey;
@@ -100,6 +111,23 @@ public class LinkageConfiguration extends Configuration {
     public void setBefiscAuthKey(String befiscAuthKey) {
         this.befiscAuthKey = befiscAuthKey;
     }
+
+    public String getBefiscSendAadharOtpUrl() {
+        return befiscSendAadharOtpUrl;
+    }
+
+    public void setBefiscSendAadharOtpUrl(String befiscSendAadharOtpUrl) {
+        this.befiscSendAadharOtpUrl = befiscSendAadharOtpUrl;
+    }
+
+    public String getBefiscVerifyAadharOtpUrl() {
+        return befiscVerifyAadharOtpUrl;
+    }
+
+    public void setBefiscVerifyAadharOtpUrl(String befiscVerifyAadharOtpUrl) {
+        this.befiscVerifyAadharOtpUrl = befiscVerifyAadharOtpUrl;
+    }
+
 
     public String getMessageProviderTemplateUrl() {
         return messageProviderTemplateUrl;
@@ -274,4 +302,29 @@ public class LinkageConfiguration extends Configuration {
     public void setUserJavaUrl(String userJavaUrl) {
         this.userJavaUrl = userJavaUrl;
     }
+
+    public String getWebEngageApiKey() {
+        return webEngageApiKey;
+    }
+
+    public String getWebEngageApiUrl() {
+        return webEngageApiUrl;
+    }
+
+    public String getWebEngageLiscenseCode() {
+        return webEngageLiscenseCode;
+    }
+
+    public void setWebEngageApiKey(String webEngageApiKey) {
+        this.webEngageApiKey = webEngageApiKey;
+    }
+
+    public void setWebEngageApiUrl(String webEngageApiUrl) {
+        this.webEngageApiUrl = webEngageApiUrl;
+    }
+
+    public void setWebEngageLiscenseCode(String webEngageLiscenseCode) {
+        this.webEngageLiscenseCode = webEngageLiscenseCode;
+    }
+
 }
