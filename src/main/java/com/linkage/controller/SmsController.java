@@ -1,6 +1,5 @@
 package com.linkage.controller;
 
-
 import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
@@ -27,10 +26,8 @@ public class SmsController extends BaseController {
 
     private final SmsClient smsClient;
     private SmsService smsService;
-    private  UserService userService;
+    private UserService userService;
 
-
-   
     public SmsController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
         this.smsClient = new SmsClient(configuration);
@@ -59,15 +56,20 @@ public class SmsController extends BaseController {
         String otp = reqBody.getOtp();
         String expiryTime = reqBody.getExpiryTime();
         String dltTemplateId = configuration.getSmsConfig().getDltOtpSmsTemplateId();
-        
+
         // Send OTP message
-        String response = smsClient.sendMessage(phoneNumber, dltTemplateId, 
-                "Dear User, %s is your login OTP into Qubehealth App. OTP is valid for %s mins.", 
-                otp, expiryTime);
+        String response = smsClient.sendMessage(
+                phoneNumber,
+                dltTemplateId,
+                "%s is your OTP to log in to QubeHealth App (Valid only for %s Mins.) \n%s",
+                otp,
+                expiryTime,
+                "MyzTUkWm5h1"
+        );
 
         // Check response and create ApiResponse object
         boolean isSuccess = response.contains("success"); // Simplified success check
-        ApiResponse<String> apiResponse = new ApiResponse<>(isSuccess, 
+        ApiResponse<String> apiResponse = new ApiResponse<>(isSuccess,
                 isSuccess ? "OTP sent successfully" : "Failed to send OTP", response);
 
         // Return response with appropriate HTTP status
