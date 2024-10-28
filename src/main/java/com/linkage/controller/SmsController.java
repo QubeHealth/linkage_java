@@ -83,6 +83,7 @@ public class SmsController extends BaseController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public ApiResponse<Object> paymentStatus(SmsSchema.PaymentStatus body) {
+        // Validate the input body
         Set<ConstraintViolation<SmsSchema.PaymentStatus>> violations = validator.validate(body);
         if (!violations.isEmpty()) {
             // Construct error message from violations
@@ -91,16 +92,46 @@ public class SmsController extends BaseController {
                     .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
             return new ApiResponse<>(false, errorMessage, null);
         }
-
+    
+        // Retrieve user mobile number
         ApiResponse<Object> result = this.userService.getMobileNo(body.getUserID());
         if (!result.getStatus()) {
             return new ApiResponse<>(false, "User mobile not found", result);
         }
-
+    
         String mobileNo = (String) result.getData();
         body.setMobile(mobileNo);
-
-        return this.smsService.sendPaymentSms(body);
-
+    
+        // Initialize variables for message content and template ID
+        String message;
+        String dltTemplateId;
+    
+        // Construct payment status message and select appropriate template ID
+        if ("payment_pending".equals(body.getStatus())) {
+            message = String.format(
+                "Payment Pending:\nQubePay Payment Pending Txn. ID %s. Please check the app after 30 mins",
+                body.getTransactionId()
+            );
+            dltTemplateId = configuration.getKayeraPaymentPendingTemplateId(); 
+        } else if ("payment_failed".equals(body.getStatus())) {
+            message = String.format(
+                "Payment Failed: \nOh! Your payment via QubePay Txn. ID %s FAILED. Don't worry, any amount debited from %s will be REFUNDED within 7 Business days.",
+                body.getTransactionId(),
+                body.getType()
+            );
+            dltTemplateId = configuration.getKayeraPaymentFailedTemplateId(); 
+        } else {
+            return new ApiResponse<>(false, "Invalid payment status", null);
+        }
+    
+        // Send the payment status message using the selected template ID
+        String response = smsClient.sendMessage(mobileNo, dltTemplateId, message);
+    
+        // Check the response from the SMS client if needed and act accordingly
+        if (response == null || response.isEmpty()) {
+            return new ApiResponse<>(false, "Failed to send SMS", null);
+        }
+    
+        return new ApiResponse<>(true, "Payment status message sent successfully", null);
     }
 }
