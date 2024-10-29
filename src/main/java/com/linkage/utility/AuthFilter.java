@@ -35,10 +35,10 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String authorization = httpRequest.getHeader("Authorization");
+       // String authorization = httpRequest.getHeader("Authorization");
         String xApiKey = httpRequest.getHeader("X-API-Key");
 
-        if (authorization == null || xApiKey == null) {
+        if (xApiKey == null) {
             httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -48,7 +48,7 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        if (!authorization.equals(authorizationKey) || !xApiKey.equals(apiKey)) {
+        if ( !xApiKey.equals(apiKey)) {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
             ObjectMapper objectMapper = new ObjectMapper();
