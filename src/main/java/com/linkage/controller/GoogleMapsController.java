@@ -1,15 +1,12 @@
 package com.linkage.controller;
 
-import com.google.api.client.util.Sets;
+import java.util.List;
+import java.util.Set;
+
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.api.HspDetails;
 import com.linkage.client.GoogleMapsService;
-
-import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.HashMap;
 import com.linkage.core.validations.HspByLocation;
 import com.linkage.utility.Helper;
 
