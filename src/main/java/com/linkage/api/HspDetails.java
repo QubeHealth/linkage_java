@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class HspDetails {
     @JsonProperty("name")
     private String name;

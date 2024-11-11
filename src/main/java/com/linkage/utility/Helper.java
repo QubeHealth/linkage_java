@@ -7,8 +7,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.crypto.Cipher;
@@ -25,6 +27,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -184,14 +187,14 @@ public final class Helper {
     }
 
     public static String getCurrentDate(String format) {
-        LocalDateTime currentDate = LocalDateTime.now();
+        ZonedDateTime nowIST = ZonedDateTime.now(ZoneId.of("Asia/Kolkata"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         if (format != null && !format.isBlank()) {
             formatter = DateTimeFormatter.ofPattern(format);
         }
 
-        return currentDate.format(formatter);
+        return nowIST.format(formatter);
 
     }
 
@@ -367,4 +370,65 @@ public final class Helper {
         }
     }
 
+    // to extract values based on field mappings from a Map
+    public static Map<String, Object> getMappedValuesFromMap(Map<String, Object> rootMap, Map<String, Object> fieldMappings) {
+        Map<String, Object> resultMap = new HashMap<>();
+    
+        // Iterate over the field mappings
+        for (Map.Entry<String, Object> entry : fieldMappings.entrySet()) {
+            String outputField = entry.getKey();
+            String keyPath = entry.getValue().toString();
+    
+            // Support concatenation of multiple fields using "+"
+            if (keyPath.contains("+")) {
+                String[] keyParts = keyPath.split("\\+");
+                StringBuilder concatenatedValue = new StringBuilder();
+    
+                for (String part : keyParts) {
+                    Object value = getValueFromMap(rootMap, part.trim());
+                    if (value != null) {
+                        if (concatenatedValue.length() > 0) {
+                            concatenatedValue.append(" "); // Add a space between concatenated parts
+                        }
+                        concatenatedValue.append(value.toString()); // Convert the object to string before concatenation
+                    }
+                }
+    
+                resultMap.put(outputField, concatenatedValue.length() > 0 ? concatenatedValue.toString() : null);
+            } else {
+                // Get the value based on the key path
+                Object value = getValueFromMap(rootMap, keyPath);
+                resultMap.put(outputField, value);
+            }
+        }
+    
+        return resultMap;
+    }
+
+    // To get value based on key path from a Map
+    private static Object getValueFromMap(Map<String, Object> rootMap, String keyPath) {
+        String[] keys = keyPath.split("\\.");
+    
+        Object current = rootMap;
+        for (String key : keys) {
+            if (current instanceof Map) {
+                current = ((Map<String, Object>) current).get(key);
+    
+                // If the field does not exist or is null, return null
+                if (current == null) {
+                    return null;
+                }
+            } else {
+                return null; // If we hit a non-map object before the key is resolved
+            }
+        }
+    
+        return current; // Return the object, which could be of any type
+    }
+
+    public static String getCurrentTimeForWebEngage() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        String currentTime = formatter.format(new Date());
+        return currentTime;
+    }
 }
