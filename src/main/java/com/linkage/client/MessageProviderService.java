@@ -203,6 +203,8 @@ public class MessageProviderService extends BaseServiceClient {
         params.add(body.getAppointmentTime());
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_CONFIRM);
+        parameter.setLink(body.getVoucher());  
+
         return sendMessage(parameter);
 
     }
