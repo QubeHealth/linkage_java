@@ -17,9 +17,9 @@ public class WebengageSchema {
         @JsonProperty("event_name")
         private String eventName;
 
-        @NotNull(message = "event data cannot be null")
-        @JsonProperty("event_data")
-        private Object eventData;
+        @NotNull(message = "event body cannot be null")
+        @JsonProperty("event_body")
+        private Object eventBody;
     }
 
     @Data
@@ -30,20 +30,10 @@ public class WebengageSchema {
         @NotEmpty(message = "userId is required")
         private String userId;
 
-        @NotEmpty(message = "eventTime is required")
+        @NotEmpty(message = "userId is required")
         private String eventTime;
 
-        private Object eventData;
-    }
-
-    @Data
-    public static class UploadEmployeeSchema {
-        @NotEmpty(message = "event name is required")
-        @JsonProperty("event_name")
-        private String eventName;
-
         @NotNull(message = "event data cannot be null")
-        @JsonProperty("event_data")
         private Object eventData;
     }
 }
