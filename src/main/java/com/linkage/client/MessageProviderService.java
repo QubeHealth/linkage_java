@@ -44,8 +44,8 @@ public class MessageProviderService extends BaseServiceClient {
     private static final String ADJUDICATION_INPROGRESS = "ncif_adjudication_1_22nov2023";
     private static final String ADJUDICATION_REJECTED = "ncif_adjudication_3_22nov2023";
 
-    private static final String AHC_APPOINTMENT_REPORT = "ahc_appt_report_8_sept_2023";// "ahc_appointment_report_8_sept_2023";
-    private static final String AHC_APPOINTMENT_CONFIRM = "ahc_appointment_confirmation_7_sept_2023";
+    private static final String AHC_APPOINTMENT_REPORT = "ahc_appt_report_11_nov_2024";// "ahc_appointment_report_8_sept_2023";
+    private static final String AHC_APPOINTMENT_CONFIRM = "ahc_appointment_confirmation_11_nov_2024";
 
     private static final String CREDIT_ASSIGNED = "qc_limit_assigned_22nov2023";
     private static final String DISBURSEMENT_SUCCESS = "qc_disbursement_successful_22nov2023";
