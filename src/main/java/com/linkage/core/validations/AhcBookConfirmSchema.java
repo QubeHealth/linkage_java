@@ -38,4 +38,6 @@ public class AhcBookConfirmSchema {
     @JsonProperty("voucher")
     private String voucher;
 
+    @JsonProperty("email")
+    private String email;
 }

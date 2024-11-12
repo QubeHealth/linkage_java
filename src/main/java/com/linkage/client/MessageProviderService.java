@@ -189,7 +189,7 @@ public class MessageProviderService extends BaseServiceClient {
 
     // Appointment Confirmed
     public ApiResponse<Object> appointmentConfirmed(AhcBookConfirmSchema body) {
-
+        /**Send Whatsapp Message */
         SendMessageSchema parameter = new SendMessageSchema();
         parameter.setMobile(body.getMobile());    
         // Create a list to hold the parameter values
@@ -204,7 +204,27 @@ public class MessageProviderService extends BaseServiceClient {
         parameter.setElementName(AHC_APPOINTMENT_CONFIRM);
         parameter.setLink(body.getVoucher());  
 
-        return sendMessage(parameter);
+        sendMessage(parameter);
+
+        /**Send Email */
+        String emailSubject = "Health Checkup Confirmed!";
+        String emailBody = "Hi " + body.getFirstName() + ", \n\n"+
+        "Please find the details of your appointment below: \n Diagnostic Center Address: "+ body.getDiagnosticsAddress()+"\n Date: "+ body.getAppointmentDate() +"\n Time: "+ body.getAppointmentTime()+"\n\n, Note:\n" + 
+        "  1. Show the Attached PDF at the Diagnostic Center\n" + 
+        "  2. Set a Reminder and Do Not Be Late.\n" + 
+        "  3. Avoid eating for 10 to 12 hours before the day of your test.\n" + 
+        "  4. Avoid drinking Juices, Tea or Coffee before your test.\n\n" +
+        "Your Voucher : "+body.getVoucher() +
+        "Thanks\n"+
+        "QubeHealth Team";
+
+        Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, body.getEmail(), emailSubject,
+            emailBody);
+        if(!sendSubscriptionEmailRes) {
+            return new ApiResponse<Object>(false, "Failed to send appointment confirmation email", null);
+        } else {
+            return new ApiResponse<Object>(true, "Appointment Confirmation email sent to " + body.getEmail(), null);
+        }
 
     }
 
