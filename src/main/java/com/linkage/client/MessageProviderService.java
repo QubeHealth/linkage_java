@@ -32,8 +32,8 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 
 public class MessageProviderService extends BaseServiceClient {
     private static final String REFEREE_INVITE_TEMPLATE = "qp_cashback_referal_invite24may2024";
-    private static final String REFERER_CASHBACK_TEMPLATE = "qp_cashback_referrer_24may2024";
-    private static final String REFEREE_CASHBACK_TEMPLATE = "qp_cashback_referree_24may2024";
+    private static final String REFERER_CASHBACK_TEMPLATE = "qp_cashback_referrer_24may2024_stopped"; // Stopped qp_cashback_referrer_24may2024
+    private static final String REFEREE_CASHBACK_TEMPLATE = "qp_cashback_referree_24may2024_stopped";
     private static final String CASHBACK_TEMPLATE = "qp_ubv_24may2024";
     private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024";
     private static final String BILL_PARTIAL_VERIFIED_TEMPLATE = "qp_ubr_new24may2024";
@@ -214,7 +214,7 @@ public class MessageProviderService extends BaseServiceClient {
         "  2. Set a Reminder and Do Not Be Late.\n" + 
         "  3. Avoid eating for 10 to 12 hours before the day of your test.\n" + 
         "  4. Avoid drinking Juices, Tea or Coffee before your test.\n\n" +
-        "Your Voucher : "+body.getVoucher() +
+        "Your Voucher : "+body.getVoucher() + "\n\n" +
         "Thanks\n"+
         "QubeHealth Team";
 
