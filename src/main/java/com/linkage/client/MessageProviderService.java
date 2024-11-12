@@ -208,14 +208,18 @@ public class MessageProviderService extends BaseServiceClient {
 
         /**Send Email */
         String emailSubject = "Health Checkup Confirmed!";
-        String emailBody = "Hi " + body.getFirstName() + ", \n\n"+
-        "Please find the details of your appointment below: \nDiagnostic Center Address: "+ body.getDiagnosticsAddress()+"\nDate: "+ body.getAppointmentDate() +"\n ime: "+ body.getAppointmentTime()+"\n\n,Note:\n" + 
-        "  1. Show the Attached PDF at the Diagnostic Center\n" + 
-        "  2. Set a Reminder and Do Not Be Late.\n" + 
-        "  3. Avoid eating for 10 to 12 hours before the day of your test.\n" + 
-        "  4. Avoid drinking Juices, Tea or Coffee before your test.\n\n" +
-        "Your Voucher : "+body.getVoucher() + "\n\n" +
-        "Thanks\n"+
+        String emailBody = "Hi " + body.getFirstName() + ",<br><br>" +
+        "Please find the details of your appointment below:<br>" +
+        "Diagnostic Center Address: " + body.getDiagnosticsAddress() + "<br>" +
+        "Date: " + body.getAppointmentDate() + "<br>" +
+        "Time: " + body.getAppointmentTime() + "<br><br>" +
+        "<strong>Note:</strong><br>" +
+        "1. Show the attached PDF at the Diagnostic Center.<br>" +
+        "2. Set a reminder and do not be late.<br>" +
+        "3. Avoid eating for 10 to 12 hours before the day of your test.<br>" +
+        "4. Avoid drinking juices, tea, or coffee before your test.<br><br>" +
+        "Your Voucher: <a href='" + body.getVoucher() + "'>Click here to view your voucher</a><br><br>" +
+        "Thanks,<br>" +
         "QubeHealth Team";
 
         Boolean sendEmailResult = Helper.sendEmail(configuration, body.getEmail(), emailSubject,
@@ -246,9 +250,10 @@ public class MessageProviderService extends BaseServiceClient {
 
         /**Send Email */
         String emailSubject = "Health Checkup Report!";
-        String emailBody = "Hi " + body.getFirstName() + ", \n\n"+
-        "Please find the report of your Health Checkup Conducted on "+ body.getAppointmentDate()+".\nReport: " + body.getReportPath() + "\n\n"+
-        "Thanks\n"+
+        String emailBody = "Hi " + body.getFirstName() + ",<br><br>" +
+        "Please find the report of your Health Checkup conducted on " + body.getAppointmentDate() + ".<br>" +
+        "Report: <a href='" + body.getReportPath() + "'>Click here to view your report</a><br><br>" +
+        "Thanks,<br>" +
         "QubeHealth Team";
 
         Boolean sendEmailResult = Helper.sendEmail(configuration, body.getEmail(), emailSubject,

@@ -51,11 +51,11 @@ public class SubscriptionController extends BaseController {
         for (SubscriptionSchema email : request) {
 
             String emailSubject = email.getEmployeeName() + " is requesting Qube Renewal!";
-            String emailBody = "Dear " + email.getHrName() + ", \n\n"+
-            email.getEmployeeName() + " from your team, just requested you to RENEW their Qube Subscription. \nThere might be many others who are worried about their subscription expiry - Please reach out to your contact at QubeHealth to get this done soon.\n\n" +
-            "Thanks\n"+
+            String emailBody = "Dear " + email.getHrName() + ",<br><br>" +
+            email.getEmployeeName() + " from your team has requested a renewal of their Qube Subscription.<br>" +
+            "There might be many others who are concerned about their subscription expiry. Please reach out to your contact at QubeHealth to get this resolved soon.<br><br>" +
+            "Thanks,<br>" +
             "QubeHealth Subscription Team";
-
 
             Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, email.getHrEmail(), emailSubject,
             emailBody);
