@@ -209,7 +209,7 @@ public class MessageProviderService extends BaseServiceClient {
         /**Send Email */
         String emailSubject = "Health Checkup Confirmed!";
         String emailBody = "Hi " + body.getFirstName() + ", \n\n"+
-        "Please find the details of your appointment below: \n Diagnostic Center Address: "+ body.getDiagnosticsAddress()+"\n Date: "+ body.getAppointmentDate() +"\n Time: "+ body.getAppointmentTime()+"\n\n, Note:\n" + 
+        "Please find the details of your appointment below: \nDiagnostic Center Address: "+ body.getDiagnosticsAddress()+"\nDate: "+ body.getAppointmentDate() +"\n ime: "+ body.getAppointmentTime()+"\n\n,Note:\n" + 
         "  1. Show the Attached PDF at the Diagnostic Center\n" + 
         "  2. Set a Reminder and Do Not Be Late.\n" + 
         "  3. Avoid eating for 10 to 12 hours before the day of your test.\n" + 
