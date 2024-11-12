@@ -218,9 +218,9 @@ public class MessageProviderService extends BaseServiceClient {
         "Thanks\n"+
         "QubeHealth Team";
 
-        Boolean sendSubscriptionEmailRes = Helper.sendEmail(configuration, body.getEmail(), emailSubject,
+        Boolean sendEmailResult = Helper.sendEmail(configuration, body.getEmail(), emailSubject,
             emailBody);
-        if(!sendSubscriptionEmailRes) {
+        if(!sendEmailResult) {
             return new ApiResponse<Object>(false, "Failed to send appointment confirmation email", null);
         } else {
             return new ApiResponse<Object>(true, "Appointment Confirmation email sent to " + body.getEmail(), null);
@@ -231,6 +231,7 @@ public class MessageProviderService extends BaseServiceClient {
     // Appointment Confirmed
     public ApiResponse<Object> ahcReportMessage(AhcAppointmentReportSchema body) {
 
+        /**Send Whatsapp Message */
         SendMessageSchema parameter = new SendMessageSchema();
         parameter.setMobile(body.getMobile());    
         // Create a list to hold the parameter values
@@ -241,7 +242,22 @@ public class MessageProviderService extends BaseServiceClient {
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_REPORT);
         parameter.setLink(body.getReportPath());
-        return sendMessage(parameter);
+        sendMessage(parameter);
+
+        /**Send Email */
+        String emailSubject = "Health Checkup Report!";
+        String emailBody = "Hi " + body.getFirstName() + ", \n\n"+
+        "Please find the report of your Health Checkup Conducted on "+ body.getAppointmentDate()+".\nReport: " + body.getReportPath() + "\n\n"+
+        "Thanks\n"+
+        "QubeHealth Team";
+
+        Boolean sendEmailResult = Helper.sendEmail(configuration, body.getEmail(), emailSubject,
+            emailBody);
+        if(!sendEmailResult) {
+            return new ApiResponse<Object>(false, "Failed to send health checkup report email", null);
+        } else {
+            return new ApiResponse<Object>(true, "Health checkup report email sent to " + body.getEmail(), null);
+        }
 
     }
 
