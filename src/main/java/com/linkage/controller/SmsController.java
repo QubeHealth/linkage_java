@@ -64,7 +64,7 @@ public class SmsController extends BaseController {
                 "%s is your OTP to log in to QubeHealth App (Valid only for %s Mins.) \n%s",
                 otp,
                 expiryTime,
-                "MyzTUkWm5h1"
+                configuration.appSignature()
         );
 
         // Check response and create ApiResponse object
