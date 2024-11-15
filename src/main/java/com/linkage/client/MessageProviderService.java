@@ -35,8 +35,8 @@ public class MessageProviderService extends BaseServiceClient {
     private static final String REFEREE_INVITE_TEMPLATE = "qp_cashback_referal_invite24may2024";
     private static final String REFERER_CASHBACK_TEMPLATE = "qp_cashback_referrer_24may2024_stopped"; // Stopped qp_cashback_referrer_24may2024
     private static final String REFEREE_CASHBACK_TEMPLATE = "qp_cashback_referree_24may2024_stopped";
-    private static final String CASHBACK_TEMPLATE = "qp_ubv_24may2024";
-    private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024";
+    private static final String CASHBACK_TEMPLATE = "qp_ubv_24may2024_stopped";
+    private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024_stopped";
     private static final String BILL_PARTIAL_VERIFIED_TEMPLATE = "qp_ubr_new24may2024";
     private static final String BILL_REJECTED_TEMPLATE = "qp_ubr_new24may2024";
 
