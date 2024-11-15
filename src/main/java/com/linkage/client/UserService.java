@@ -11,7 +11,7 @@ public class UserService extends BaseServiceClient {
     }
 
     public ApiResponse<Object> getMobileNo(Long userId) {
-        String url = configuration.getUserJavaUrl() + "users/getMobileNo";
+        String url = configuration.getUserJavaUrl() + "auth/getMobileNo";
 
         return this.networkCallInternalService(url, "post", userId, null);
     }
