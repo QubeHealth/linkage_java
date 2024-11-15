@@ -1,5 +1,6 @@
 package com.linkage.controller;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
@@ -98,8 +99,10 @@ public class SmsController extends BaseController {
         if (!result.getStatus()) {
             return new ApiResponse<>(false, "User mobile not found", result);
         }
+
+        Map<String,Object> userMob = (Map<String,Object>) result.getData();
     
-        String mobileNo = (String) result.getData();
+        String mobileNo = (String) userMob.get("data");
         body.setMobile(mobileNo);
     
         // Initialize variables for message content and template ID
