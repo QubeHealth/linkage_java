@@ -8,7 +8,7 @@ public class SmsSchema {
     @Data
     public static class PaymentStatus {
         private String status;
-        private Long userID;
+        private Long userId;
         private String transactionId;
         private String type;
         private String mobile;
