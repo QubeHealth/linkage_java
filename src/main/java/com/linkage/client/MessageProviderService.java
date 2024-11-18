@@ -390,6 +390,7 @@ public class MessageProviderService extends BaseServiceClient {
         if (!extractedTemplateData.get("templateType").toString().equalsIgnoreCase("TEXT")) {
             final JSONObject imageObject = new JSONObject();
             imageObject.put("link", parameter.getLink());
+            imageObject.put("filename", parameter.getFileName());
             final JSONObject messagObject = new JSONObject();
             messagObject.put("type", extractedTemplateData.get("templateType").toString().toLowerCase());
             messagObject.put(extractedTemplateData.get("templateType").toString().toLowerCase(), imageObject);
