@@ -202,7 +202,8 @@ public class MessageProviderService extends BaseServiceClient {
         params.add(body.getAppointmentTime());
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_CONFIRM);
-        parameter.setLink(body.getVoucher());  
+        parameter.setLink(body.getVoucher()); 
+        parameter.setFileName("Voucher"); 
 
         sendMessage(parameter);
 
@@ -246,6 +247,7 @@ public class MessageProviderService extends BaseServiceClient {
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_REPORT);
         parameter.setLink(body.getReportPath());
+        parameter.setFileName("Report");
         sendMessage(parameter);
 
         /**Send Email */
