@@ -30,4 +30,6 @@ public class AhcAppointmentReportSchema {
     @JsonProperty("report_path")
     private String reportPath;
 
+    @JsonProperty("email")
+    private String email;
 }

@@ -33,10 +33,10 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 
 public class MessageProviderService extends BaseServiceClient {
     private static final String REFEREE_INVITE_TEMPLATE = "qp_cashback_referal_invite24may2024";
-    private static final String REFERER_CASHBACK_TEMPLATE = "qp_cashback_referrer_24may2024";
-    private static final String REFEREE_CASHBACK_TEMPLATE = "qp_cashback_referree_24may2024";
-    private static final String CASHBACK_TEMPLATE = "qp_ubv_24may2024";
-    private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024";
+    private static final String REFERER_CASHBACK_TEMPLATE = "qp_cashback_referrer_24may2024_stopped"; // Stopped qp_cashback_referrer_24may2024
+    private static final String REFEREE_CASHBACK_TEMPLATE = "qp_cashback_referree_24may2024_stopped";
+    private static final String CASHBACK_TEMPLATE = "qp_ubv_24may2024_stopped";
+    private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024_stopped";
     private static final String BILL_PARTIAL_VERIFIED_TEMPLATE = "qp_ubr_new24may2024";
     private static final String BILL_REJECTED_TEMPLATE = "qp_ubr_new24may2024";
 
@@ -44,8 +44,8 @@ public class MessageProviderService extends BaseServiceClient {
     private static final String ADJUDICATION_INPROGRESS = "ncif_adjudication_1_22nov2023";
     private static final String ADJUDICATION_REJECTED = "ncif_adjudication_3_22nov2023";
 
-    private static final String AHC_APPOINTMENT_REPORT = "ahc_appt_report_8_sept_2023";// "ahc_appointment_report_8_sept_2023";
-    private static final String AHC_APPOINTMENT_CONFIRM = "ahc_appointment_confirmation_7_sept_2023";
+    private static final String AHC_APPOINTMENT_REPORT = "ahc_appt_report_11_nov_2024";// "ahc_appointment_report_8_sept_2023";
+    private static final String AHC_APPOINTMENT_CONFIRM = "ahc_appointment_confirmation_11_nov_2024";
 
     private static final String CREDIT_ASSIGNED = "qc_limit_assigned_22nov2023";
     private static final String DISBURSEMENT_SUCCESS = "qc_disbursement_successful_22nov2023";
@@ -53,8 +53,7 @@ public class MessageProviderService extends BaseServiceClient {
 
     private static final String NEW_USER_ONBOARDING = "qp_awareness_ne_29mar2024";
     private static final String REPEAT_USER_RETENTION = "qp_usage_rem_29mar2024";
-    private static final String ADD_FAMILY_MEMBER = "qa_add_family_01sep2024";
-
+    private static final String ADD_FAMILY_MEMBER = "qhsms_adfam_25oct2024";
 
 
     public ApiResponse<Object> templatesData;
@@ -191,7 +190,7 @@ public class MessageProviderService extends BaseServiceClient {
 
     // Appointment Confirmed
     public ApiResponse<Object> appointmentConfirmed(AhcBookConfirmSchema body) {
-
+        /**Send Whatsapp Message */
         SendMessageSchema parameter = new SendMessageSchema();
         parameter.setMobile(body.getMobile());    
         // Create a list to hold the parameter values
@@ -204,13 +203,40 @@ public class MessageProviderService extends BaseServiceClient {
         params.add(body.getAppointmentTime());
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_CONFIRM);
-        return sendMessage(parameter);
+        parameter.setLink(body.getVoucher());  
+
+        sendMessage(parameter);
+
+        /**Send Email */
+        String emailSubject = "Health Checkup Confirmed!";
+        String emailBody = "Hi " + body.getFirstName() + ",<br><br>" +
+        "Please find the details of your appointment below:<br>" +
+        "Diagnostic Center Address: " + body.getDiagnosticsAddress() + "<br>" +
+        "Date: " + body.getAppointmentDate() + "<br>" +
+        "Time: " + body.getAppointmentTime() + "<br><br>" +
+        "<strong>Note:</strong><br>" +
+        "1. Show the attached PDF at the Diagnostic Center.<br>" +
+        "2. Set a reminder and do not be late.<br>" +
+        "3. Avoid eating for 10 to 12 hours before the day of your test.<br>" +
+        "4. Avoid drinking juices, tea, or coffee before your test.<br><br>" +
+        "Your Voucher: <a href='" + body.getVoucher() + "'>Click here to view your voucher</a><br><br>" +
+        "Thanks,<br>" +
+        "QubeHealth Team";
+
+        Boolean sendEmailResult = Helper.sendEmail(configuration, body.getEmail(), emailSubject,
+            emailBody);
+        if(!sendEmailResult) {
+            return new ApiResponse<Object>(false, "Failed to send appointment confirmation email", null);
+        } else {
+            return new ApiResponse<Object>(true, "Appointment Confirmation email sent to " + body.getEmail(), null);
+        }
 
     }
 
     // Appointment Confirmed
     public ApiResponse<Object> ahcReportMessage(AhcAppointmentReportSchema body) {
 
+        /**Send Whatsapp Message */
         SendMessageSchema parameter = new SendMessageSchema();
         parameter.setMobile(body.getMobile());    
         // Create a list to hold the parameter values
@@ -221,7 +247,23 @@ public class MessageProviderService extends BaseServiceClient {
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_REPORT);
         parameter.setLink(body.getReportPath());
-        return sendMessage(parameter);
+        sendMessage(parameter);
+
+        /**Send Email */
+        String emailSubject = "Health Checkup Report!";
+        String emailBody = "Hi " + body.getFirstName() + ",<br><br>" +
+        "Please find the report of your Health Checkup conducted on " + body.getAppointmentDate() + ".<br>" +
+        "Report: <a href='" + body.getReportPath() + "'>Click here to view your report</a><br><br>" +
+        "Thanks,<br>" +
+        "QubeHealth Team";
+
+        Boolean sendEmailResult = Helper.sendEmail(configuration, body.getEmail(), emailSubject,
+            emailBody);
+        if(!sendEmailResult) {
+            return new ApiResponse<Object>(false, "Failed to send health checkup report email", null);
+        } else {
+            return new ApiResponse<Object>(true, "Health checkup report email sent to " + body.getEmail(), null);
+        }
 
     }
 
@@ -307,8 +349,8 @@ public class MessageProviderService extends BaseServiceClient {
         // Create a list to hold the parameter values
         List<String> params = new ArrayList<>();
         // Add values to the list
-        params.add(body.getPrimaryFname().toString());
         params.add(body.getSecondaryFname().toString());
+        params.add(body.getPrimaryFname().toString());
         parameter.setParams(params);
         parameter.setElementName(ADD_FAMILY_MEMBER);
         return sendMessage(parameter);

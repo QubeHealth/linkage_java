@@ -33,4 +33,11 @@ public class AhcBookConfirmSchema {
     @NotBlank(message = "Please enter valid appointment_time")
     @JsonProperty("appointment_time")
     private String appointmentTime;
+
+    @NotBlank(message = "Please enter valid voucher")
+    @JsonProperty("voucher")
+    private String voucher;
+
+    @JsonProperty("email")
+    private String email;
 }
