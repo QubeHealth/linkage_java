@@ -77,15 +77,6 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String appSignature;
 
-    @NotEmpty
-    private String qubepayUrl;
-
- 
-
-    public String getQubepayUrl() {
-        return qubepayUrl;
-    }
-
     public String getxApiKey() {
         return xApiKey;
     
