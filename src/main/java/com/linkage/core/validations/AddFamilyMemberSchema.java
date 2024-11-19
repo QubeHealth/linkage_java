@@ -23,8 +23,12 @@ public class AddFamilyMemberSchema {
 
                
     @NotNull(message = "Please enter a valid user id")
-    @JsonProperty("user_id")
+    @JsonProperty("user_id")    
     private Long userId;
+
+    @NotNull(message = "Please enter a valid cashback")
+    @JsonProperty("cashback")
+    private String cashback;
 
     @JsonProperty("primary_fname")
     private String primaryFname;

@@ -7,11 +7,7 @@ import java.util.Set;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.MessageProviderService;
-import com.linkage.client.QubepayService;
 import com.linkage.client.SmsClient;
-import com.linkage.client.SmsService;
-import com.linkage.client.UserService;
-import com.linkage.core.constants.Constants;
 import com.linkage.core.validations.AddFamilyMemberSchema;
 import com.linkage.core.validations.AdjudicationStatusMessageSchema;
 import com.linkage.core.validations.AhcAppointmentReportSchema;
@@ -45,15 +41,11 @@ import jakarta.ws.rs.core.MediaType;
 public class MessageProviderController extends BaseController {
     private final SmsClient smsClient;
     private MessageProviderService messageProviderService;
-    private QubepayService qubepayService;
-    private UserService userService;
 
     public MessageProviderController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
         messageProviderService = new MessageProviderService(configuration);
         this.smsClient = new SmsClient(configuration);
-        this.qubepayService = new QubepayService(configuration);
-        this.userService = new UserService(configuration);
 
     }
 
@@ -511,35 +503,17 @@ public class MessageProviderController extends BaseController {
         if (messageProviderResponse.getData() == null) {
             return messageProviderResponse;
         }
-
-        String cashbackPercentage;
-        ApiResponse<Object> qubepayResponse = this.qubepayService.getUserCashbackPercentage(body.getUserId());
-        Map<String, Object> qubepayResponseData = (Map<String, Object>) qubepayResponse.getData();
-        if (qubepayResponse.getData() == null) {
-            cashbackPercentage = Constants.STANDARD_CASHBACK_PERCENTAGE;
-        }
-
-        if( qubepayResponseData.get("data") == null){
-            cashbackPercentage = Constants.STANDARD_CASHBACK_PERCENTAGE;
-        }else{
-            cashbackPercentage = (String) qubepayResponseData.get("data");
-
-            if(cashbackPercentage.equals("0")){
-                cashbackPercentage = Constants.STANDARD_CASHBACK_PERCENTAGE;
-            }
-        }
         
         String smsResponse = smsClient.sendMessage(
                 body.getMobile(),
                 configuration.getSmsConfig().getAddFamilyTemplateId(),
                 "Hi, %s has just added you to their QubeHealth Account. Get %s%% Cashback on All your Medical Bill Payments using QubePay. Just Download the App NOW!",
                 body.getPrimaryFname(),
-                cashbackPercentage
+                body.getCashback() 
         );
 
         boolean isSuccess = smsResponse.contains("success"); // Simplified success check
 
-        @SuppressWarnings("unchecked")
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         if (!response.get("status").equals("submitted") || !isSuccess) {
             messageProviderResponse.setMessage("Message failed to deliver");

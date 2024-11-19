@@ -6,7 +6,6 @@ import java.util.Map;
 
 public class Constants {
     public static final Map<String, String> SUBSCRIPTION_EXPIRED_EMAIL;
-    public static final String STANDARD_CASHBACK_PERCENTAGE = "10";
     
     static {
         Map<String, String> emailMap = new HashMap<>();
