@@ -25,5 +25,8 @@ public class MessageProviderSchema {
         @JsonProperty("link")
         private String link;
 
+        @JsonProperty("file_name")
+        private String fileName;
+
     }
 }

@@ -35,8 +35,8 @@ public class MessageProviderService extends BaseServiceClient {
     private static final String REFEREE_INVITE_TEMPLATE = "qp_cashback_referal_invite24may2024";
     private static final String REFERER_CASHBACK_TEMPLATE = "qp_cashback_referrer_24may2024_stopped"; // Stopped qp_cashback_referrer_24may2024
     private static final String REFEREE_CASHBACK_TEMPLATE = "qp_cashback_referree_24may2024_stopped";
-    private static final String CASHBACK_TEMPLATE = "qp_ubv_24may2024";
-    private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024";
+    private static final String CASHBACK_TEMPLATE = "qp_ubv_24may2024_stopped";
+    private static final String BILL_VERIFIED_TEMPLATE = "qp_ubv_24may2024_stopped";
     private static final String BILL_PARTIAL_VERIFIED_TEMPLATE = "qp_ubr_new24may2024";
     private static final String BILL_REJECTED_TEMPLATE = "qp_ubr_new24may2024";
 
@@ -203,7 +203,8 @@ public class MessageProviderService extends BaseServiceClient {
         params.add(body.getAppointmentTime());
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_CONFIRM);
-        parameter.setLink(body.getVoucher());  
+        parameter.setLink(body.getVoucher()); 
+        parameter.setFileName("Voucher"); 
 
         sendMessage(parameter);
 
@@ -247,6 +248,7 @@ public class MessageProviderService extends BaseServiceClient {
         parameter.setParams(params);
         parameter.setElementName(AHC_APPOINTMENT_REPORT);
         parameter.setLink(body.getReportPath());
+        parameter.setFileName("Report");
         sendMessage(parameter);
 
         /**Send Email */
@@ -391,6 +393,7 @@ public class MessageProviderService extends BaseServiceClient {
         if (!extractedTemplateData.get("templateType").toString().equalsIgnoreCase("TEXT")) {
             final JSONObject imageObject = new JSONObject();
             imageObject.put("link", parameter.getLink());
+            imageObject.put("filename", parameter.getFileName());
             final JSONObject messagObject = new JSONObject();
             messagObject.put("type", extractedTemplateData.get("templateType").toString().toLowerCase());
             messagObject.put(extractedTemplateData.get("templateType").toString().toLowerCase(), imageObject);

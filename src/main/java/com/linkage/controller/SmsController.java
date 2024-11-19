@@ -95,7 +95,7 @@ public class SmsController extends BaseController {
         }
     
         // Retrieve user mobile number
-        ApiResponse<Object> result = this.userService.getMobileNo(body.getUserID());
+        ApiResponse<Object> result = this.userService.getMobileNo(body.getUserId());
         if (!result.getStatus()) {
             return new ApiResponse<>(false, "User mobile not found", result);
         }
