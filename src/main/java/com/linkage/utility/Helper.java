@@ -308,8 +308,11 @@ public final class Helper {
             // Set Subject: header field
             message.setSubject(subject);
     
-            // Set the actual message
-            message.setText(body);
+            // // Set the actual message
+            // message.setText(body);
+
+            // Set HTML content for the email body
+            message.setContent(body, "text/html");
     
             // Send the message
             Transport.send(message);

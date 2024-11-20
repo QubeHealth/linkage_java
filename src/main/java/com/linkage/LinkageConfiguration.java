@@ -1,5 +1,7 @@
 package com.linkage;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.dropwizard.core.Configuration;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -73,6 +75,11 @@ public class LinkageConfiguration extends Configuration {
     private String webEngageApiUrl;
 
     @NotEmpty
+    private String appSignature;
+
+ 
+
+    @NotEmpty
     private String hrmsTokenApiUrl;
 
     @NotEmpty
@@ -103,6 +110,14 @@ public class LinkageConfiguration extends Configuration {
 
     public String getxApiKey() {
         return xApiKey;
+    
+    }
+    public void setAppSignature(String appSignature) {
+        this.appSignature = appSignature;
+    }
+
+    public String appSignature() {
+        return appSignature;
     }
 
     public void setxApiKey(String xApiKey) {
@@ -261,6 +276,51 @@ public class LinkageConfiguration extends Configuration {
 
     public void setHereApiKey(String hereApiKey) {
         this.hereApiKey = hereApiKey;
+    }
+
+    @JsonProperty("sms")
+    private SmsConfig smsConfig;
+
+    public SmsConfig getSmsConfig() {
+        return smsConfig;
+    }
+
+    public static class SmsConfig {
+        @NotEmpty
+        private String dltOtpSmsTemplateId;
+
+        @NotEmpty
+        private String gupshupEndpoint;
+
+        @NotEmpty
+        private String dltPrincipalEntityId;
+
+        @NotEmpty
+        private String gupshupUserId;
+
+        @NotEmpty
+        private String gupshupPassword;
+
+        // Getters
+        public String getDltOtpSmsTemplateId() {
+            return dltOtpSmsTemplateId;
+        }
+
+        public String getGupshupEndpoint() {
+            return gupshupEndpoint;
+        }
+        
+        public String getDltPrincipalEntityId() {
+            return dltPrincipalEntityId;
+        }
+
+        public String getGupshupUserId() {
+            return gupshupUserId;
+        }
+
+        public String getGupshupPassword() {
+            return gupshupPassword;
+        }
     }
     public String getGoogleApiKey() {
         return googleApiKey;
