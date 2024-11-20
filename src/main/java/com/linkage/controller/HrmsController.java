@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.client.ElasticrunService;
+import com.linkage.client.HrmsService;
 
 import jakarta.validation.Validator;
 import jakarta.ws.rs.Consumes;
@@ -16,14 +16,14 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/api/elasticrun")
-public class ElasticrunController extends BaseController {
+@Path("/api/hrms")
+public class HrmsController extends BaseController {
 
-    private final ElasticrunService elasticrunService;
+    private final HrmsService hrmsService;
 
-    public ElasticrunController(LinkageConfiguration configuration, Validator validator) {
+    public HrmsController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
-        this.elasticrunService = new ElasticrunService(configuration);
+        this.hrmsService = new HrmsService(configuration);
     }
 
     private Response buildResponse(Response.Status status, ApiResponse<?> apiResponse) {
@@ -32,8 +32,8 @@ public class ElasticrunController extends BaseController {
 
     @SuppressWarnings("unchecked")
     private Optional<String> getAccessToken() {
-        // Retrieve token from ElasticrunService
-        ApiResponse<Object> tokenResponse = elasticrunService.getToken();
+        // Retrieve token from hrmsService
+        ApiResponse<Object> tokenResponse = hrmsService.getToken();
         if (tokenResponse == null || tokenResponse.getData() == null) {
             return Optional.empty();
         }
@@ -45,7 +45,7 @@ public class ElasticrunController extends BaseController {
 
     private ApiResponse<Object> fetchEmployeeData(String accessToken) {
         // Fetch employee data using the access token
-        return elasticrunService.getEmployeeData(accessToken);
+        return hrmsService.getEmployeeData(accessToken);
     }
 
     @SuppressWarnings("unchecked")

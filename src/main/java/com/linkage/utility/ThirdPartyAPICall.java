@@ -67,6 +67,8 @@ public final class ThirdPartyAPICall {
             } catch (Exception e) {
                 logger.error("Failed to parse the response body to JSON", e);
             }
+        } else {
+            responseBody = response.readEntity(new GenericType<Map<String, Object>>() {});
         }
         System.out.println("Response status => " + response.toString());
         logger.info("\n\nThird party api response => {}", responseBody);
