@@ -1,16 +1,12 @@
 package com.linkage.controller;
 
-import com.google.api.client.util.Sets;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.api.HspDetails;
 import com.linkage.client.GoogleMapsService;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import com.linkage.core.validations.HspByLocation;
-import com.linkage.core.validations.WebengageSchema;
 import com.linkage.utility.Helper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,7 +53,7 @@ public class GoogleMapsController extends BaseController {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error Occurred. Please try again later.", null)).build();
             }
 
-            return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Success", gmbApiData)).build();
+            return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Success", Helper.toJsonString(gmbApiData))).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error Occurred. Please try again later.", null)).build();
