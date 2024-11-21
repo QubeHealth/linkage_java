@@ -26,13 +26,14 @@ import jakarta.ws.rs.core.Response;
 public class SmsController extends BaseController {
 
     private final SmsClient smsClient;
-    private SmsService smsService;
     private UserService userService;
 
     public SmsController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
+
         this.smsClient = new SmsClient(configuration);
-        this.smsService = new SmsService(configuration);
+
+
         this.userService = new UserService(configuration);
     }
 
@@ -65,7 +66,7 @@ public class SmsController extends BaseController {
                 "%s is your OTP to log in to QubeHealth App (Valid only for %s Mins.) \n%s",
                 otp,
                 expiryTime,
-                configuration.appSignature()
+                "MyzTUkWm5h1"
         );
 
         // Check response and create ApiResponse object
@@ -99,10 +100,8 @@ public class SmsController extends BaseController {
         if (!result.getStatus()) {
             return new ApiResponse<>(false, "User mobile not found", result);
         }
-
-        Map<String,Object> userMob = (Map<String,Object>) result.getData();
     
-        String mobileNo = (String) userMob.get("data");
+        String mobileNo = (String) result.getData();
         body.setMobile(mobileNo);
     
         // Initialize variables for message content and template ID
