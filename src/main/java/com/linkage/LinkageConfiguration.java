@@ -77,8 +77,6 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String appSignature;
 
- 
-
     public String getxApiKey() {
         return xApiKey;
     
@@ -272,6 +270,9 @@ public class LinkageConfiguration extends Configuration {
         @NotEmpty
         private String gupshupPassword;
 
+        @NotEmpty
+        private String addFamilyTemplateId;
+
         // Getters
         public String getDltOtpSmsTemplateId() {
             return dltOtpSmsTemplateId;
@@ -292,6 +293,11 @@ public class LinkageConfiguration extends Configuration {
         public String getGupshupPassword() {
             return gupshupPassword;
         }
+
+        public String getAddFamilyTemplateId() {
+            return addFamilyTemplateId;
+        }
+
     }
     public String getGoogleApiKey() {
         return googleApiKey;
