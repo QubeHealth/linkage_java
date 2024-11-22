@@ -77,6 +77,37 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String appSignature;
 
+ 
+
+    @NotEmpty
+    private String hrmsTokenApiUrl;
+
+    @NotEmpty
+    private String hrmsEmployeeApiUrl;
+
+    @NotEmpty
+    private String hrmsTokenAuthorization;
+
+    @NotEmpty
+    private String hrmsEmployeeApiKey;
+
+    public String getHrmsEmployeeApiKey() {
+        return hrmsEmployeeApiKey;
+    }
+
+    public String getHrmsTokenAuthorization() {
+        return hrmsTokenAuthorization;
+    }
+
+    public String getHrmsEmployeeApiUrl() {
+        return hrmsEmployeeApiUrl;
+    }
+
+    public String getHrmsTokenApiUrl() {
+        return hrmsTokenApiUrl;
+    }
+
+
     public String getxApiKey() {
         return xApiKey;
     
