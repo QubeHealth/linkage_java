@@ -2,7 +2,7 @@ package com.linkage.core.validations;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,14 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class HspByLocation {
   
-   @NotBlank(message = "Latitude is required")
+   @NotNull(message = "Latitude is required")
    @JsonProperty("latitude")
-   private String latitude;
+   private Double latitude;
 
-   @NotBlank(message = "Longitude code is required")
+   @NotNull(message = "Longitude code is required")
    @JsonProperty("longitude")
-   private String longitude;
+   private Double longitude;
 
+   @JsonProperty("radius")
+   private Integer radius;
 }
 
 
