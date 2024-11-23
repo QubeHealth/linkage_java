@@ -7,6 +7,7 @@ import java.util.Set;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.MessageProviderService;
+import com.linkage.client.SmsClient;
 import com.linkage.core.validations.AddFamilyMemberSchema;
 import com.linkage.core.validations.AdjudicationStatusMessageSchema;
 import com.linkage.core.validations.AhcAppointmentReportSchema;
@@ -38,11 +39,14 @@ import jakarta.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 
 public class MessageProviderController extends BaseController {
+    private final SmsClient smsClient;
     private MessageProviderService messageProviderService;
 
     public MessageProviderController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
         messageProviderService = new MessageProviderService(configuration);
+        this.smsClient = new SmsClient(configuration);
+
     }
 
     @POST
@@ -481,6 +485,7 @@ public class MessageProviderController extends BaseController {
     }
     
         
+    @SuppressWarnings("unchecked")
     @POST
     @Path("/addFamilyMember")
     @Produces(MediaType.APPLICATION_JSON)
@@ -498,16 +503,28 @@ public class MessageProviderController extends BaseController {
         if (messageProviderResponse.getData() == null) {
             return messageProviderResponse;
         }
+        
+        String smsResponse = smsClient.sendMessage(
+                body.getMobile(),
+                configuration.getSmsConfig().getAddFamilyTemplateId(),
+                "Hi, %s has just added you to their QubeHealth Account. Get %s%% Cashback on All your Medical Bill Payments using QubePay. Just Download the App NOW!",
+                body.getPrimaryFname(),
+                body.getCashback() 
+        );
+
+        boolean isSuccess = smsResponse.contains("success"); // Simplified success check
+
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
-        if (!response.get("status").equals("submitted")) {
+        if (!response.get("status").equals("submitted") || !isSuccess) {
             messageProviderResponse.setMessage("Message failed to deliver");
             return messageProviderResponse;
         }
         messageProviderResponse.setMessage("Message delivered successfully");
         messageProviderResponse.setData(null);
         return messageProviderResponse;
+        
     }
-    
+
     @POST
     @Path("/getTemplates")
     @Produces(MediaType.APPLICATION_JSON)
