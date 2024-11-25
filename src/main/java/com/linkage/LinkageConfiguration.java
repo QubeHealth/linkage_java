@@ -77,7 +77,34 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String appSignature;
 
- 
+    @NotEmpty
+    private String hrmsTokenApiUrl;
+
+    @NotEmpty
+    private String hrmsEmployeeApiUrl;
+
+    @NotEmpty
+    private String hrmsTokenAuthorization;
+
+    @NotEmpty
+    private String hrmsEmployeeApiKey;
+
+    public String getHrmsEmployeeApiKey() {
+        return hrmsEmployeeApiKey;
+    }
+
+    public String getHrmsTokenAuthorization() {
+        return hrmsTokenAuthorization;
+    }
+
+    public String getHrmsEmployeeApiUrl() {
+        return hrmsEmployeeApiUrl;
+    }
+
+    public String getHrmsTokenApiUrl() {
+        return hrmsTokenApiUrl;
+    }
+
 
     public String getxApiKey() {
         return xApiKey;
@@ -272,6 +299,9 @@ public class LinkageConfiguration extends Configuration {
         @NotEmpty
         private String gupshupPassword;
 
+        @NotEmpty
+        private String addFamilyTemplateId;
+
         // Getters
         public String getDltOtpSmsTemplateId() {
             return dltOtpSmsTemplateId;
@@ -292,6 +322,11 @@ public class LinkageConfiguration extends Configuration {
         public String getGupshupPassword() {
             return gupshupPassword;
         }
+
+        public String getAddFamilyTemplateId() {
+            return addFamilyTemplateId;
+        }
+
     }
     public String getGoogleApiKey() {
         return googleApiKey;

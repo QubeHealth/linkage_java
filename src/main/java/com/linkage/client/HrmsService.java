@@ -1,0 +1,51 @@
+package com.linkage.client;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.linkage.LinkageConfiguration;
+import com.linkage.api.ApiResponse;
+
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+
+public class HrmsService extends BaseServiceClient {
+
+    public HrmsService(LinkageConfiguration configuration) {
+        super(configuration);
+    }
+
+    // Method to retrieve authentication token
+    public ApiResponse<Object> getToken() {
+        String url = configuration.getHrmsTokenApiUrl();
+
+        MultivaluedHashMap<String, Object> headers = new MultivaluedHashMap<>();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        headers.add("Authorization",
+               configuration.getHrmsTokenAuthorization() );
+
+        Form form = new Form();
+        form.param("grant_type", "client_credentials");
+
+        return this.networkCallExternalService(url, "POST", form, headers);
+    }
+
+    // Method to retrieve employee data
+    public ApiResponse<Object> getEmployeeData(String token) {
+        String url = configuration.getHrmsEmployeeApiUrl();
+
+        MultivaluedHashMap<String, Object> headers = new MultivaluedHashMap<>();
+
+        headers.add("Authorization", "Bearer " + token);
+
+        headers.add("Content-Type", MediaType.APPLICATION_JSON);
+
+        headers.add("apikey", configuration.getHrmsEmployeeApiKey());
+
+        Map<String, Object> reqBody = new HashMap<>();
+        reqBody.put("integrationMasterName", "Qubehealth");
+
+        return this.networkCallExternalService(url, "POST", reqBody, headers);
+    }
+}

@@ -1,10 +1,12 @@
 package com.linkage.controller;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.SmsClient;
+import com.linkage.client.SmsService;
 import com.linkage.client.UserService;
 import com.linkage.core.validations.OtpSmsSchema;
 import com.linkage.core.validations.SmsSchema;
@@ -21,18 +23,16 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/api/sms")
-@Produces(MediaType.APPLICATION_JSON)
 public class SmsController extends BaseController {
 
     private final SmsClient smsClient;
+    private SmsService smsService;
     private UserService userService;
 
     public SmsController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
-
         this.smsClient = new SmsClient(configuration);
-
-
+        this.smsService = new SmsService(configuration);
         this.userService = new UserService(configuration);
     }
 
@@ -65,7 +65,7 @@ public class SmsController extends BaseController {
                 "%s is your OTP to log in to QubeHealth App (Valid only for %s Mins.) \n%s",
                 otp,
                 expiryTime,
-                "MyzTUkWm5h1"
+                configuration.appSignature()
         );
 
         // Check response and create ApiResponse object
@@ -95,12 +95,14 @@ public class SmsController extends BaseController {
         }
     
         // Retrieve user mobile number
-        ApiResponse<Object> result = this.userService.getMobileNo(body.getUserID());
+        ApiResponse<Object> result = this.userService.getMobileNo(body.getUserId());
         if (!result.getStatus()) {
             return new ApiResponse<>(false, "User mobile not found", result);
         }
+
+        Map<String,Object> userMob = (Map<String,Object>) result.getData();
     
-        String mobileNo = (String) result.getData();
+        String mobileNo = (String) userMob.get("data");
         body.setMobile(mobileNo);
     
         // Initialize variables for message content and template ID

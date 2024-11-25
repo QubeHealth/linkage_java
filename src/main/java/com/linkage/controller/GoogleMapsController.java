@@ -5,8 +5,10 @@ import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
-import com.linkage.api.HspDetails;
 import com.linkage.client.GoogleMapsService;
+
+import java.util.HashMap;
+import java.util.Set;
 import com.linkage.core.validations.HspByLocation;
 import com.linkage.utility.Helper;
 
@@ -32,41 +34,32 @@ public class GoogleMapsController extends BaseController {
     }
 
     @POST
-    @Path("/searchByLatLong")
+    @Path("/nearbySearch")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response HspByLocation(@Context HttpServletRequest request, HspByLocation reqBody) {
+    public Response nearbySearch(@Context HttpServletRequest request, HspByLocation reqBody) {
+
+        Set<ConstraintViolation<HspByLocation>> violations = validator
+                .validate(reqBody);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponse<>(false, errorMessage, null)).build();
+        }
+
         try {
-            // Validate the request body
-            Set<ConstraintViolation<HspByLocation>> violations = validator.validate(reqBody);
-            if (!violations.isEmpty()) {
-                String errorMessage = violations.stream()
-                        .map(ConstraintViolation::getMessage)
-                        .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new ApiResponse<>(false, errorMessage, null))
-                        .build();
-            }
-    
-            // Call the service to search for HSP
-            ApiResponse<List<HspDetails>>  response = mapsService.searchHsp(reqBody);
-            
-            if (response == null || !response.getStatus()) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity(new ApiResponse<>(false, "Failed to fetch data from external service", null))
-                        .build();
+
+            HashMap<String, Object> gmbApiData = mapsService.gmbApiData(reqBody.getLatitude(), reqBody.getLongitude(), reqBody.getRadius());
+            if(gmbApiData == null) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error Occurred. Please try again later.", null)).build();
             }
 
-            return Response.status(Response.Status.OK)
-                    .entity(new ApiResponse<>(true, "Data fetched successfully", Helper.toJsonString(response.getData())))
-                    .build();
+            return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Success", Helper.toJsonString(gmbApiData))).build();
         } catch (Exception e) {
-            // Log the exception for debugging purposes
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ApiResponse<>(false, "Internal server error: " + e.getMessage(), null))
-                    .build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error Occurred. Please try again later.", null)).build();
         }
     }
-
 }
