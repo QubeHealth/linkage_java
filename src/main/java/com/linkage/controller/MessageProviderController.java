@@ -1,13 +1,17 @@
 package com.linkage.controller;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.MessageProviderService;
 import com.linkage.client.SmsClient;
+import com.linkage.client.UserService;
 import com.linkage.core.validations.AddFamilyMemberSchema;
 import com.linkage.core.validations.AdjudicationStatusMessageSchema;
 import com.linkage.core.validations.AhcAppointmentReportSchema;
@@ -18,6 +22,7 @@ import com.linkage.core.validations.CashbackTypeMessageSchema;
 import com.linkage.core.validations.CreditAssignedSchema;
 import com.linkage.core.validations.DisbursedMessageSchema;
 import com.linkage.core.validations.DynamicMessageSchema;
+import com.linkage.core.validations.MessageProviderSchema.SendMessageSchema;
 import com.linkage.core.validations.NewUserOnboardingSchema;
 import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
@@ -34,6 +39,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
 @Path("/api/messenger")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -41,11 +49,13 @@ import jakarta.ws.rs.core.MediaType;
 public class MessageProviderController extends BaseController {
     private final SmsClient smsClient;
     private MessageProviderService messageProviderService;
+    private UserService userService;
 
     public MessageProviderController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
         messageProviderService = new MessageProviderService(configuration);
         this.smsClient = new SmsClient(configuration);
+        this.userService = new UserService(configuration);
 
     }
 
@@ -570,5 +580,74 @@ public class MessageProviderController extends BaseController {
         Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
         return new ApiResponse<Object>(true, null, response);
 
+    }
+
+    @POST
+    @Path("/sendUserReport")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public ApiResponse<Object> sendUserReport(
+        @Context HttpServletRequest request,
+        @FormDataParam("report") FormDataBodyPart report,
+        @FormDataParam("first_name") String firstName,
+        @FormDataParam("email") String email,
+        @FormDataParam("mobile") String mobile,
+        @FormDataParam("appointment_date") String appointmentDate,
+        @FormDataParam("file_id") String fileId
+    ) {
+        if (report == null || (mobile == null && email == null)) {
+            return new ApiResponse<Object>(false, "Invalid Request", null);
+        }
+
+        try {
+
+            // Get file url from gcp
+            ApiResponse<Object> fileUrlRes = this.userService.getFileUrl(fileId);
+            if(fileUrlRes == null || !fileUrlRes.getStatus()) {
+                return fileUrlRes;
+            }
+
+            String fileUrl = ((Map<String, String>) fileUrlRes.getData()).get("data");
+
+            // Email subject and body
+            String emailSubject = "Health Checkup Report!";
+            String emailBody = "Hi " + firstName + ",<br><br>" +
+                "Please find the report of your Health Checkup conducted on " + appointmentDate + ".<br>" +
+                "Please find the report attached to this email.<br><br>" +
+                "Thanks,<br>" +
+                "QubeHealth Team";
+
+            // Send email
+            ApiResponse<Object> sendEmailRes = this.messageProviderService.sendEmailWithAttachment(
+                                                    email,
+                                                    emailSubject,
+                                                    emailBody,
+                                                    report.getEntityAs(InputStream.class),
+                                                    report.getContentDisposition().getFileName(),
+                                                    report.getMediaType().toString(),
+                                                    configuration
+                                                );
+            if(sendEmailRes == null || !sendEmailRes.getStatus()) {
+                return sendEmailRes;
+            }
+
+            // Send Whatsapp message
+            ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
+                                                    fileUrl,
+                                                    mobile,
+                                                    firstName,
+                                                    appointmentDate,
+                                                    report.getEntityAs(InputStream.class),
+                                                    report.getContentDisposition().getFileName()
+                                                );
+            if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
+                return sendWhatsappMessageRes;
+            }
+
+            return new ApiResponse<Object>(true, "Success", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<Object>(false, "Something went wrong", null);
+        }
     }
 }
