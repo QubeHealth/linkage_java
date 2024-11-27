@@ -595,7 +595,7 @@ public class MessageProviderController extends BaseController {
         @FormDataParam("appointment_date") String appointmentDate,
         @FormDataParam("file_id") String fileId
     ) {
-        if (report == null || (mobile == null && email == null)) {
+        if (report == null || (mobile == null && email == null) || fileId == null || firstName == null || appointmentDate == null) {
             return new ApiResponse<Object>(false, "Invalid Request", null);
         }
 
