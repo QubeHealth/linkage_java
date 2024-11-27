@@ -617,31 +617,35 @@ public class MessageProviderController extends BaseController {
                 "Thanks,<br>" +
                 "QubeHealth Team";
 
-            // Send email
-            ApiResponse<Object> sendEmailRes = this.messageProviderService.sendEmailWithAttachment(
-                                                    email,
-                                                    emailSubject,
-                                                    emailBody,
-                                                    report.getEntityAs(InputStream.class),
-                                                    report.getContentDisposition().getFileName(),
-                                                    report.getMediaType().toString(),
-                                                    configuration
-                                                );
-            if(sendEmailRes == null || !sendEmailRes.getStatus()) {
-                return sendEmailRes;
+            if(email != null) {
+                // Send email
+                ApiResponse<Object> sendEmailRes = this.messageProviderService.sendEmailWithAttachment(
+                                                        email,
+                                                        emailSubject,
+                                                        emailBody,
+                                                        report.getEntityAs(InputStream.class),
+                                                        report.getContentDisposition().getFileName(),
+                                                        report.getMediaType().toString(),
+                                                        configuration
+                                                    );
+                if(sendEmailRes == null || !sendEmailRes.getStatus()) {
+                    return sendEmailRes;
+                }
             }
 
-            // Send Whatsapp message
-            ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
-                                                    fileUrl,
-                                                    mobile,
-                                                    firstName,
-                                                    appointmentDate,
-                                                    report.getEntityAs(InputStream.class),
-                                                    report.getContentDisposition().getFileName()
-                                                );
-            if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
-                return sendWhatsappMessageRes;
+            if(mobile != null) {
+                // Send Whatsapp message
+                ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
+                                                        fileUrl,
+                                                        mobile,
+                                                        firstName,
+                                                        appointmentDate,
+                                                        report.getEntityAs(InputStream.class),
+                                                        report.getContentDisposition().getFileName()
+                                                    );
+                if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
+                    return sendWhatsappMessageRes;
+                }
             }
 
             return new ApiResponse<Object>(true, "Success", null);
