@@ -589,6 +589,7 @@ public class MessageProviderController extends BaseController {
     public ApiResponse<Object> sendUserReport(
         @Context HttpServletRequest request,
         @FormDataParam("report") FormDataBodyPart report,
+        @FormDataParam("report_url") String reportUrl,
         @FormDataParam("first_name") String firstName,
         @FormDataParam("email") String email,
         @FormDataParam("mobile") String mobile,
@@ -600,14 +601,6 @@ public class MessageProviderController extends BaseController {
         }
 
         try {
-
-            // Get file url from gcp
-            ApiResponse<Object> fileUrlRes = this.userService.getFileUrl(fileId);
-            if(fileUrlRes == null || !fileUrlRes.getStatus()) {
-                return fileUrlRes;
-            }
-
-            String fileUrl = ((Map<String, String>) fileUrlRes.getData()).get("data");
 
             // Email subject and body
             String emailSubject = "Health Checkup Report!";
@@ -633,7 +626,7 @@ public class MessageProviderController extends BaseController {
 
             // Send Whatsapp message
             ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
-                                                    fileUrl,
+                                                    reportUrl,
                                                     mobile,
                                                     firstName,
                                                     appointmentDate,
