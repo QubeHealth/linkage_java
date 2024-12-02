@@ -42,7 +42,8 @@ public final class ThirdPartyAPICall {
         if (request.getMethod().equalsIgnoreCase("GET")) {
             response = builder.get();
         } else {
-            if (request.getHeaders()!=null && request.getHeaders().get("Content-Type")!= null && request.getHeaders().get("Content-Type").get(0).equals(MediaType.APPLICATION_FORM_URLENCODED)) {
+            if (request.getHeaders() != null && request.getHeaders().get("Content-Type") != null
+                    && request.getHeaders().get("Content-Type").get(0).equals(MediaType.APPLICATION_FORM_URLENCODED)) {
                 response = builder.post(Entity.entity(request.getBody(), MediaType.APPLICATION_FORM_URLENCODED));
             } else {
                 response = builder.post(Entity.json(request.getBody()));
@@ -56,7 +57,8 @@ public final class ThirdPartyAPICall {
         Map<String, Object> responseBody = null;
         if (contentType != null && contentType.contains("application/json")) {
             // If the response is JSON, read it into a Map
-            responseBody = response.readEntity(new GenericType<Map<String, Object>>() {});
+            responseBody = response.readEntity(new GenericType<Map<String, Object>>() {
+            });
         } else if (contentType != null && contentType.contains("text/html")) {
             // If the response is HTML, read it as a String
             String responseBodyStr = response.readEntity(String.class);
@@ -67,8 +69,21 @@ public final class ThirdPartyAPICall {
             } catch (Exception e) {
                 logger.error("Failed to parse the response body to JSON", e);
             }
-        } else {
-            responseBody = response.readEntity(new GenericType<Map<String, Object>>() {});
+        } else if (contentType != null && contentType.contains("text/plain")) {
+            // If the response is HTML, read it as a String
+            String responseBodyStr = response.readEntity(String.class);
+            logger.error("Received TEXT/PLAIN response instead of JSON: {}", responseBodyStr);
+            // You can decide to return this error or handle it differently
+            try {
+                responseBody = objectMapper.readValue(responseBodyStr, Map.class); // Parse the string to a Map
+            } catch (Exception e) {
+                logger.error("Failed to parse the response body to JSON", e);
+            }
+        }
+
+        else {
+            responseBody = response.readEntity(new GenericType<Map<String, Object>>() {
+            });
         }
         System.out.println("Response status => " + response.toString());
         logger.info("\n\nThird party api response => {}", responseBody);

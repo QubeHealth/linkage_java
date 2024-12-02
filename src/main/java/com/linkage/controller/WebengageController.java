@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.WebengageService;
@@ -29,6 +31,7 @@ public class WebengageController extends BaseController {
 
     private WebengageService webengageService;
     private String userUpload = "User_Uploaded";
+    private String secondaryUserType = "SECONDARY";
     private static final Logger LOGGER = Logger.getLogger(WebengageController.class.getName());
 
     public WebengageController(LinkageConfiguration configuration, Validator validator) {
@@ -107,11 +110,41 @@ public class WebengageController extends BaseController {
 
             ArrayList<HashMap<String, Object>> users = (ArrayList<HashMap<String, Object>>) body.getEventData();
             for(HashMap<String, Object> user : users) {
-            WebengageSchema.EventSchema event = new WebengageSchema.EventSchema();
+                WebengageSchema.EventSchema event = new WebengageSchema.EventSchema();
                 event.setEventName(body.getEventName());
                 event.setEventTime(Helper.getCurrentTimeForWebEngage());
                 event.setUserId(user.get("userId").toString());
 
+                ApiResponse<Object> triggerEvent = addEvent(event);
+                LOGGER.info("triggerEvent {}" + Helper.toJsonString(triggerEvent));
+                if(triggerEvent == null || !triggerEvent.getStatus()) {
+                    return new ApiResponse<Object>(false, triggerEvent != null ? triggerEvent.getMessage() : "Error occurred", null);
+                }
+            }
+            
+            if(secondaryUserType.equals(body.getUserType())){
+                // Assuming addedByEventDetails is a JSON-like structure.
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                // Deserialize addedByEventDetails into a Map or a specific class.
+                Map<String, Object> addedByDetails = objectMapper.convertValue(body.getAddedByEventDetails(), new TypeReference<Map<String, Object>>() {});
+                WebengageSchema.EventSchema event = new WebengageSchema.EventSchema();
+
+                // Create a new map for eventData with only required fields
+                Map<String, Object> eventData = new HashMap<>();
+                eventData.put("primaryUserFirstName", addedByDetails.get("primaryUserFirstName"));
+                eventData.put("primaryUserLastName", addedByDetails.get("primaryUserLastName"));
+                eventData.put("primaryUserMobile", addedByDetails.get("primaryUserMobile"));
+                eventData.put("primaryUserCompany", addedByDetails.get("primaryUserCompany"));
+                eventData.put("specifiedRelation", addedByDetails.get("specifiedRelation"));
+
+                // Extract and set the event name and other details.
+                event.setEventName(addedByDetails.getOrDefault("eventName", "Added_By").toString());
+                event.setEventTime(Helper.getCurrentTimeForWebEngage());
+                event.setUserId(addedByDetails.get("userId").toString());
+                event.setEventData(eventData); // Set only the filtered eventData
+
+               
                 ApiResponse<Object> triggerEvent = addEvent(event);
                 LOGGER.info("triggerEvent {}" + Helper.toJsonString(triggerEvent));
                 if(triggerEvent == null || !triggerEvent.getStatus()) {
