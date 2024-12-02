@@ -589,14 +589,13 @@ public class MessageProviderController extends BaseController {
     public ApiResponse<Object> sendUserReport(
         @Context HttpServletRequest request,
         @FormDataParam("report") FormDataBodyPart report,
-        @FormDataParam("report_url") String reportUrl,
         @FormDataParam("first_name") String firstName,
         @FormDataParam("email") String email,
         @FormDataParam("mobile") String mobile,
         @FormDataParam("appointment_date") String appointmentDate,
-        @FormDataParam("file_id") String fileId
+        @FormDataParam("file_url") String fileUrl
     ) {
-        if (report == null || (mobile == null && email == null)) {
+        if (report == null || (mobile == null && email == null) || fileUrl == null || firstName == null || appointmentDate == null) {
             return new ApiResponse<Object>(false, "Invalid Request", null);
         }
 
@@ -610,23 +609,25 @@ public class MessageProviderController extends BaseController {
                 "Thanks,<br>" +
                 "QubeHealth Team";
 
-            // Send email
-            ApiResponse<Object> sendEmailRes = this.messageProviderService.sendEmailWithAttachment(
-                                                    email,
-                                                    emailSubject,
-                                                    emailBody,
-                                                    report.getEntityAs(InputStream.class),
-                                                    report.getContentDisposition().getFileName(),
-                                                    report.getMediaType().toString(),
-                                                    configuration
-                                                );
-            if(sendEmailRes == null || !sendEmailRes.getStatus()) {
-                return sendEmailRes;
+            if(email != null) {
+                // Send email
+                ApiResponse<Object> sendEmailRes = this.messageProviderService.sendEmailWithAttachment(
+                                                        email,
+                                                        emailSubject,
+                                                        emailBody,
+                                                        report.getEntityAs(InputStream.class),
+                                                        report.getContentDisposition().getFileName(),
+                                                        report.getMediaType().toString(),
+                                                        configuration
+                                                    );
+                if(sendEmailRes == null || !sendEmailRes.getStatus()) {
+                    return sendEmailRes;
+                }
             }
 
             // Send Whatsapp message
             ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
-                                                    reportUrl,
+                                                    fileUrl,
                                                     mobile,
                                                     firstName,
                                                     appointmentDate,
