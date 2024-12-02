@@ -45,5 +45,12 @@ public class WebengageSchema {
         @NotNull(message = "event data cannot be null")
         @JsonProperty("event_data")
         private Object eventData;
+
+        @NotEmpty(message = "user type is required")
+        @JsonProperty("user_type")
+        private String userType;
+
+        @JsonProperty("added_by_event_details")
+        private Object addedByEventDetails;
     }
 }

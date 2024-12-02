@@ -76,8 +76,11 @@ public class HrmsController extends BaseController {
                 List<Map<String, Object>> employeeMasterData = (List<Map<String, Object>>) employeeMaster
                         .get("EmployeeMasterData");
 
+                   // Convert employeeMasterData to JSON string
+                String employeeMasterJson = new com.fasterxml.jackson.databind.ObjectMapper()
+                .writeValueAsString(employeeMasterData);
                 return buildResponse(Response.Status.OK,
-                        new ApiResponse<>(true, "Employee data fetched successfully", employeeMasterData));
+                        new ApiResponse<>(true, "Employee data fetched successfully", employeeMasterJson));
             } else {
                 return buildResponse(Response.Status.INTERNAL_SERVER_ERROR,
                         new ApiResponse<>(false, "Failed to fetch employee data", null));
