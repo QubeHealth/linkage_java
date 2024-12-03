@@ -1,5 +1,7 @@
 package com.linkage.client;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -440,5 +442,31 @@ public class MessageProviderService extends BaseServiceClient {
         parameter.setParams(params);
         return sendMessage(parameter);
 
+    }
+
+    public ApiResponse<Object> sendEmailWithAttachment(String toEmail, String emailSubject, String emailBody, InputStream attachmentStream, String attachmentName, String attachmentType, LinkageConfiguration configuration) {
+        Boolean sendEmailRes = Helper.sendEmailWithAttachment(toEmail, emailSubject, emailBody, attachmentStream, attachmentName, attachmentType, configuration);
+        if (sendEmailRes) {
+            return new ApiResponse<Object>(true, "Email sent successfully", null);
+        } else {
+            return new ApiResponse<Object>(false, "Failed to send email", null);
+        }
+    }
+
+    public ApiResponse<Object> sendWhatsappMessageWithAttachment(String link, String toMobile, String firstName, String appointmentDate, InputStream attachmentStream, String attachmentName) throws IOException {
+
+        /**Send Whatsapp Message */
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(toMobile);
+        // Add values to the list
+        List<String> params = new ArrayList<>();
+        params.add(firstName);
+        params.add(appointmentDate);
+        parameter.setParams(params);
+        parameter.setElementName(AHC_APPOINTMENT_REPORT);
+        parameter.setLink(link);
+        parameter.setFileName("Report");
+
+        return sendMessage(parameter);
     }
 }

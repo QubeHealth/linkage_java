@@ -31,7 +31,6 @@ public class SmsController extends BaseController {
 
     public SmsController(LinkageConfiguration configuration, Validator validator) {
         super(configuration, validator);
-
         this.smsClient = new SmsClient(configuration);
         this.smsService = new SmsService(configuration);
         this.userService = new UserService(configuration);

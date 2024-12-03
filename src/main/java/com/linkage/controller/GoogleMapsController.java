@@ -53,7 +53,7 @@ public class GoogleMapsController extends BaseController {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error Occurred. Please try again later.", null)).build();
             }
 
-            return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Success", Helper.toJsonString(gmbApiData))).build();
+            return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Success",  Helper.toJsonString(gmbApiData))).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error Occurred. Please try again later.", null)).build();

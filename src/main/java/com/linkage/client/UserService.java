@@ -18,4 +18,9 @@ public class UserService extends BaseServiceClient {
         return this.networkCallInternalService(url, "post", Map.of("user_id",userId), null);
     }
 
+    public ApiResponse<Object> getFileUrl(String fileId) {
+        String url = configuration.getUserJavaUrl() + "bills/getFileUrl";
+
+        return this.networkCallInternalService(url, "post", Map.of("file_id",fileId), null);
+    }
 }
