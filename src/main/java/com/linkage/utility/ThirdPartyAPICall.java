@@ -2,8 +2,6 @@ package com.linkage.utility;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkage.api.ApiRequest;
@@ -23,7 +21,7 @@ public final class ThirdPartyAPICall {
     private ThirdPartyAPICall() {
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(ThirdPartyAPICall.class);
+ 
 
     @SuppressWarnings("unchecked")
     public static ApiResponse<Object> thirdPartyAPICall(ApiRequest request) {
@@ -50,7 +48,7 @@ public final class ThirdPartyAPICall {
             }
         }
 
-        logger.info("\n\nThird party api request => {}", Helper.toJsonString(request));
+        AdvancedLogger.logInfo("\n\nThird party api request => {}", Helper.toJsonString(request));
         // Use GenericType to specify the type parameter for readEntity method
         String contentType = response.getHeaderString("Content-Type");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -62,22 +60,22 @@ public final class ThirdPartyAPICall {
         } else if (contentType != null && contentType.contains("text/html")) {
             // If the response is HTML, read it as a String
             String responseBodyStr = response.readEntity(String.class);
-            logger.error("Received HTML response instead of JSON: {}", responseBodyStr);
+            AdvancedLogger.logInfo("Received HTML response instead of JSON: {}", responseBodyStr);
             // You can decide to return this error or handle it differently
             try {
                 responseBody = objectMapper.readValue(responseBodyStr, Map.class); // Parse the string to a Map
             } catch (Exception e) {
-                logger.error("Failed to parse the response body to JSON", e);
+             AdvancedLogger.logError("Failed to parse the response body to JSON", e.toString());
             }
         } else if (contentType != null && contentType.contains("text/plain")) {
             // If the response is HTML, read it as a String
             String responseBodyStr = response.readEntity(String.class);
-            logger.error("Received TEXT/PLAIN response instead of JSON: {}", responseBodyStr);
+             AdvancedLogger.logError("Received TEXT/PLAIN response instead of JSON: {}", responseBodyStr);
             // You can decide to return this error or handle it differently
             try {
                 responseBody = objectMapper.readValue(responseBodyStr, Map.class); // Parse the string to a Map
             } catch (Exception e) {
-                logger.error("Failed to parse the response body to JSON", e);
+                AdvancedLogger.logError("Failed to parse the response body to JSON", e.toString());
             }
         }
 
@@ -85,8 +83,8 @@ public final class ThirdPartyAPICall {
             responseBody = response.readEntity(new GenericType<Map<String, Object>>() {
             });
         }
-        System.out.println("Response status => " + response.toString());
-        logger.info("\n\nThird party api response => {}", responseBody);
+   
+        AdvancedLogger.logError("\n\nThird party api response => {}", responseBody.toString());
         boolean status = false;
         if (Response.Status.OK.getStatusCode() <= response.getStatus() && response.getStatus() < 300) {
             status = true;
