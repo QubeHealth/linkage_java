@@ -89,6 +89,18 @@ public class LinkageConfiguration extends Configuration {
     @NotEmpty
     private String hrmsEmployeeApiKey;
 
+    @NotEmpty
+    private String grayLogUrl;
+
+    // Getters and Setters for grayLogUrl
+    public String getGrayLogUrl() {
+        return grayLogUrl;
+    }
+
+    public void setGrayLogUrl(String grayLogUrl) {
+        this.grayLogUrl = grayLogUrl;
+    }
+
     public String getHrmsEmployeeApiKey() {
         return hrmsEmployeeApiKey;
     }
