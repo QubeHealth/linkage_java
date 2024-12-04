@@ -4,16 +4,17 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import com.linkage.controller.BefiscController;
 import com.linkage.controller.DigitapController;
-import com.linkage.controller.HrmsController;
 import com.linkage.controller.ErupeeController;
 import com.linkage.controller.FirebaseController;
 import com.linkage.controller.GoogleMapsController;
+import com.linkage.controller.HrmsController;
 import com.linkage.controller.MessageProviderController;
+import com.linkage.controller.SmsController;
 import com.linkage.controller.SubscriptionController;
 import com.linkage.controller.VendorController;
 import com.linkage.controller.WebengageController;
-import com.linkage.controller.SmsController;
 import com.linkage.controller.WebhookController;
+import com.linkage.utility.AdvancedLogger;
 import com.linkage.utility.AuthFilter;
 
 import io.dropwizard.core.Application;
@@ -35,6 +36,7 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
 
     @Override
     public void run(LinkageConfiguration configuration, Environment environment) throws Exception {
+        initializeAdvancedLogger( configuration) ;
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
 
@@ -70,5 +72,10 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         environment.jersey().register(webengageController);
         environment.jersey().register(hrmsController);
 
+    }
+     private void initializeAdvancedLogger(LinkageConfiguration configuration) {
+
+        AdvancedLogger.initialize(configuration.getGrayLogUrl());
+        AdvancedLogger.logInfo("AdvancedLogger initialized with URL: " , configuration.getGrayLogUrl());
     }
 }
