@@ -453,7 +453,13 @@ public class MessageProviderService extends BaseServiceClient {
         }
     }
 
-    public ApiResponse<Object> sendWhatsappMessageWithAttachment(String link, String toMobile, String firstName, String appointmentDate, InputStream attachmentStream, String attachmentName) throws IOException {
+    public ApiResponse<Object> sendWhatsappMessageWithAttachment(
+        String link,
+        String toMobile,
+        String firstName,
+        String appointmentDate,
+        String type
+    ) throws IOException {
 
         /**Send Whatsapp Message */
         SendMessageSchema parameter = new SendMessageSchema();
@@ -463,9 +469,15 @@ public class MessageProviderService extends BaseServiceClient {
         params.add(firstName);
         params.add(appointmentDate);
         parameter.setParams(params);
-        parameter.setElementName(AHC_APPOINTMENT_REPORT);
         parameter.setLink(link);
-        parameter.setFileName("Report");
+
+        if(type.equals("REPORT")){
+            parameter.setElementName(AHC_APPOINTMENT_REPORT);
+            parameter.setFileName("Report");
+        } else if(type.equals("VOUCHER")) {
+            parameter.setElementName(AHC_APPOINTMENT_CONFIRM);
+            parameter.setFileName("Voucher");
+        }
 
         return sendMessage(parameter);
     }

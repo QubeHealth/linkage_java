@@ -631,8 +631,7 @@ public class MessageProviderController extends BaseController {
                                                     mobile,
                                                     firstName,
                                                     appointmentDate,
-                                                    report.getEntityAs(InputStream.class),
-                                                    report.getContentDisposition().getFileName()
+                                                    "REPORT"
                                                 );
             if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
                 return sendWhatsappMessageRes;
@@ -642,6 +641,62 @@ public class MessageProviderController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ApiResponse<Object>(false, "Something went wrong", null);
+        }
+    }
+
+    @POST
+    @Path("/userConfirmAhcNew")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> userConfirmAhcNew(AhcBookConfirmSchema body) {
+
+        Set<ConstraintViolation<AhcBookConfirmSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+
+        try {
+
+            Boolean isVoucherSent = false;
+
+            if(body.getMobile() != null) {
+                // Send whatsapp message
+                ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
+                    body.getVoucher(),
+                    body.getMobile(),
+                    body.getFirstName(),
+                    body.getAppointmentDate(),
+                    "VOUCHER"
+                );
+                if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
+                    isVoucherSent = false;
+                } else {
+                    isVoucherSent = true;
+                }
+            }
+
+            // Send email
+            if(body.getEmail() != null) {
+                ApiResponse<Object> sendEmailRes = this.messageProviderService.appointmentConfirmed(body);
+                if(sendEmailRes == null || !sendEmailRes.getStatus()) {
+                    isVoucherSent = false;
+                } else {
+                    isVoucherSent = true;
+                }
+            }
+
+            if(isVoucherSent) {
+                return new ApiResponse<Object>(true, "Success", null);
+            } else {
+                return new ApiResponse<Object>(false, "Unable to send vouchers", null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<>(false, "Error Occurred. Unable to send vouchers", null);
         }
     }
 }
