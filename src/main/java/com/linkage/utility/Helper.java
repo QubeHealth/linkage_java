@@ -1,13 +1,19 @@
 package com.linkage.utility;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -16,13 +22,20 @@ import java.time.format.DateTimeFormatter;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -433,5 +447,81 @@ public final class Helper {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         String currentTime = formatter.format(new Date());
         return currentTime;
+    }
+
+    public static boolean sendEmailWithAttachment(
+        String toEmail,
+        String subject,
+        String body,
+        InputStream attachmentStream,
+        String attachmentName,
+        String attachmentType,
+        LinkageConfiguration configuration
+    ) {
+        try {
+            // SMTP server information
+            String host = configuration.getEmailHost();
+            final String username = configuration.getEmailSmtp();
+            final String password = configuration.getEmailPassword();
+
+            // Set properties for the SMTP connection
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", host);
+            props.put("mail.smtp.port", "587"); // Replace with your SMTP port if different
+
+            // Create a session with authentication
+            Session session = Session.getInstance(props, new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(username, password);
+                }
+            });
+
+            // Create the email message
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+            message.setSubject(subject);
+
+            // Create the email body part
+            MimeBodyPart bodyPart = new MimeBodyPart();
+            bodyPart.setContent(body, "text/html");
+
+            // Create the attachment part
+            MimeBodyPart attachmentPart = new MimeBodyPart();
+            DataSource source = new ByteArrayDataSource(attachmentStream, attachmentType);
+            attachmentPart.setDataHandler(new DataHandler(source));
+            attachmentPart.setFileName(attachmentName);
+
+            // Combine the email body and attachment into a multipart
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(bodyPart);
+            multipart.addBodyPart(attachmentPart);
+
+            // Set the email content
+            message.setContent(multipart);
+
+            // Send the email
+            Transport.send(message);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static String createTemporaryLink(InputStream inputStream, String fileName) throws IOException {
+
+        Path tempDir = Files.createTempDirectory("reportsFilesTemp");
+
+        Path tempFile = tempDir.resolve(fileName);
+
+        // Write the input stream to the file
+        Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+
+        // Return the file URL (this assumes a server is serving files from `tempDir`)
+        return "http://localhost:5016/reportsFilesTemp/" + fileName;
     }
 }
