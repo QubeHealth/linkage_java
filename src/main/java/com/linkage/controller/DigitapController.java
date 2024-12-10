@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
 import com.linkage.client.DigitapService;
@@ -73,6 +72,10 @@ public class DigitapController extends BaseController {
             Map<String, Object> creditResponse = (Map<String, Object>) digitapResponse.getData();
 
             if (creditResponse.get("result_code") != null && !creditResponse.get("result_code").equals(101)) {
+                if (creditResponse.get("result_code").equals(102)) {
+                    return response(Response.Status.OK,
+                            new ApiResponse<>(true, creditResponse.get("message").toString(), creditResponse));
+                }
                 return response(Response.Status.FORBIDDEN,
                         new ApiResponse<>(false, creditResponse.get("message").toString(), creditResponse));
 
@@ -80,7 +83,7 @@ public class DigitapController extends BaseController {
 
             Map<String, Object> report = (Map<String, Object>) creditResponse.get("result");
 
-            String xmlReport = Helper.jsonToXML(Helper.toJsonString(report.get("result_json")));
+            String xmlReport = Helper.downloadXmlAsString(report.getOrDefault("result_xml", "").toString());
 
             creditResponse.put("result", xmlReport);
 
@@ -93,4 +96,5 @@ public class DigitapController extends BaseController {
         }
 
     }
+
 }

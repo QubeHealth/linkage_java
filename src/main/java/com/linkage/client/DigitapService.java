@@ -20,12 +20,13 @@ public class DigitapService extends BaseServiceClient {
     private static final String CONSENT_MESSAGE = "I hereby authorize Experian to pull my credit report for the Credit History";
     private static final String DEVICE_TYPE = "mobile";
     private static final String DEVICE_ID = "350123451234560";
+    private static final Integer REPORT_TYPE = 1; // for xml report
 
     public ApiResponse<Object> getCreditReport(GetCreditBureau body) {
 
         String timeStamp = Helper.getCurrentDate("ddMMyyyy-HH:mm:ss");
         body.setTimestamp(timeStamp);
-
+        body.setReportType(REPORT_TYPE);
         body.setConsentMessage(CONSENT_MESSAGE);
         body.setDeviceType(DEVICE_TYPE);
         body.setConsentAcceptance("yes");
