@@ -2,7 +2,6 @@ package com.linkage.utility;
 
 import java.util.Map;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkage.api.ApiRequest;
 import com.linkage.api.ApiResponse;
@@ -92,7 +91,7 @@ public final class ThirdPartyAPICall {
         String message = status ? "success" : "failed";
 
         client.close();
-
+        AdvancedLogger.logError("EXTERNAL_PARTY_LOG \t\t" + request.getUrl() +"->"+request.getBody(), responseBody.toString());
         return new ApiResponse<>(status, message, responseBody);
     }
 
