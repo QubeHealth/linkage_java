@@ -601,6 +601,8 @@ public class MessageProviderController extends BaseController {
 
         try {
 
+            Boolean isReportSent = false;
+
             // Email subject and body
             String emailSubject = "Health Checkup Report!";
             String emailBody = "Hi " + firstName + ",<br><br>" +
@@ -621,23 +623,36 @@ public class MessageProviderController extends BaseController {
                                                         configuration
                                                     );
                 if(sendEmailRes == null || !sendEmailRes.getStatus()) {
-                    return sendEmailRes;
+                    isReportSent = false;
+                } else {
+                    isReportSent = true;
                 }
             }
 
-            // Send Whatsapp message
-            ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
-                                                    fileUrl,
-                                                    mobile,
-                                                    firstName,
-                                                    appointmentDate,
-                                                    "REPORT"
-                                                );
-            if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
-                return sendWhatsappMessageRes;
+            if(mobile != null) {
+                // Send Whatsapp message
+                ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
+                                                        fileUrl,
+                                                        mobile,
+                                                        firstName,
+                                                        appointmentDate,
+                                                        null,
+                                                        null,
+                                                        null,
+                                                        "REPORT"
+                                                    );
+                if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
+                    isReportSent = false;
+                } else {
+                    isReportSent = true;
+                }
             }
 
-            return new ApiResponse<Object>(true, "Success", null);
+            if(isReportSent) {
+                return new ApiResponse<Object>(true, "Success", null);
+            } else {
+                return new ApiResponse<Object>(false, "Unable to send Report", null);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return new ApiResponse<Object>(false, "Something went wrong", null);
@@ -647,42 +662,70 @@ public class MessageProviderController extends BaseController {
     @POST
     @Path("/userConfirmAhcNew")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public ApiResponse<Object> userConfirmAhcNew(AhcBookConfirmSchema body) {
-
-        Set<ConstraintViolation<AhcBookConfirmSchema>> violations = validator.validate(body);
-        if (!violations.isEmpty()) {
-            // Construct error message from violations
-            String errorMessage = violations.stream()
-                    .map(ConstraintViolation::getMessage)
-                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
-            return new ApiResponse<>(false, errorMessage, null);
-        }
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public ApiResponse<Object> userConfirmAhcNew(
+        @Context HttpServletRequest request,
+        @FormDataParam("voucher") FormDataBodyPart voucher,
+        @FormDataParam("voucher_url") String voucherUrl,
+        @FormDataParam("first_name") String firstName,
+        @FormDataParam("email") String email,
+        @FormDataParam("mobile") String mobile,
+        @FormDataParam("appointment_date") String appointmentDate,
+        @FormDataParam("appointment_time") String appointmentTime,
+        @FormDataParam("diagnostics_address") String diagnosticsAddress
+    ) {
 
         try {
 
             Boolean isVoucherSent = false;
 
-            if(body.getMobile() != null) {
-                // Send whatsapp message
-                ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
-                    body.getVoucher(),
-                    body.getMobile(),
-                    body.getFirstName(),
-                    body.getAppointmentDate(),
-                    "VOUCHER"
+            // Send email
+            if(email != null) {
+                /**Send Email */
+                String emailSubject = "Health Checkup Confirmed!";
+                String emailBody = "Hi " + firstName + ",<br><br>" +
+                "Please find the details of your appointment below:<br>" +
+                "Diagnostic Center Address: " + diagnosticsAddress + "<br>" +
+                "Date: " + appointmentDate + "<br>" +
+                "Time: " + appointmentTime + "<br><br>" +
+                "<strong>Note:</strong><br>" +
+                "1. Show the attached PDF at the Diagnostic Center.<br>" +
+                "2. Set a reminder and do not be late.<br>" +
+                "3. Avoid eating for 10 to 12 hours before the day of your test.<br>" +
+                "4. Avoid drinking juices, tea, or coffee before your test.<br><br>" +
+                "Please find the voucher attached to this email.<br><br>" +
+                "Thanks,<br>" +
+                "QubeHealth Team";
+
+                ApiResponse<Object> sendEmailRes = this.messageProviderService.sendEmailWithAttachment(
+                    email,
+                    emailSubject,
+                    emailBody,
+                    voucher.getEntityAs(InputStream.class),
+                    voucher.getContentDisposition().getFileName(),
+                    "application/pdf",
+                    configuration
                 );
-                if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
+                if(sendEmailRes == null || !sendEmailRes.getStatus()) {
                     isVoucherSent = false;
                 } else {
                     isVoucherSent = true;
                 }
             }
 
-            // Send email
-            if(body.getEmail() != null) {
-                ApiResponse<Object> sendEmailRes = this.messageProviderService.appointmentConfirmed(body);
-                if(sendEmailRes == null || !sendEmailRes.getStatus()) {
+            // Send whatsapp message
+            if(mobile != null) {
+                ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
+                    voucherUrl,
+                    mobile,
+                    firstName,
+                    appointmentDate,
+                    appointmentTime,
+                    diagnosticsAddress,
+                    voucher.getContentDisposition().getFileName(),
+                    "VOUCHER"
+                );
+                if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
                     isVoucherSent = false;
                 } else {
                     isVoucherSent = true;
