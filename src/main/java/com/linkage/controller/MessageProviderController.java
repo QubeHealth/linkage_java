@@ -601,6 +601,8 @@ public class MessageProviderController extends BaseController {
 
         try {
 
+            Boolean isReportSent = false;
+
             // Email subject and body
             String emailSubject = "Health Checkup Report!";
             String emailBody = "Hi " + firstName + ",<br><br>" +
@@ -621,23 +623,36 @@ public class MessageProviderController extends BaseController {
                                                         configuration
                                                     );
                 if(sendEmailRes == null || !sendEmailRes.getStatus()) {
-                    return sendEmailRes;
+                    isReportSent = false;
+                } else {
+                    isReportSent = true;
                 }
             }
 
-            // Send Whatsapp message
-            ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
-                                                    fileUrl,
-                                                    mobile,
-                                                    firstName,
-                                                    appointmentDate,
-                                                    "REPORT"
-                                                );
-            if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
-                return sendWhatsappMessageRes;
+            if(mobile != null) {
+                // Send Whatsapp message
+                ApiResponse<Object> sendWhatsappMessageRes = this.messageProviderService.sendWhatsappMessageWithAttachment(
+                                                        fileUrl,
+                                                        mobile,
+                                                        firstName,
+                                                        appointmentDate,
+                                                        null,
+                                                        null,
+                                                        null,
+                                                        "REPORT"
+                                                    );
+                if(sendWhatsappMessageRes == null || !sendWhatsappMessageRes.getStatus()) {
+                    isReportSent = false;
+                } else {
+                    isReportSent = true;
+                }
             }
 
-            return new ApiResponse<Object>(true, "Success", null);
+            if(isReportSent) {
+                return new ApiResponse<Object>(true, "Success", null);
+            } else {
+                return new ApiResponse<Object>(false, "Unable to send Report", null);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return new ApiResponse<Object>(false, "Something went wrong", null);
