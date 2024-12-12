@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.core.Configuration;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
 
 public class LinkageConfiguration extends Configuration {
     @NotEmpty
@@ -88,6 +89,8 @@ public class LinkageConfiguration extends Configuration {
 
     @NotEmpty
     private String hrmsEmployeeApiKey;
+
+    private SentryConfig sentry;
 
     public String getHrmsEmployeeApiKey() {
         return hrmsEmployeeApiKey;
@@ -422,4 +425,23 @@ public class LinkageConfiguration extends Configuration {
         this.webEngageLiscenseCode = webEngageLiscenseCode;
     }
 
+    @JsonProperty("sentry")
+    public SentryConfig getSentry() {
+        return sentry;
+    }
+
+    @JsonProperty("sentry")
+    public void setSentry(SentryConfig sentry) {
+        this.sentry = sentry;
+    }
+
+    @Data
+    public static class SentryConfig {
+        @JsonProperty
+        @NotEmpty
+        private String dsn;
+        @JsonProperty
+        @NotEmpty
+        private String environment;
+    }
 }
