@@ -458,17 +458,30 @@ public class MessageProviderService extends BaseServiceClient {
         String toMobile,
         String firstName,
         String appointmentDate,
+        String appointmentTime,
+        String diagnosticsAddress,
+        String fileName,
         String type
     ) throws IOException {
 
         /**Send Whatsapp Message */
         SendMessageSchema parameter = new SendMessageSchema();
         parameter.setMobile(toMobile);
+
         // Add values to the list
         List<String> params = new ArrayList<>();
-        params.add(firstName);
-        params.add(appointmentDate);
+        if(type.equals("REPORT")){
+            params.add(firstName);
+            params.add(appointmentDate);
+        } else if(type.equals("VOUCHER")) {
+            // Add values to the list
+            params.add(firstName);
+            params.add(diagnosticsAddress);
+            params.add(appointmentDate);
+            params.add(appointmentTime);
+        }
         parameter.setParams(params);
+
         parameter.setLink(link);
 
         if(type.equals("REPORT")){
@@ -476,7 +489,7 @@ public class MessageProviderService extends BaseServiceClient {
             parameter.setFileName("Report");
         } else if(type.equals("VOUCHER")) {
             parameter.setElementName(AHC_APPOINTMENT_CONFIRM);
-            parameter.setFileName("Voucher");
+            parameter.setFileName(fileName);
         }
 
         return sendMessage(parameter);
