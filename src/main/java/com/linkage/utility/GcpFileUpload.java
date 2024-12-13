@@ -7,6 +7,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.linkage.api.ApiResponse;
+import com.linkage.utility.sentry.SentryException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,6 +57,7 @@ public final class GcpFileUpload {
 
             return new ApiResponse<>(true, "File Uploaded Successfully", signedUrl);
         } catch (Exception e) {
+            SentryException.captureException(e);
             return new ApiResponse<>(false, "File Upload Failed", e.getMessage());
         }
     }
@@ -78,6 +80,7 @@ public final class GcpFileUpload {
             return signedUrl;
 
         } catch (Exception e) {
+            SentryException.captureException(e);
             System.err.println("GET SIGN URL ERROR => " + e.getMessage());
             return "";
         }

@@ -71,6 +71,7 @@ public class SmsClient {
             return response.toString();
 
         } catch (Exception e) {
+            SentryException.captureException(e);
             e.printStackTrace();
             return "Failed to send message: " + e.getMessage();
         }

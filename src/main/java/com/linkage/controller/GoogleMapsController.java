@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Set;
 import com.linkage.core.validations.HspByLocation;
 import com.linkage.utility.Helper;
+import com.linkage.utility.sentry.SentryException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -55,6 +56,7 @@ public class GoogleMapsController extends BaseController {
 
             return Response.status(Response.Status.OK).entity(new ApiResponse<>(true, "Success", Helper.toJsonString(gmbApiData))).build();
         } catch (Exception e) {
+            SentryException.captureException(request.getAttribute("user_id"),request.getPathInfo(), e);
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponse<>(false, "Error Occurred. Please try again later.", null)).build();
         }

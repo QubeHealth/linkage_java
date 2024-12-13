@@ -19,6 +19,7 @@ import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.ErupeeSchema.VoucherRequest;
 import com.linkage.core.validations.ErupeeSchema.VoucherStatus;
 import com.linkage.utility.Helper;
+import com.linkage.utility.sentry.SentryException;
 
 import java.io.FileInputStream;
 import java.security.*;
@@ -59,6 +60,7 @@ public class ErupeeService extends BaseServiceClient {
             return new ApiResponse<>(true, "success", map);
 
         } catch (Exception e) {
+            SentryException.captureException(e);
             return new ApiResponse<>(false, e.getMessage(), null);
         }
 
@@ -208,6 +210,7 @@ public class ErupeeService extends BaseServiceClient {
             return new ApiResponse<>(true, "success", map);
 
         } catch (Exception e) {
+            SentryException.captureException(e);
             return new ApiResponse<>(false, e.getMessage(), null);
         }
 

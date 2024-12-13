@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkage.api.ApiRequest;
 import com.linkage.api.ApiResponse;
+import com.linkage.utility.sentry.SentryException;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -67,6 +68,7 @@ public final class ThirdPartyAPICall {
             try {
                 responseBody = objectMapper.readValue(responseBodyStr, Map.class); // Parse the string to a Map
             } catch (Exception e) {
+            SentryException.captureException(e);
                 logger.error("Failed to parse the response body to JSON", e);
             }
         } else if (contentType != null && contentType.contains("text/plain")) {
@@ -77,6 +79,7 @@ public final class ThirdPartyAPICall {
             try {
                 responseBody = objectMapper.readValue(responseBodyStr, Map.class); // Parse the string to a Map
             } catch (Exception e) {
+            SentryException.captureException(e);
                 logger.error("Failed to parse the response body to JSON", e);
             }
         }

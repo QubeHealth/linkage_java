@@ -9,6 +9,7 @@ import com.linkage.api.ApiResponse;
 import com.linkage.client.DigitapService;
 import com.linkage.core.validations.DigitapSchema.GetCreditBureau;
 import com.linkage.utility.Helper;
+import com.linkage.utility.sentry.SentryException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -91,6 +92,7 @@ public class DigitapController extends BaseController {
                     new ApiResponse<>(true, "Bureau fetch success", creditResponse));
 
         } catch (Exception e) {
+            SentryException.captureException(request.getAttribute("user_id"),request.getPathInfo(), e);
             return response(Response.Status.INTERNAL_SERVER_ERROR,
                     new ApiResponse<>(false, e.getMessage(), e));
         }

@@ -97,6 +97,7 @@ public final class Helper {
 
             return new String(decrypted, StandardCharsets.UTF_8);
         } catch (Exception e) {
+            SentryException.captureException(e);
             e.printStackTrace();
         }
         return null;
@@ -117,6 +118,7 @@ public final class Helper {
 
             return Base64.getEncoder().encodeToString(encryptedBytes);
         } catch (Exception e) {
+            SentryException.captureException(e);
             e.printStackTrace();
             return null;
         }
@@ -148,6 +150,7 @@ public final class Helper {
             resultMap.put("data", jsonToMap(json));
             return resultMap;
         } catch (Exception e) {
+            SentryException.captureException(e);
             System.out.println(e.getMessage());
             e.printStackTrace();
             Map<String, Object> resultMap = new HashMap<>();
@@ -224,6 +227,7 @@ public final class Helper {
             new URL(urlString);
             return true; // If no exception is thrown, URL is valid
         } catch (Exception e) {
+            SentryException.captureException(e);
             return false; // If an exception is caught, URL is not valid
         }
     }
@@ -249,6 +253,7 @@ public final class Helper {
             return xml;
 
         } catch (Exception e) {
+            SentryException.captureException(e);
             e.printStackTrace();
             return "";
         }
@@ -333,6 +338,7 @@ public final class Helper {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(jsonNode);
         } catch (Exception e) {
+            SentryException.captureException(e);
             e.printStackTrace();
             return null;
         }
@@ -368,6 +374,7 @@ public final class Helper {
                 return "";
             }
         } catch (Exception e) {
+            SentryException.captureException(e);
             System.out.println("Error while downloading xml " + e.getMessage());
             return "";
         }
