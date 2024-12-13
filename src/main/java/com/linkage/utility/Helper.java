@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.linkage.LinkageConfiguration;
+import com.linkage.utility.sentry.SentryException;
 
 public final class Helper {
     private Helper() {

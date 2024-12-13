@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import com.linkage.LinkageConfiguration;
+import com.linkage.utility.sentry.SentryException;
 
 public class SmsClient {
 
