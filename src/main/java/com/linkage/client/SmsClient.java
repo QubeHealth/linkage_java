@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import com.linkage.LinkageConfiguration;
+import com.linkage.utility.sentry.SentryException;
 
 public class SmsClient {
 
@@ -71,6 +72,7 @@ public class SmsClient {
             return response.toString();
 
         } catch (Exception e) {
+            SentryException.captureException(e);
             e.printStackTrace();
             return "Failed to send message: " + e.getMessage();
         }

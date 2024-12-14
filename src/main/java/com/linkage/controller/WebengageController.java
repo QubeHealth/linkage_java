@@ -14,6 +14,7 @@ import com.linkage.api.ApiResponse;
 import com.linkage.client.WebengageService;
 import com.linkage.core.validations.WebengageSchema;
 import com.linkage.utility.Helper;
+import com.linkage.utility.sentry.SentryException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -154,6 +155,7 @@ public class WebengageController extends BaseController {
 
             return new ApiResponse<Object>(true, "Employees Uploaded Successfully", null);
         } catch (Exception e) {
+            SentryException.captureException(request.getAttribute("user_id"),request.getPathInfo(), e);
             e.printStackTrace();
             return new ApiResponse<Object>(false, e.getMessage(), null);
         }

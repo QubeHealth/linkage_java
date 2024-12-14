@@ -27,6 +27,7 @@ import com.linkage.core.validations.RefereeCashbackMsgSchema;
 import com.linkage.core.validations.RefereeInviteMsgSchema;
 import com.linkage.core.validations.RepeatUserRetentionSchema;
 import com.linkage.utility.Helper;
+import com.linkage.utility.sentry.SentryException;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
@@ -420,6 +421,7 @@ public class MessageProviderService extends BaseServiceClient {
                 .findFirst()
                 .orElse(null); // Return the first matching id or null if none found
         } catch (Exception e) {
+            SentryException.captureException(e);
             e.printStackTrace();
             // Handle exceptions (e.g., logging)
             return null;

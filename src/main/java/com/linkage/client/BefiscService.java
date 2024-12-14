@@ -8,6 +8,7 @@ import com.linkage.api.ApiResponse;
 import com.linkage.core.validations.GetBankDetailsByAccSchema;
 import com.linkage.core.validations.GetVpaByMobileSchema;
 import com.linkage.core.validations.GetVpaDetailsSchema;
+import com.linkage.utility.sentry.SentryException;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 
@@ -57,6 +58,7 @@ public class BefiscService extends BaseServiceClient {
             Map<String, Object> data = (Map<String, Object>) responseData.get("result");
             return new ApiResponse<>(status, message, data);
         } catch (Exception e) {
+            SentryException.captureException(e);
             // Handle exception or log error
             System.out.println(e.getMessage());
             return new ApiResponse<>(false, "Something went wrong", null);
