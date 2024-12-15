@@ -1,5 +1,7 @@
 package com.linkage;
 
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+
 import com.linkage.controller.BefiscController;
 import com.linkage.controller.DigitapController;
 import com.linkage.controller.HrmsController;
@@ -54,6 +56,7 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         WebengageController webengageController = new WebengageController(configuration, validator);
         HrmsController hrmsController = new HrmsController(configuration, validator);
 
+        environment.jersey().register(MultiPartFeature.class);
         environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
