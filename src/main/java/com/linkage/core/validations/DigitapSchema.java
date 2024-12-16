@@ -72,6 +72,9 @@ public class DigitapSchema {
         @JsonProperty("device_id")
         private String deviceId;
 
+        @JsonProperty("report_type")
+        private Integer reportType;
+
     }
 
 }

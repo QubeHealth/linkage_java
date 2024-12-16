@@ -3,11 +3,14 @@ package com.linkage;
 import com.linkage.controller.BefiscController;
 import com.linkage.controller.DigitapController;
 import com.linkage.controller.EmailController;
+import com.linkage.controller.HrmsController;
 import com.linkage.controller.ErupeeController;
 import com.linkage.controller.FirebaseController;
 import com.linkage.controller.GoogleMapsController;
 import com.linkage.controller.MessageProviderController;
 import com.linkage.controller.SubscriptionController;
+import com.linkage.controller.VendorController;
+import com.linkage.controller.WebengageController;
 import com.linkage.controller.SmsController;
 import com.linkage.controller.WebhookController;
 import com.linkage.utility.AuthFilter;
@@ -47,9 +50,12 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         SubscriptionController subscriptionController = new SubscriptionController(configuration, validator);
         EmailController emailController = new EmailController(configuration, validator);
         SmsController smsController = new SmsController(configuration, validator);
-
         ErupeeController erupeeController = new ErupeeController(configuration, validator);
         GoogleMapsController googleMapsController=new GoogleMapsController(configuration, validator);
+        VendorController vendorController=new VendorController(configuration, validator);
+        WebengageController webengageController = new WebengageController(configuration, validator);
+        HrmsController hrmsController = new HrmsController(configuration, validator);
+
         environment.jersey().register(befiscController);
         environment.jersey().register(webhookController);
         environment.jersey().register(firebaseController);
@@ -60,6 +66,9 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         environment.jersey().register(erupeeController);
         environment.jersey().register(googleMapsController);
         environment.jersey().register(smsController);
+        environment.jersey().register(vendorController);
+        environment.jersey().register(webengageController);
+        environment.jersey().register(hrmsController);
 
     }
 }
