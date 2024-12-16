@@ -67,17 +67,17 @@ public class EmailController extends BaseController {
                  .collect(Collectors.joining(" "));
 
             String emailSubject = formattedProductName + " Interested: " + req.getHrName() + " - " + req.getClusterName();
-            String emailBody = "Hi Shweta, \n\n"+
-            "This is an auto-triggered mail by our Qubehealth System basis on the interest shown by " + req.getHrName() + " of “Cluster Dashboard“.\n" + //
-            "The interest shown is for our " + formattedProductName + " Product on " + formattedDate + ".\n" + //
-            "\n" + //
-            "Requesting to contact HR to take this ahead.\n" + //
-            "HR Contact Number -\n" + //
-            "HR Full Name -\n" + //
-            "Designation -\n" + //
-            "Cluster Dashboard Role - \n" + //
-            "\n\n" + //
-            "Thanks,\n" + //
+            String emailBody = "Hi Shweta,<br><br>" +
+            "This is an auto-triggered mail by our Qubehealth System basis on the interest shown by " + req.getHrName() + " of \"Cluster Dashboard\".<br>" +
+            "The interest shown is for our " + formattedProductName + " Product on " + formattedDate + ".<br>" +
+            "<br>" +
+            "Requesting to contact HR to take this ahead.<br>" +
+            "HR Contact Number -<br>" +
+            "HR Full Name -<br>" +
+            "Designation -<br>" +
+            "Cluster Dashboard Role - <br>" +
+            "<br><br>" +
+            "Thanks,<br>" +
             "Qubehealth";
 
             Boolean sendAdBannerEmailRes = Helper.sendEmail(configuration, "noel.pinto@qubehealth.com", emailSubject, emailBody);
