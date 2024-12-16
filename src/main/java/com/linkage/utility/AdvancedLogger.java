@@ -2,6 +2,10 @@ package com.linkage.utility;
 
 
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -56,9 +60,14 @@ public class AdvancedLogger {
             return;
         }
 
+        // Convert the current time to IST
+        ZonedDateTime istTime = Instant.now().atZone(ZoneId.of("Asia/Kolkata"));
+        String istFormattedTime = istTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        // Create JSON payload
         String jsonPayload = String.format(
-            "{ \"version\": \"1.1\", \"host\": \"%s\", \"short_message\": \"[%s] %s\", \"full_message\": \"%s\", \"timestamp\": %.3f, \"level\": %d }",
-            "advanced-host", severity, shortMessage, fullMessage, System.currentTimeMillis() / 1000.0, level
+            "{ \"version\": \"1.1\", \"host\": \"%s\", \"short_message\": \"[%s] %s\", \"full_message\": \"%s\", \"timestamp\": \"%s\", \"level\": %d }",
+            "advanced-host", severity, shortMessage, fullMessage, istFormattedTime, level
         );
 
         RequestBody requestBody = RequestBody.create(jsonPayload, JSON_MEDIA_TYPE);
