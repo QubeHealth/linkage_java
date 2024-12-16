@@ -2,6 +2,7 @@ package com.linkage;
 
 import com.linkage.controller.BefiscController;
 import com.linkage.controller.DigitapController;
+import com.linkage.controller.EmailController;
 import com.linkage.controller.HrmsController;
 import com.linkage.controller.ErupeeController;
 import com.linkage.controller.FirebaseController;
@@ -47,6 +48,7 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         MessageProviderController messageProviderController = new MessageProviderController(configuration, validator);
         DigitapController digitapController = new DigitapController(configuration, validator);
         SubscriptionController subscriptionController = new SubscriptionController(configuration, validator);
+        EmailController emailController = new EmailController(configuration, validator);
         SmsController smsController = new SmsController(configuration, validator);
         ErupeeController erupeeController = new ErupeeController(configuration, validator);
         GoogleMapsController googleMapsController=new GoogleMapsController(configuration, validator);
@@ -60,6 +62,7 @@ public class LinkageApplication extends Application<LinkageConfiguration> {
         environment.jersey().register(messageProviderController);
         environment.jersey().register(digitapController);
         environment.jersey().register(subscriptionController);
+        environment.jersey().register(emailController);
         environment.jersey().register(erupeeController);
         environment.jersey().register(googleMapsController);
         environment.jersey().register(smsController);
