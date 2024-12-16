@@ -1,7 +1,5 @@
 package com.linkage.utility;
 
-
-
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -36,18 +34,18 @@ public class AdvancedLogger {
     }
 
     public static void logInfo(String shortMessage, String fullMessage) {
-        LOGGER.info("[INFO] {}",  shortMessage);
-        sendToExternalSystemAsync("INFO", "LINKAGE_SERVICE_" +shortMessage, fullMessage, 6);
+        LOGGER.info("[INFO] {}", shortMessage);
+        sendToExternalSystemAsync("INFO", "LINKAGE_SERVICE_" + shortMessage, fullMessage, 6);
     }
 
     public static void logWarn(String shortMessage, String fullMessage) {
         LOGGER.warn("[WARN] {}", shortMessage);
-        sendToExternalSystemAsync("WARN","LINKAGE_SERVICE_"+ shortMessage, fullMessage, 4);
+        sendToExternalSystemAsync("WARN", "LINKAGE_SERVICE_" + shortMessage, fullMessage, 4);
     }
 
     public static void logError(String shortMessage, String fullMessage) {
         LOGGER.error("[ERROR] {}", shortMessage);
-        sendToExternalSystemAsync("ERROR","LINKAGE_SERVICE_"+ shortMessage, fullMessage, 3);
+        sendToExternalSystemAsync("ERROR", "LINKAGE_SERVICE_" + shortMessage, fullMessage, 3);
     }
 
     private static void sendToExternalSystemAsync(String severity, String shortMessage, String fullMessage, int level) {
@@ -60,15 +58,16 @@ public class AdvancedLogger {
             return;
         }
 
-        // Convert the current time to IST
+        // Get the current time in IST
         ZonedDateTime istTime = Instant.now().atZone(ZoneId.of("Asia/Kolkata"));
-        String istFormattedTime = istTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        // Convert IST time to seconds since epoch
+        double istTimestamp = istTime.toEpochSecond() + (istTime.getNano() / 1_000_000_000.0);
 
         // Create JSON payload
         String jsonPayload = String.format(
-            "{ \"version\": \"1.1\", \"host\": \"%s\", \"short_message\": \"[%s] %s\", \"full_message\": \"%s\", \"timestamp\": \"%s\", \"level\": %d }",
-            "advanced-host", severity, shortMessage, fullMessage, istFormattedTime, level
-        );
+                "{ \"version\": \"1.1\", \"host\": \"%s\", \"short_message\": \"[%s] %s\", \"full_message\": \"%s\", \"timestamp\": %.3f, \"level\": %d }",
+                "advanced-host", severity, shortMessage, fullMessage, istTimestamp, level);
 
         RequestBody requestBody = RequestBody.create(jsonPayload, JSON_MEDIA_TYPE);
         Request request = new Request.Builder()
