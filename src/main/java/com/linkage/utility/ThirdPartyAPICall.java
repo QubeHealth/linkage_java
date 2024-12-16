@@ -64,17 +64,17 @@ public final class ThirdPartyAPICall {
             try {
                 responseBody = objectMapper.readValue(responseBodyStr, Map.class); // Parse the string to a Map
             } catch (Exception e) {
-             AdvancedLogger.logError("Failed to parse the response body to JSON", e.toString());
+             AdvancedLogger.logInfo("Failed to parse the response body to JSON", e.toString());
             }
         } else if (contentType != null && contentType.contains("text/plain")) {
             // If the response is HTML, read it as a String
             String responseBodyStr = response.readEntity(String.class);
-             AdvancedLogger.logError("Received TEXT/PLAIN response instead of JSON: {}", responseBodyStr);
+             AdvancedLogger.logInfo("Received TEXT/PLAIN response instead of JSON: {}", responseBodyStr);
             // You can decide to return this error or handle it differently
             try {
                 responseBody = objectMapper.readValue(responseBodyStr, Map.class); // Parse the string to a Map
             } catch (Exception e) {
-                AdvancedLogger.logError("Failed to parse the response body to JSON", e.toString());
+                AdvancedLogger.logInfo("Failed to parse the response body to JSON", e.toString());
             }
         }
 
@@ -83,7 +83,7 @@ public final class ThirdPartyAPICall {
             });
         }
    
-        AdvancedLogger.logError("\n\nThird party api response => {}", responseBody.toString());
+        AdvancedLogger.logInfo("\n\nThird party api response => {}", responseBody.toString());
         boolean status = false;
         if (Response.Status.OK.getStatusCode() <= response.getStatus() && response.getStatus() < 300) {
             status = true;
@@ -91,7 +91,7 @@ public final class ThirdPartyAPICall {
         String message = status ? "success" : "failed";
 
         client.close();
-        AdvancedLogger.logError(" EXTERNAL_PARTY_LOG  \t\t" + request.getUrl() +"->"+request.getBody(), responseBody.toString());
+        AdvancedLogger.logInfo(" EXTERNAL_PARTY_LOG  \t\t" + "URL:\n"+ request.getUrl() +"REQUEST \n->"+request.getBody(),"RESPONSE -->\n "+ responseBody.toString());
         return new ApiResponse<>(status, message, responseBody);
     }
 
