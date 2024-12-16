@@ -67,7 +67,7 @@ public final class ThirdPartyAPICall {
         } else if (contentType != null && contentType.contains("text/plain")) {
             // If the response is HTML, read it as a String
             String responseBodyStr = response.readEntity(String.class);
-            AdvancedLogger.logError("Received TEXT/PLAIN response instead of JSON: {}", responseBodyStr);
+            AdvancedLogger.logInfo("Received TEXT/PLAIN response instead of JSON: {}", responseBodyStr);
             // You can decide to return this error or handle it differently
             try {
                 responseBody = objectMapper.readValue(responseBodyStr, Map.class); // Parse the string to a Map
@@ -89,7 +89,7 @@ public final class ThirdPartyAPICall {
         String message = status ? "success" : "failed";
 
         client.close();
-        AdvancedLogger.logError("EXTERNAL_PARTY_LOG \tURL: " + request.getUrl() + "\n REQUEST BODY: " + Helper.toJsonString(request.getBody()),
+        AdvancedLogger.logInfo("EXTERNAL_PARTY_LOG \tURL: " + request.getUrl() + "\n REQUEST BODY: " + Helper.toJsonString(request.getBody()),
                 responseBody.toString());
         return new ApiResponse<>(status, message, responseBody);
     }
