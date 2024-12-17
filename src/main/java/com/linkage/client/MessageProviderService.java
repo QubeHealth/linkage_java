@@ -12,10 +12,12 @@ import org.json.JSONObject;
 
 import com.linkage.LinkageConfiguration;
 import com.linkage.api.ApiResponse;
+import com.linkage.core.constants.Constants;
 import com.linkage.core.validations.AddFamilyMemberSchema;
 import com.linkage.core.validations.AdjudicationStatusMessageSchema;
 import com.linkage.core.validations.AhcAppointmentReportSchema;
 import com.linkage.core.validations.AhcBookConfirmSchema;
+import com.linkage.core.validations.AhcMsgSchema;
 import com.linkage.core.validations.BillRejectedSchema;
 import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.CashbackTypeMessageSchema;
@@ -439,6 +441,33 @@ public class MessageProviderService extends BaseServiceClient {
         // Create a list to hold the parameter values
         List<String> params = new ArrayList<>();
         params.add(body.getFirstname());
+        parameter.setParams(params);
+        return sendMessage(parameter);
+
+    }
+
+    // Dynamic Wsap Message
+    public ApiResponse<Object> ahcMessage(AhcMsgSchema body) {
+
+        // Arraylist of key value pairs then added to hashmap
+        SendMessageSchema parameter = new SendMessageSchema();
+        parameter.setMobile(body.getMobile());
+        parameter.setElementName(body.getTemplateId());
+        List<String> params = new ArrayList<>();
+        params.add(body.getFirstName());
+
+        if(Constants.AHC_TEMPLATE_ID.ONGOING.equals(body.getTemplateId())){
+            params.add(body.getBookingDate());
+            params.add(body.getBookingTime());
+            params.add(body.getLab());
+            params.add(body.getAddress());
+        }else if(Constants.AHC_TEMPLATE_ID.RESCHEDULED.equals(body.getTemplateId())){
+            params.add(body.getAddress());
+            params.add(body.getBookingDate());
+            params.add(body.getBookingTime());
+            params.add(body.getCollectionType());
+        }
+  
         parameter.setParams(params);
         return sendMessage(parameter);
 

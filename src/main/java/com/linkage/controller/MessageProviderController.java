@@ -16,6 +16,7 @@ import com.linkage.core.validations.AddFamilyMemberSchema;
 import com.linkage.core.validations.AdjudicationStatusMessageSchema;
 import com.linkage.core.validations.AhcAppointmentReportSchema;
 import com.linkage.core.validations.AhcBookConfirmSchema;
+import com.linkage.core.validations.AhcMsgSchema;
 import com.linkage.core.validations.BillRejectedSchema;
 import com.linkage.core.validations.BillVerifiedMsgSchema;
 import com.linkage.core.validations.CashbackTypeMessageSchema;
@@ -573,6 +574,31 @@ public class MessageProviderController extends BaseController {
         }
 
         ApiResponse<Object> messageProviderResponse = this.messageProviderService.dynamicWsapMessage(body);
+        if (messageProviderResponse.getData() == null) {
+            return messageProviderResponse;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) messageProviderResponse.getData();
+        return new ApiResponse<Object>(true, null, response);
+
+    }
+
+    @POST
+    @Path("/ahcMsg")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ApiResponse<Object> ahcMessage(@Context HttpServletRequest request,
+            AhcMsgSchema body) {
+        Set<ConstraintViolation<AhcMsgSchema>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            // Construct error message from violations
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+            return new ApiResponse<>(false, errorMessage, null);
+        }
+
+        ApiResponse<Object> messageProviderResponse = this.messageProviderService.ahcMessage(body);
         if (messageProviderResponse.getData() == null) {
             return messageProviderResponse;
         }
