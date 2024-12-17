@@ -25,4 +25,12 @@ public class Constants {
 
     public static final String FIELDS_FOR_GMB = "places.accessibilityOptions,places.addressComponents,places.adrFormatAddress,places.attributions,places.businessStatus,places.containingPlaces,places.displayName,places.formattedAddress,places.googleMapsLinks,places.googleMapsUri,places.iconBackgroundColor,places.iconMaskBaseUri,places.id,places.location,places.name,places.photos,places.plusCode,places.primaryType,places.primaryTypeDisplayName,places.pureServiceAreaBusiness,places.shortFormattedAddress,places.subDestinations,places.types,places.utcOffsetMinutes,places.viewport,places.currentOpeningHours,places.currentSecondaryOpeningHours,places.internationalPhoneNumber,places.nationalPhoneNumber,places.priceLevel,places.priceRange,places.rating,places.regularOpeningHours,places.regularSecondaryOpeningHours,places.userRatingCount,places.websiteUri";
 
+    public static final class AHC_TEMPLATE_ID {
+        public static final String RESCHEDULED = "ahc_appt_res_29nov2024";
+        public static final String APPOINTMENT_CANCEL = "ahc_appt_can_29nov2024";
+        public static final String TEST_COMPLETE = "ahc_test_conf_29nov2024";
+        public static final String TEST_REPORT = "ahc_test_rpt_29nov2024";
+        public static final String ONGOING = "ahc_cnf_hv_29nov2024";
+
+    }
 }
