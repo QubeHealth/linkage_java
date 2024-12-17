@@ -88,7 +88,7 @@ public final class ThirdPartyAPICall {
         }
         String message = status ? "success" : "failed";
    
-        AdvancedLogger.logInfo("EXTERNAL_PARTY_LOG \tURL: " + request.getUrl() + "\tREQUEST BODY: " + Helper.toJsonString(request.getBody()),
+        AdvancedLogger.logInfo("EXTERNAL_PARTY_LOG \tURL: " + request.getUrl() + "\tREQUEST BODY: " + (request.getBody()!=null ? request.getBody().toString() : request.getBody()) ,
                 responseBody.toString());
 
         client.close();
