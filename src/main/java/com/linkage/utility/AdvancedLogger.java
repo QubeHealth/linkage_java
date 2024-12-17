@@ -86,14 +86,11 @@ public class AdvancedLogger {
         }
 
         try {
-            // Convert current time to IST and calculate timestamp
-            ZonedDateTime istTime = Instant.now().atZone(ZoneId.of("Asia/Kolkata"));
-            double istTimestamp = istTime.toEpochSecond() + (istTime.getNano() / 1_000_000_000.0);
 
             // Create JSON payload
             String jsonPayload = String.format(
                     "{ \"version\": \"1.1\", \"host\": \"%s\", \"short_message\": \"[%s] %s\", \"full_message\": \"%s\", \"timestamp\": %.3f, \"level\": %d }",
-                    HOST_NAME, severity, shortMessage, fullMessage, istTimestamp, level);
+                    HOST_NAME, severity, shortMessage, fullMessage, System.currentTimeMillis() / 1000.0, level);
 
             // Build and execute HTTP request
             RequestBody requestBody = RequestBody.create(jsonPayload, JSON_MEDIA_TYPE);
